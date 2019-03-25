@@ -3,6 +3,8 @@
 
 // Author: Lars Tingelstad (NTNU) <lars.tingelstad@ntnu.no>
 
+#include <mlpiMotionLib.h>
+
 #include <crane_hw_interface/crane_hw_interface.h>
 
 namespace crane_hw_interface

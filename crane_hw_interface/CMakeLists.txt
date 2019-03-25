@@ -19,6 +19,7 @@ find_package(TinyXML REQUIRED)
 catkin_package(
   INCLUDE_DIRS
     include
+    include/mlpiCoreClient
   LIBRARIES
     crane_hw_interface
   CATKIN_DEPENDS
@@ -33,6 +34,7 @@ catkin_package(
 
 include_directories(
   include
+  include/mlpiCoreClient
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${TinyXML_INCLUDE_DIRS}
