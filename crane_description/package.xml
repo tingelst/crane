@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>crane_description</name>
+  <version>0.0.1</version>
+  <description>crane_description contains URDF files and meshes for the crane at MTP, NTNU</description>
+  <maintainer email="lars.tingelstad@ntnu.no">Lars Tingelstad</maintainer>
+  <license>MIT</license>
+
+  <url type="repository">https://github.com/tingelst/crane</url>
+  <url type="bugtracker">https://github.com/tingelst/crane/issues</url>
+  <author>Lars Tingelstad</author>
+  <author>Andrej Cibicik</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>xacro</exec_depend>
+</package>
