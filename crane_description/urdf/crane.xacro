@@ -8,9 +8,9 @@
         <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01" />
       </inertial>
       <visual>
-        <origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="package://crane_description/meshes/visual/KingBot.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="package://crane_description/meshes/visual/KingBot.stl" />
         </geometry>
       </visual>
     </link>
@@ -21,14 +21,14 @@
         <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01" />
       </inertial>
       <visual>
-        <origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
+        <origin xyz="0 0 3" rpy="0 0 0"/>
         <geometry>
           <mesh filename="package://crane_description/meshes/visual/King.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </visual>
     </link>
-    <joint name="joint_a1" type="revolute">
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+    <joint name="joint_1" type="revolute">
+      <origin xyz="0 0 0.623" rpy="0 0 0"/>
       <parent link="KingBot"/>
       <child link="King"/>
       <axis xyz="0 0 1"/>
