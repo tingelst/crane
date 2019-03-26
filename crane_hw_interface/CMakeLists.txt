@@ -12,14 +12,9 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
 )
 
-find_package(Boost REQUIRED COMPONENTS system)
-find_package(TinyXML REQUIRED)
-
-
 catkin_package(
   INCLUDE_DIRS
     include
-    include/mlpiCoreClient
   LIBRARIES
     crane_hw_interface
   CATKIN_DEPENDS
@@ -27,17 +22,17 @@ catkin_package(
     hardware_interface
     joint_limits_interface
     roscpp
-  DEPENDS
-    TinyXML
 )
-
 
 include_directories(
   include
-  include/mlpiCoreClient
   ${catkin_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
-  ${TinyXML_INCLUDE_DIRS}
+)
+
+add_library(mlpi SHARED IMPORTED)
+set_target_properties(mlpi PROPERTIES
+  IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/external/mlpiCoreClient/bin/libmlpi.so"
+  INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/external/mlpiCoreClient/include"
 )
 
 add_library(crane_hw_interface
@@ -46,8 +41,7 @@ add_library(crane_hw_interface
 
 target_link_libraries(crane_hw_interface
   ${catkin_LIBRARIES}
-  ${Boost_LIBRARIES}
-  ${TinyXML_LIBRARIES}
+  mlpi
 )
 
 add_executable(crane_hw_interface_node

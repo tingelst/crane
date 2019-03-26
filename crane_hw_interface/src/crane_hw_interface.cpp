@@ -3,7 +3,7 @@
 
 // Author: Lars Tingelstad (NTNU) <lars.tingelstad@ntnu.no>
 
-#include <mlpiMotionLib.h>
+#include <mlpiApiLib.h>
 
 #include <crane_hw_interface/crane_hw_interface.h>
 
@@ -13,7 +13,7 @@ CraneHardwareInterface::CraneHardwareInterface()
   : joint_position_(n_dof_, 0.0)
   , joint_velocity_(n_dof_, 0.0)
   , joint_effort_(n_dof_, 0.0)
-  , joint_position_command_(n_dof_, 0.0)
+  , joint_velocity_command_(n_dof_, 0.0)
   , joint_names_(n_dof_)
 {
 }
@@ -21,7 +21,6 @@ CraneHardwareInterface::CraneHardwareInterface()
 CraneHardwareInterface::~CraneHardwareInterface()
 {
 }
-
 
 void CraneHardwareInterface::init()
 {
@@ -40,13 +39,13 @@ void CraneHardwareInterface::init()
                                                                                &joint_velocity_[i], &joint_effort_[i]));
 
     // Joint position control interface
-    position_joint_interface_.registerHandle(hardware_interface::JointHandle(
-        joint_state_interface_.getHandle(joint_names_[i]), &joint_position_command_[i]));
+    velocity_joint_interface_.registerHandle(hardware_interface::JointHandle(
+        joint_state_interface_.getHandle(joint_names_[i]), &joint_velocity_command_[i]));
   }
 
   // Register interfaces
   registerInterface(&joint_state_interface_);
-  registerInterface(&position_joint_interface_);
+  registerInterface(&velocity_joint_interface_);
 
   ROS_INFO_STREAM_NAMED("crane_hw_interface", "Loaded crane hardware interface");
 }
@@ -60,11 +59,39 @@ void CraneHardwareInterface::start()
 
 void CraneHardwareInterface::read(const ros::Time& time, const ros::Duration& period)
 {
-
 }
 
 void CraneHardwareInterface::write(const ros::Time& time, const ros::Duration& period)
 {
+}
+
+void CraneHardwareInterface::configure()
+{
+  std::string address;
+  std::string user;
+  std::string password;
+
+  if (nh_.getParam("mlpi/address", address) && nh_.getParam("mlpi/user", user) &&
+      nh_.getParam("mlpi/password", password))
+  {
+    ROS_INFO_STREAM_NAMED("crane_hw_interface", "Connecting to MLPI");
+
+    std::stringstream ss;
+    ss << address << " -user=" << user << " -password=" << password;
+    std::string ss_str = ss.str();
+    std::wstring connection_identifier = std::wstring(ss_str.begin(), ss_str.end());
+
+    MLPIHANDLE connection = 0;
+    MLPIRESULT result = mlpiApiConnect(connection_identifier.c_str(), &connection);
+    if (MLPI_FAILED(result))
+    {
+      ROS_ERROR_NAMED("crane_hw_interface", "Failed to connecto to MLPI!");
+    }
+    else
+    {
+      ROS_INFO_NAMED("crane_hw_interface", "Successfully connected to MLPI!");
+    }
+  }
 }
 
 }  // namespace crane_hw_interface

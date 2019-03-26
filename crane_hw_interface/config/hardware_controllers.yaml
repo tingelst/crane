@@ -4,15 +4,19 @@ joint_state_controller:
   publish_rate: 50
 
 # Joint trajectory controller
-position_trajectory_controller:
-  type: "position_controllers/JointTrajectoryController"
+joint_trajectory_controller:
+  type: "velocity_controllers/JointTrajectoryController"
   joints:
     - joint_1
     - joint_2
-    - joint_3
-    - joint_4
-    - joint_5
-    - joint_6
-
-  state_publish_rate: 50 # Defaults to 50
-  action_monitor_rate: 20 # Defaults to 20
+    - joint_2
+  gains:
+    joint_1: { p: 100, d: 1, i: 1, i_clamp: 1 }
+    joint_2: { p: 100, d: 1, i: 1, i_clamp: 1 }
+    joint_3: { p: 100, d: 1, i: 1, i_clamp: 1 }
+  velocity_ff:
+    joint_1: 1.0
+    joint_2: 1.0
+    joint_3: 1.0
+  state_publish_rate: 50
+  action_monitor_rate: 20 
