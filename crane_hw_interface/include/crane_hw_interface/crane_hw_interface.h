@@ -24,12 +24,12 @@ class CraneHardwareInterface : public hardware_interface::RobotHW
 private:
   ros::NodeHandle nh_;
 
-  const unsigned int n_dof_ = 6;
+  const unsigned int n_dof_ = 3;
   std::vector<std::string> joint_names_;
   std::vector<double> joint_position_;
   std::vector<double> joint_velocity_;
   std::vector<double> joint_effort_;
-  std::vector<double> joint_position_command_;
+  std::vector<double> joint_velocity_command_;
 
   // Timing
   ros::Duration control_period_;
@@ -38,7 +38,7 @@ private:
 
   // Interfaces
   hardware_interface::JointStateInterface joint_state_interface_;
-  hardware_interface::PositionJointInterface position_joint_interface_;
+  hardware_interface::VelocityJointInterface velocity_joint_interface_;
 
 public:
   CraneHardwareInterface();
@@ -48,6 +48,7 @@ public:
   void start();
   void read(const ros::Time &time, const ros::Duration &period);
   void write(const ros::Time &time, const ros::Duration &period);
+  void configure();
 };
 
 }  // namespace crane_hw_interface
