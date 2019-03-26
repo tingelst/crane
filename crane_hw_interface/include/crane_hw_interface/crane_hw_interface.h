@@ -9,7 +9,8 @@
 #include <string>
 #include <vector>
 
-#include <boost/asio.hpp>
+#include <mlpiApiLib.h>
+#include <mlpiLogicLib.h>
 
 #include <controller_manager/controller_manager.h>
 #include <hardware_interface/joint_command_interface.h>
@@ -40,6 +41,9 @@ private:
   hardware_interface::JointStateInterface joint_state_interface_;
   hardware_interface::VelocityJointInterface velocity_joint_interface_;
 
+  // MLPI
+  MLPIHANDLE mlpi_connection_;
+
 public:
   CraneHardwareInterface();
   ~CraneHardwareInterface();
@@ -48,7 +52,6 @@ public:
   void start();
   void read(const ros::Time &time, const ros::Duration &period);
   void write(const ros::Time &time, const ros::Duration &period);
-  void configure();
 };
 
 }  // namespace crane_hw_interface

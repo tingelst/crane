@@ -18,5 +18,6 @@
     <node name="crane_hw_interface" pkg="crane_hw_interface" type="crane_hw_interface_node" respawn="false"/>
 
     <!-- Load controllers -->
+    <!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_trajectory_controller joint_state_controller"/> -->
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller"/>
 </launch>
