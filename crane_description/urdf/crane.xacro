@@ -1,6 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:macro name="crane">
+    <material name="white">
+      <color rgba="1 1 1 1"/>
+    </material>
     <link name="KingBot">
       <inertial>
         <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -12,23 +15,20 @@
         <geometry>
           <mesh filename="package://crane_description/meshes/visual/KingBot.stl" />
         </geometry>
+        <material name="white"/>
       </visual>
     </link>
     <link name="King">
-      <inertial>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <mass value="2"/>
-        <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01" />
-      </inertial>
       <visual>
-        <origin xyz="0 0 3" rpy="0 0 0"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="package://crane_description/meshes/visual/King.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="package://crane_description/meshes/visual/King.stl" />
         </geometry>
+        <material name="white"/>
       </visual>
     </link>
     <joint name="joint_1" type="revolute">
-      <origin xyz="0 0 0.623" rpy="0 0 0"/>
+      <origin xyz="0 0 0.628" rpy="0 0 0"/>
       <parent link="KingBot"/>
       <child link="King"/>
       <axis xyz="0 0 1"/>
