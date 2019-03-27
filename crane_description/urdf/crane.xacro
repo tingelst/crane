@@ -54,11 +54,29 @@
         <material name="white"/>
       </visual>
     </link>
+    <link name="Cyl2">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://crane_description/meshes/visual/Cyl2.stl" />
+        </geometry>
+        <material name="white"/>
+      </visual>
+    </link>
     <link name="Piston1">
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
           <mesh filename="package://crane_description/meshes/visual/Piston1.stl" />
+        </geometry>
+        <material name="white"/>
+      </visual>
+    </link>
+    <link name="Piston2">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://crane_description/meshes/visual/Piston2.stl" />
         </geometry>
         <material name="white"/>
       </visual>
@@ -85,14 +103,28 @@
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
     </joint>
     <joint name="cyl1_joint" type="fixed">
-      <origin xyz="0.154236 0 0.116" rpy="0 0 0"/>
+      <origin xyz="0.154236 0 0.156" rpy="0 ${radians(-49.90)} 0"/>
       <parent link="King"/>
       <child link="Cyl1"/>
     </joint>
-    <joint name="cyl1_pistion1_joint" type="fixed">
+    <joint name="cyl1_pistion1_joint" type="prismatic">
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <parent link="King"/>
+      <parent link="Cyl1"/>
       <child link="Piston1"/>
+      <axis xyz="1 0 0"/>
+      <limit effort="0" lower="0" upper="0.1" velocity="${radians(156)}"/>
+    </joint>
+    <joint name="cyl2_joint" type="fixed">
+      <origin xyz="0.767068 0 0.002395" rpy="0 ${radians(-12.49)} 0"/>
+      <parent link="Boom1"/>
+      <child link="Cyl2"/>
+    </joint>
+    <joint name="cyl2_pistion2_joint" type="prismatic">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="Cyl2"/>
+      <child link="Piston2"/>
+      <axis xyz="1 0 0"/>
+      <limit effort="0" lower="0" upper="0.1" velocity="${radians(156)}"/>
     </joint>
   </xacro:macro>
 </robot>
