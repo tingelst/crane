@@ -81,6 +81,7 @@
         <material name="white"/>
       </visual>
     </link>
+
     <joint name="joint_1" type="revolute">
       <origin xyz="0 0 0.628" rpy="0 0 0"/>
       <parent link="KingBot"/>
@@ -88,6 +89,7 @@
       <axis xyz="0 0 1"/>
       <limit effort="0" lower="${radians(-185)}" upper="${radians(185)}" velocity="${radians(156)}"/>
     </joint>
+
     <joint name="joint_3" type="revolute">
       <origin xyz="1.468171 0 0.308337" rpy="0 0 0"/>
       <parent link="Boom1"/>
@@ -95,11 +97,7 @@
       <axis xyz="0 1 0"/>
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
     </joint>
-    <joint name="cyl1_joint" type="fixed">
-      <origin xyz="0.154236 0 0.156" rpy="0 ${radians(-49.90)} 0"/>
-      <parent link="King"/>
-      <child link="Cyl1"/>
-    </joint>
+
     <joint name="cyl1_piston1_joint" type="prismatic">
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <parent link="Cyl1"/>
@@ -107,14 +105,28 @@
       <axis xyz="1 0 0"/>
       <limit effort="0" lower="0" upper="0.1" velocity="${radians(156)}"/>
     </joint>
+
+    <xacro:property name="a1" value="0.6141172" />
+    <xacro:property name="b1" value="0.5712169" />
+
     <joint name="joint_2" type="revolute">
       <origin xyz="0 0 0.706" rpy="0 0 0"/>
       <parent link="King"/>
       <child link="Boom1"/>
       <axis xyz="0 1 0"/>
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
-      <mimic joint="cyl1_piston1_joint" offset="0"/>
+      <mimic joint="cyl1_piston1_joint" multiplier="-1" offset="0"/>
     </joint>
+
+    <joint name="cyl1_joint" type="revolute">
+      <origin xyz="0.154236 0 0.156" rpy="0 ${radians(-49.90)} 0"/>
+      <parent link="King"/>
+      <child link="Cyl1"/>
+      <axis xyz="0 1 0"/>
+      <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
+      <mimic joint="joint_2" multiplier="1" offset="0"/>
+    </joint>
+
     <joint name="cyl2_joint" type="fixed">
       <origin xyz="0.767068 0 0.002395" rpy="0 ${radians(-12.49)} 0"/>
       <parent link="Boom1"/>
