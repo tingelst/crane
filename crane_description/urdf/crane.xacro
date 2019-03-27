@@ -27,12 +27,72 @@
         <material name="white"/>
       </visual>
     </link>
+    <link name="Boom1">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://crane_description/meshes/visual/Boom1.stl" />
+        </geometry>
+        <material name="white"/>
+      </visual>
+    </link>
+    <link name="Boom2">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://crane_description/meshes/visual/Boom2.stl" />
+        </geometry>
+        <material name="white"/>
+      </visual>
+    </link>
+    <link name="Cyl1">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://crane_description/meshes/visual/Cyl1.stl" />
+        </geometry>
+        <material name="white"/>
+      </visual>
+    </link>
+    <link name="Piston1">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://crane_description/meshes/visual/Piston1.stl" />
+        </geometry>
+        <material name="white"/>
+      </visual>
+    </link>
     <joint name="joint_1" type="revolute">
       <origin xyz="0 0 0.628" rpy="0 0 0"/>
       <parent link="KingBot"/>
       <child link="King"/>
       <axis xyz="0 0 1"/>
       <limit effort="0" lower="${radians(-185)}" upper="${radians(185)}" velocity="${radians(156)}"/>
+    </joint>
+    <joint name="joint_2" type="revolute">
+      <origin xyz="0 0 0.706" rpy="0 0 0"/>
+      <parent link="King"/>
+      <child link="Boom1"/>
+      <axis xyz="0 1 0"/>
+      <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
+    </joint>
+    <joint name="joint_3" type="revolute">
+      <origin xyz="1.468171 0 0.308337" rpy="0 0 0"/>
+      <parent link="Boom1"/>
+      <child link="Boom2"/>
+      <axis xyz="0 1 0"/>
+      <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
+    </joint>
+    <joint name="cyl1_joint" type="fixed">
+      <origin xyz="0.154236 0 0.116" rpy="0 0 0"/>
+      <parent link="King"/>
+      <child link="Cyl1"/>
+    </joint>
+    <joint name="cyl1_pistion1_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="King"/>
+      <child link="Piston1"/>
     </joint>
   </xacro:macro>
 </robot>
