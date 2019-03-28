@@ -127,15 +127,15 @@
       <origin xyz="1.468171 0 0.308337" rpy="0 0 0"/>
       <parent link="Boom1"/>
       <child link="Boom2"/>
-      <axis xyz="0 1 0"/>
+      <axis xyz="0 -1 0"/>
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
     </joint>
 
     <joint name="beta_3" type="revolute">
-      <origin xyz="0.767068 0 0.002395" rpy="0 ${radians(-12.49)} 0"/>
+      <origin xyz="0.767068 0 0.002395" rpy="0 0 0"/>
       <parent link="Boom1"/>
       <child link="Cyl2"/>
-      <axis xyz="0 1 0"/>
+      <axis xyz="0 -1 0"/>
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
     </joint>
 

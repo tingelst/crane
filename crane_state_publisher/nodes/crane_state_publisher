@@ -29,12 +29,12 @@ class CraneStatePublisher():
         self._joint_state_pub = rospy.Publisher(
             'joint_states', JointState, queue_size=5)
 
-    def _alpha_beta(self, q1):
+    def _alpha_beta_2(self, q):
         e1 = 0.154236
         a1 = 0.550
         e2 = 0.130
         a2 = 0.600199
-        l1 = 0.713962 + q1
+        l1 = 0.713962 + q
         alpha_2_offset = np.deg2rad(11.86)
         gam1 = np.arctan(e1/a1)
         gam2 = np.arctan(e2/a2)
@@ -46,19 +46,24 @@ class CraneStatePublisher():
         beta2 = -np.arccos((b2*b2 - b1*b1 - l1*l1) /
                            (-2.0*b1*l1)) - np.arctan(a1/e1) + np.pi
 
-        # e1 = 0.160
-        # a1 = 0.750
-        # e2 = 0.0765
-        # a2 = 0.167
-        # gam1 = np.arctan(e1/a1)
-        # gam2 = np.arctan(e2/a2)
-        # b1 = np.sqrt(a1*a1 + e1*e1)
-        # b2 = np.sqrt(a2*a2 + e2*e2)
-        # gam3 = np.arccos((l2*l2 - b1*b1 - b2*b2)/(-2.0*b1*b2))
-        # alpha3 = gam1 + gam2 + gam3 - pi
-        # beta3 = -np.arccos((b2*b2 - b1*b1 - l1*l1) / (-2.0*b1*l1))) - np.arctan(a1/e1)
-
         return alpha2, beta2
+
+    def _alpha_beta_3(self, q):
+        e1 = 0.160
+        a1 = 0.750
+        e2 = 0.0765
+        a2 = 0.167
+        l2 = 0.854949 + q
+        gam1 = np.arctan(e1/a1)
+        gam2 = np.arctan(e2/a2)
+        b1 = np.sqrt(a1*a1 + e1*e1)
+        b2 = np.sqrt(a2*a2 + e2*e2)
+        gam3 = np.arccos((l2*l2 - b1*b1 - b2*b2)/(-2.0*b1*b2))
+        alpha3 = gam1 + gam2 + gam3 - np.pi/2
+        beta3 = -np.arccos((b2*b2 - b1*b1 - l2*l2) /
+                           (-2.0*b1*l2)) - np.arctan(a1/e1) + np.pi/2
+
+        return alpha3, beta3
 
     def _actuator_states_cb(self, actuator_states):
 
@@ -78,11 +83,19 @@ class CraneStatePublisher():
             elif actuator_states.name[i] == 'joint_2':
                 msg.name.append('joint_2')
                 msg.position.append(actuator_states.position[i])
-                alpha_2, beta_2 = self._alpha_beta(actuator_states.position[i])
+                alpha, beta = self._alpha_beta_2(actuator_states.position[i])
                 msg.name.append('alpha_2')
-                msg.position.append(alpha_2)
+                msg.position.append(alpha)
                 msg.name.append('beta_2')
-                msg.position.append(beta_2)
+                msg.position.append(beta)
+            elif actuator_states.name[i] == 'joint_3':
+                msg.name.append('joint_3')
+                msg.position.append(actuator_states.position[i])
+                alpha, beta = self._alpha_beta_3(actuator_states.position[i])
+                msg.name.append('alpha_3')
+                msg.position.append(alpha)
+                msg.name.append('beta_3')
+                msg.position.append(beta)
 
             # elif actuator_states.name[i] == 'joint_2':
             #     msg.position[i] = actuator_states.position[i]
