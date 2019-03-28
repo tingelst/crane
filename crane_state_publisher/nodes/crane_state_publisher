@@ -1,0 +1,100 @@
+#!/usr/bin/env python
+
+
+import numpy as np
+import rospy
+import xml.dom.minidom
+from sensor_msgs.msg import JointState
+
+
+def get_param(name, value=None):
+    private = "~%s" % name
+    if rospy.has_param(private):
+        return rospy.get_param(private)
+    elif rospy.has_param(name):
+        return rospy.get_param(name)
+    else:
+        return value
+
+
+class CraneStatePublisher():
+    def __init__(self):
+        description = get_param('robot_description')
+
+        crane = xml.dom.minidom.parseString(description)
+
+        self._actuator_state_sub = rospy.Subscriber(
+            'actuator_states', JointState, self._actuator_states_cb)
+
+        self._joint_state_pub = rospy.Publisher(
+            'joint_states', JointState, queue_size=5)
+
+    def _alpha_beta(self, q1):
+        e1 = 0.154236
+        a1 = 0.550
+        e2 = 0.130
+        a2 = 0.600199
+        l1 = 0.713962 + q1
+        alpha_2_offset = np.deg2rad(11.86)
+        gam1 = np.arctan(e1/a1)
+        gam2 = np.arctan(e2/a2)
+        b1 = np.sqrt(a1*a1 + e1*e1)
+        b2 = np.sqrt(a2*a2 + e2*e2)
+        gam3 = np.arccos((l1*l1 - b1*b1 - b2*b2)/(-2.0*b1*b2))
+        alpha2 = gam1 + gam2 + gam3 - np.pi/2 - alpha_2_offset
+
+        beta2 = -np.arccos((b2*b2 - b1*b1 - l1*l1) /
+                           (-2.0*b1*l1)) - np.arctan(a1/e1) + np.pi
+
+        # e1 = 0.160
+        # a1 = 0.750
+        # e2 = 0.0765
+        # a2 = 0.167
+        # gam1 = np.arctan(e1/a1)
+        # gam2 = np.arctan(e2/a2)
+        # b1 = np.sqrt(a1*a1 + e1*e1)
+        # b2 = np.sqrt(a2*a2 + e2*e2)
+        # gam3 = np.arccos((l2*l2 - b1*b1 - b2*b2)/(-2.0*b1*b2))
+        # alpha3 = gam1 + gam2 + gam3 - pi
+        # beta3 = -np.arccos((b2*b2 - b1*b1 - l1*l1) / (-2.0*b1*l1))) - np.arctan(a1/e1)
+
+        return alpha2, beta2
+
+    def _actuator_states_cb(self, actuator_states):
+
+        num_joints = 7
+        msg = JointState()
+        msg.header.stamp = rospy.Time.now()
+        # msg.name = [
+        #     'joint_1', 'joint_2', 'alpha_2', 'beta_2', 'joint_3', 'alpha_3', 'beta_3']
+        # msg.position = num_joints * [0.0]
+        # msg.velocity = num_joints * [0.0]
+        # msg.effort = num_joints * [0.0]
+
+        for i in range(num_joints):
+            if actuator_states.name[i] == 'joint_1':
+                msg.name.append('joint_1')
+                msg.position.append(actuator_states.position[i])
+            elif actuator_states.name[i] == 'joint_2':
+                msg.name.append('joint_2')
+                msg.position.append(actuator_states.position[i])
+                alpha_2, beta_2 = self._alpha_beta(actuator_states.position[i])
+                msg.name.append('alpha_2')
+                msg.position.append(alpha_2)
+                msg.name.append('beta_2')
+                msg.position.append(beta_2)
+
+            # elif actuator_states.name[i] == 'joint_2':
+            #     msg.position[i] = actuator_states.position[i]
+
+        self._joint_state_pub.publish(msg)
+
+
+if __name__ == '__main__':
+    try:
+        rospy.init_node('crane_state_publisher')
+        csp = CraneStatePublisher()
+        rospy.spin()
+
+    except rospy.ROSInterruptException:
+        pass

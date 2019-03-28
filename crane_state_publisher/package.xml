@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>crane_state_publisher</name>
+  <version>0.0.1</version>
+  <description>crane_state_publisher pubslishes joint states and tf for the crane at MTP, NTNU</description>
+  <maintainer email="lars.tingelstad@ntnu.no">Lars Tingelstad</maintainer>
+  <license>MIT</license>
+
+  <url type="repository">https://github.com/tingelst/crane</url>
+  <url type="bugtracker">https://github.com/tingelst/crane/issues</url>
+  <author>Lars Tingelstad</author>
+  <author>Andrej Cibicik</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>tf</exec_depend>
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+
+</package>
