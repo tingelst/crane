@@ -1,0 +1,5 @@
+<library path="lib/libcrane_controllers">
+  <class name="crane_controllers/CraneControllerller" type="crane_controllers::CraneController" base_class_type="controller_interface::ControllerBase">
+    <description>A crane controller.</description>
+  </class>
+</library>

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>crane_controllers</name>
+  <version>0.0.1</version>
+  <description>crane_controllers contains (MPC) controllers for the crane at MTP, NTNU</description>
+  <maintainer email="lars.tingelstad@ntnu.no">Lars Tingelstad</maintainer>
+  <license>MIT</license>
+
+  <url type="repository">https://github.com/tingelst/crane</url>
+  <url type="bugtracker">https://github.com/tingelst/crane/issues</url>
+  <author>Lars Tingelstad</author>
+  <author>Andrej Cibicik</author>
+  <author>Geir O. Tysse</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>message_generation</build_depend>
+  <build_depend>eigen</build_depend>
+
+  <build_export_depend>message_runtime</build_export_depend>
+
+  <depend>controller_interface</depend>
+  <depend>dynamic_reconfigure</depend>
+  <depend>kdl_conversions</depend>
+  <depend>geometry_msgs</depend>
+  <depend>hardware_interface</depend>
+  <depend>pluginlib</depend>
+  <depend>realtime_tools</depend>
+  <depend>roscpp</depend>
+
+  <exec_depend>message_runtime</exec_depend>
+
+  <export>
+    <controller_interface plugin="${prefix}/crane_controllers_plugin.xml"/>
+  </export>
+
+</package>

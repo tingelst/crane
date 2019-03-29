@@ -88,6 +88,9 @@
       </visual>
     </link>
 
+    <link name="tip">
+    </link>
+
 
     <joint name="joint_1" type="revolute">
       <origin xyz="0 0 0.628" rpy="0 0 0"/>
@@ -144,6 +147,13 @@
       <axis xyz="0 -1 0"/>
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
     </joint>
+
+    <joint name="boom2_tip" type="fixed">
+      <origin xyz="0.719737 0 -0.907615" rpy="0 0 0"/>
+      <parent link="Boom2"/>
+      <child link="tip"/>
+    </joint>
+
 
 
   </xacro:macro>
