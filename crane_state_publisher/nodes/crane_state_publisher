@@ -42,27 +42,24 @@ class CraneStatePublisher():
         b2 = np.sqrt(a2*a2 + e2*e2)
         gam3 = np.arccos((l1*l1 - b1*b1 - b2*b2)/(-2.0*b1*b2))
         alpha2 = gam1 + gam2 + gam3 - np.pi/2 - alpha_2_offset
-
         beta2 = -np.arccos((b2*b2 - b1*b1 - l1*l1) /
                            (-2.0*b1*l1)) - np.arctan(a1/e1) + np.pi
-
         return alpha2, beta2
 
     def _alpha_beta_3(self, q):
         e1 = 0.160
         a1 = 0.750
-        e2 = 0.0765
-        a2 = 0.167
-        l2 = 0.854949 + q
+        e2 = 0.078714
+        a2 = 0.165893
+        l2 = 0.855 + q
         gam1 = np.arctan(e1/a1)
         gam2 = np.arctan(e2/a2)
         b1 = np.sqrt(a1*a1 + e1*e1)
         b2 = np.sqrt(a2*a2 + e2*e2)
         gam3 = np.arccos((l2*l2 - b1*b1 - b2*b2)/(-2.0*b1*b2))
-        alpha3 = gam1 + gam2 + gam3 - np.pi/2
+        alpha3 = gam1 + gam2 + gam3 + np.pi + np.deg2rad(29.76) 
         beta3 = -np.arccos((b2*b2 - b1*b1 - l2*l2) /
-                           (-2.0*b1*l2)) - np.arctan(a1/e1) + np.pi/2
-
+                           (-2.0*b1*l2)) - np.arctan(a1/e1) + np.pi/2 + np.deg2rad(11.86)
         return alpha3, beta3
 
     def _actuator_states_cb(self, actuator_states):
@@ -70,11 +67,6 @@ class CraneStatePublisher():
         num_joints = 7
         msg = JointState()
         msg.header.stamp = rospy.Time.now()
-        # msg.name = [
-        #     'joint_1', 'joint_2', 'alpha_2', 'beta_2', 'joint_3', 'alpha_3', 'beta_3']
-        # msg.position = num_joints * [0.0]
-        # msg.velocity = num_joints * [0.0]
-        # msg.effort = num_joints * [0.0]
 
         for i in range(num_joints):
             if actuator_states.name[i] == 'joint_1':
@@ -96,10 +88,6 @@ class CraneStatePublisher():
                 msg.position.append(alpha)
                 msg.name.append('beta_3')
                 msg.position.append(beta)
-
-            # elif actuator_states.name[i] == 'joint_2':
-            #     msg.position[i] = actuator_states.position[i]
-
         self._joint_state_pub.publish(msg)
 
 
