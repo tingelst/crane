@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -140,6 +140,42 @@
 //! @addtogroup WatchdogLibVersionPermission Version and Permission
 //! @ingroup WatchdogLib
 //! @{
+//! @addtogroup WatchdogLibVersionPermission_new Server version since 1.26.0.0 (MLC-FW: 14V22)
+//! @ingroup WatchdogLibVersionPermission
+//! @{
+//!
+//! @note Since firmware version 14V22 (MLPI-Server-Version: 1.26.0.0) a centralized permission management has been implemented in target 
+//! controls XM2, L75 and VPx. Some permissions have been summarized in order to improve their usability. 
+//! Additional information regarding the usage of older manifest files (i.e. accounts.xml) with newer server versions can be found in @ref newest_manifest.\n
+//! @note <b><span style="color:red">Users of other CML controls (i.e. L25, L45, L65) have to use the old permissions as defined in @ref WatchdogLibVersionPermission_old</span></b>
+//!
+//!
+//! @par List of valid permissions for mlpiWatchdogLib. These permissions shall be assigned to the groups (i.e. in the group manifest file groups.xml) rather than the users.
+//! <TABLE>
+//! <TR><TH> Permission-Ident       </TH><TH> Description                                                               </TH></TR>                  
+//! <TR><TD id="st_e"> WATCHDOG_USE </TD><TD> Use watchdog library - Use watchdog library for MLPI client applications. </TD></TR>  
+//! </TABLE>
+//! 
+//!  @par List of available functions in mlpiWatchdogLib and the permissions required for their use. 
+//! <TABLE>
+//! <TR><TH>           Function                   </TH><TH> Server version </TH><TH> Permission-Ident </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiWatchdogSetup     </TD><TD> 1.0.0.0        </TD><TD> "WATCHDOG_USE"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiWatchdogStart     </TD><TD> 1.0.0.0        </TD><TD> "WATCHDOG_USE"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiWatchdogStop      </TD><TD> 1.0.0.0        </TD><TD> "WATCHDOG_USE"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiWatchdogReset     </TD><TD> 1.0.0.0        </TD><TD> "WATCHDOG_USE"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiWatchdogGetState  </TD><TD> 1.0.0.0        </TD><TD> "WATCHDOG_USE"   </TD></TR>
+//! </TABLE>
+//! 
+//! @par List of the old permissions of mlpiWatchdogLib and their corresponding new permission.
+//! <TABLE>
+//! <TR><TH> Old permission                            </TH><TH> new Permission    </TH></TR>                  
+//! <TR><TD id="st_e"> MLPI_WATCHDOGLIB_PERMISSION_USE </TD><TD> WATCHDOG_USE      </TD></TR>  
+//! </TABLE>
+//!
+//! @}
+//! @addtogroup WatchdogLibVersionPermission_old Server versions before 1.26.0.0 
+//! @ingroup WatchdogLibVersionPermission
+//! @{
 //! @brief Version and permission information
 //!
 //! The table shows requirements regarding the minimum server version (@ref sec_ServerVersion) and the
@@ -174,6 +210,7 @@
 //!
 //! @see
 //! @ref sec_Permission
+//! @}
 //! @}
 
 //! @addtogroup WatchdogLibStructTypes Structs, Types, ...

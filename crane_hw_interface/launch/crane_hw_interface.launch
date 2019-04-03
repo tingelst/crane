@@ -1,23 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
-
-    <!-- the hardware_interface node expects its parameters in the 'mlpi' namespace -->
-    <rosparam>
-      mlpi:
-        address: 192.168.234.234
-        user: boschrexroth
-        password: boschrexroth
-    </rosparam>
-
     <!-- Load joint controller configurations from YAML file to parameter server -->
     <rosparam file="$(find crane_hw_interface)/config/hardware_controllers.yaml" command="load"/>
     <!-- Load standard kuka controller joint names from YAML file to parameter server -->
     <rosparam file="$(find crane_hw_interface)/config/controller_joint_names.yaml" command="load"/>
 
     <!-- main 'driver node': the crane hardware interface -->
-    <node name="crane_hw_interface" pkg="crane_hw_interface" type="crane_hw_interface_node" respawn="false"/>
+    <node name="crane_hw_interface" pkg="crane_hw_interface" type="crane_hw_interface_node" output="screen" respawn="false"/>
 
     <!-- Load controllers -->
-    <!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_trajectory_controller joint_state_controller"/> -->
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller"/>
 </launch>

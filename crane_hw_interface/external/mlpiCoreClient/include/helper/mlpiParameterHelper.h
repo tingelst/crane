@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -607,7 +607,7 @@ inline MLPIRESULT utilParameterParseIdn(const WCHAR16 *idn, ULONG *address, ULLO
     while( (idn[i]>='0') && (idn[i]<='9') )
       i++;
   }
-  
+
   // parse set, this info is optional
   if ( (wcslen16(&idn[i])>=3) && (idn[i+0]=='-') && (idn[i+1]>='0') && (idn[i+1]<='7') && (idn[i+2]=='-') )
   {
@@ -903,7 +903,13 @@ inline MLPIRESULT utilParameterParseSercosTimeToString(const ULLONG timeStamp, C
   MLPIRESULT mlpiResult=MLPI_S_OK;
 
   ULONG len = 0;
+
+#if defined (TARGET_OS_WINNT) || defined (TARGET_OS_LINUX)
+  ULLONG seconds = (ULONG) (timeStamp >> 32);
+#else
   ULONG seconds = (ULONG) (timeStamp >> 32);
+#endif
+
   ULONG nanoseconds = (ULONG) (timeStamp);
 
   if(time==NULL) {
@@ -935,7 +941,7 @@ inline MLPIRESULT utilParameterParseSercosTimeToString(const ULLONG timeStamp, C
     gmtime_s(&timeBuffer, (time_t*) &seconds);
 
     len = (ULONG) strftime(time, numElements, "%Y-%m-%dT%H:%M:%S", &timeBuffer);
-    len += sprintf(time+len, ".%09uZ", nanoseconds);
+    len += sprintf(time+len, ".%09uZ", static_cast<unsigned int>(nanoseconds));
     len++;
 #else
     tm timeBuffer;
@@ -944,7 +950,7 @@ inline MLPIRESULT utilParameterParseSercosTimeToString(const ULLONG timeStamp, C
     gmtime_r((time_t*) &seconds, &timeBuffer);
 
     len = (ULONG) strftime(time, numElements, "%Y-%m-%dT%H:%M:%S", &timeBuffer);
-    len += sprintf(time+len, ".%09uZ", nanoseconds);
+    len += sprintf(time+len, ".%09uZ", static_cast<unsigned int>(nanoseconds));
     len++;
 #endif
   }
@@ -1474,7 +1480,7 @@ template <> inline MLPIRESULT mlpiConvertBinaryDataToUtf16( DOUBLE data, WCHAR16
 template <typename T>
 inline ULONG mlpiConvertUintDecDataToUtf16ConvertLine( char* dst, T data )                  { return sprintf(dst, "%llu", data);  }
 template <> inline ULONG mlpiConvertUintDecDataToUtf16ConvertLine( char* dst, ULLONG data ) { return sprintf(dst, "%llu", data);  }
-template <> inline ULONG mlpiConvertUintDecDataToUtf16ConvertLine( char* dst, ULONG data )  { return sprintf(dst, "%u", data);    }
+template <> inline ULONG mlpiConvertUintDecDataToUtf16ConvertLine( char* dst, ULONG data )  { return sprintf(dst, "%u", static_cast<unsigned int>(data));   }
 template <> inline ULONG mlpiConvertUintDecDataToUtf16ConvertLine( char* dst, USHORT data ) { return sprintf(dst, "%hu", data);   }
 template <> inline ULONG mlpiConvertUintDecDataToUtf16ConvertLine( char* dst, UCHAR data )  { return sprintf(dst, "%hhu", data);  }
 // Implementation mlpiConvertUintDecDataToUtf16
@@ -1494,7 +1500,7 @@ inline MLPIRESULT mlpiConvertUintDecDataToUtf16( T data, WCHAR16* dataUtf16, con
 
     // Convert data to utf8
     dataBuffCnt = mlpiConvertUintDecDataToUtf16ConvertLine(dataUtf8, data);
-    
+
     // Set length
     if(numElementsRet != NULL)
       *numElementsRet = dataBuffCnt+1;
@@ -1516,7 +1522,7 @@ template <> inline MLPIRESULT mlpiConvertUintDecDataToUtf16( DOUBLE data, WCHAR1
 template <typename T>
 inline ULONG mlpiConvertIntDecDataToUtf16ConvertLine( char* dst, T data )                 { return sprintf(dst, "%lld", data);  }
 template <> inline ULONG mlpiConvertIntDecDataToUtf16ConvertLine( char* dst, LLONG data ) { return sprintf(dst, "%lld", data);  }
-template <> inline ULONG mlpiConvertIntDecDataToUtf16ConvertLine( char* dst, LONG data )  { return sprintf(dst, "%d", data);    }
+template <> inline ULONG mlpiConvertIntDecDataToUtf16ConvertLine( char* dst, LONG data )  { return sprintf(dst, "%d", static_cast<int>(data));   }
 template <> inline ULONG mlpiConvertIntDecDataToUtf16ConvertLine( char* dst, SHORT data ) { return sprintf(dst, "%hd", data);   }
 template <> inline ULONG mlpiConvertIntDecDataToUtf16ConvertLine( char* dst, CHAR data )  { return sprintf(dst, "%hhd", data);  }
 // Implementation mlpiConvertIntDecDataToUtf16
@@ -1556,11 +1562,11 @@ template <> inline MLPIRESULT mlpiConvertIntDecDataToUtf16( DOUBLE data, WCHAR16
 
 // Helper for mlpiConvertUintHexDataToUtf16 to prevent warnings
 template <typename T>
-inline ULONG mlpiConvertUintHexDataToUtf16ConvertLine( char* dst, T data )                  { return sprintf(dst, "0x%08X%08X", ((ULONG)(((ULLONG)data)>>32)), ((ULONG)(data)));  }
-template <> inline ULONG mlpiConvertUintHexDataToUtf16ConvertLine( char* dst, ULLONG data ) { return sprintf(dst, "0x%08X%08X", ((ULONG)(((ULLONG)data)>>32)), ((ULONG)(data)));  }
-template <> inline ULONG mlpiConvertUintHexDataToUtf16ConvertLine( char* dst, ULONG data )  { return sprintf(dst, "0x%08X", data);                                                }
-template <> inline ULONG mlpiConvertUintHexDataToUtf16ConvertLine( char* dst, USHORT data ) { return sprintf(dst, "0x%04X", data);                                                }
-template <> inline ULONG mlpiConvertUintHexDataToUtf16ConvertLine( char* dst, UCHAR data )  { return sprintf(dst, "0x%02X", data);                                                }
+inline ULONG mlpiConvertUintHexDataToUtf16ConvertLine( char* dst, T data )                  { return sprintf(dst, "0x%08X%08X",   ((ULONG)(((ULLONG)data)>>32)), ((ULONG)(data)));  }
+template <> inline ULONG mlpiConvertUintHexDataToUtf16ConvertLine( char* dst, ULLONG data ) { return sprintf(dst, "0x%08X%08X", (static_cast<unsigned int>(((ULLONG)data)>>32)), (static_cast<unsigned int>(data)));  }
+template <> inline ULONG mlpiConvertUintHexDataToUtf16ConvertLine( char* dst, ULONG data )  { return sprintf(dst, "0x%08X", static_cast<unsigned int>(data));                                                }
+template <> inline ULONG mlpiConvertUintHexDataToUtf16ConvertLine( char* dst, USHORT data ) { return sprintf(dst, "0x%04X",  data);                                                }
+template <> inline ULONG mlpiConvertUintHexDataToUtf16ConvertLine( char* dst, UCHAR data )  { return sprintf(dst, "0x%02X",  data);                                                }
 // Implementation mlpiConvertUintHexDataToUtf16
 template <typename T>
 inline MLPIRESULT mlpiConvertUintHexDataToUtf16( T data, WCHAR16* dataUtf16, const ULONG numElements, ULONG *numElementsRet )
@@ -1614,7 +1620,7 @@ inline MLPIRESULT mlpiConvertUintIdnDataToUtf16( T data, WCHAR16* dataUtf16, con
     switch(sizeof(T))
     {
       default:
-      case sizeof(ULLONG):  dataBuffCnt = sprintf(dataUtf8, "0x%08X%08X", ((ULONG)(((ULLONG)data)>>32)), ((ULONG)(data))); break; /* No rules for this case so use default */
+      case sizeof(ULLONG):  dataBuffCnt = sprintf(dataUtf8, "0x%08X%08X", (static_cast<unsigned int>(((ULLONG)data)>>32)), (static_cast<unsigned int>(data))); break; /* No rules for this case so use default */
       case sizeof(UCHAR):   dataBuffCnt = sprintf(dataUtf8, "0x%02X", data);                                               break; /* No rules for this case so use default */
       case sizeof(USHORT):
       {
@@ -1654,14 +1660,14 @@ template <> inline MLPIRESULT mlpiConvertUintIdnDataToUtf16( DOUBLE data, WCHAR1
 // Helper for mlpiConvertMlcIdnDataToUtf16 to prevent warnings
 template <typename T>
 inline ULONG mlpiConvertMlcIdnDataToUtf16ConvertLine( char* dst, T data )                  { return sprintf(dst, "0x%08X%08X", ((ULONG)(((ULLONG)data)>>32)), ((ULONG)(data)));  }
-template <> inline ULONG mlpiConvertMlcIdnDataToUtf16ConvertLine( char* dst, UCHAR data )  { return sprintf(dst, "0x%02X", data);                                                }
-template <> inline ULONG mlpiConvertMlcIdnDataToUtf16ConvertLine( char* dst, USHORT data ) { return sprintf(dst, "0x%04X", data);                                                }
-template <> inline ULONG mlpiConvertMlcIdnDataToUtf16ConvertLine( char* dst, ULONG data )  { return sprintf(dst, "0x%08X", data);                                                }
-template <> inline ULONG mlpiConvertMlcIdnDataToUtf16ConvertLine( char* dst, ULLONG data ) 
-{ 
+template <> inline ULONG mlpiConvertMlcIdnDataToUtf16ConvertLine( char* dst, UCHAR data )  { return sprintf(dst, "0x%02X",  data);                                                }
+template <> inline ULONG mlpiConvertMlcIdnDataToUtf16ConvertLine( char* dst, USHORT data ) { return sprintf(dst, "0x%04X",  data);                                                }
+template <> inline ULONG mlpiConvertMlcIdnDataToUtf16ConvertLine( char* dst, ULONG data )  { return sprintf(dst, "0x%08X", static_cast<unsigned int>(data));                                                }
+template <> inline ULONG mlpiConvertMlcIdnDataToUtf16ConvertLine( char* dst, ULLONG data )
+{
   switch(data & MLPI_SIDN_TYPE_MASK)
   {
-    default:                          return sprintf(dst, "0x%08X%08X", ((ULONG)(((ULLONG)data)>>32)), ((ULONG)(data)));
+    default:                          return sprintf(dst, "0x%08X%08X", (static_cast<unsigned int>(((ULLONG)data)>>32)), (static_cast<unsigned int>(data)));
     case MLPI_SIDN_TYPE_DRIVE_S:      return sprintf(dst, "A%03u:S-%01u-%04u.%01u.%01u", MLPI_SIDN_INST(data), MLPI_SIDN_SET(data), MLPI_SIDN_BLOCK(data), MLPI_SIDN_SI(data), MLPI_SIDN_SE(data));
     case MLPI_SIDN_TYPE_DRIVE_P:      return sprintf(dst, "A%03u:P-%01u-%04u.%01u.%01u", MLPI_SIDN_INST(data), MLPI_SIDN_SET(data), MLPI_SIDN_BLOCK(data), MLPI_SIDN_SI(data), MLPI_SIDN_SE(data));
     case MLPI_SIDN_TYPE_AXIS:         return sprintf(dst, "A%03u:A-%01u-%04u.%01u.%01u", MLPI_SIDN_INST(data), MLPI_SIDN_SET(data), MLPI_SIDN_BLOCK(data), MLPI_SIDN_SI(data), MLPI_SIDN_SE(data));
@@ -1724,7 +1730,7 @@ inline MLPIRESULT mlpiConvertFloatDataToUtf16( T data, WCHAR16* dataUtf16, const
     // Convert data to utf8
     switch(sizeof(T))
     {
-      default:             dataBuffCnt = sprintf(dataUtf8, "0x%08X%08X", ((ULONG)(((ULLONG)data)>>32)), ((ULONG)(data)));    /* No rules for this case so use default */
+      default:             dataBuffCnt = sprintf(dataUtf8, "0x%08X%08X", (static_cast<unsigned int>(((ULLONG)data)>>32)), (static_cast<unsigned int>(data)));    /* No rules for this case so use default */
       case sizeof(DOUBLE): dataBuffCnt = sprintf(dataUtf8, "%lf", data);  break;
       case sizeof(FLOAT):  dataBuffCnt = sprintf(dataUtf8, "%f", data);   break;
     }
@@ -1747,11 +1753,11 @@ inline MLPIRESULT mlpiConvertFloatDataToUtf16( T data, WCHAR16* dataUtf16, const
 // Helper for mlpiConvertSercosTimeDataToUtf16 to prevent warnings
 template <typename T>
 inline ULONG mlpiConvertSercosTimeDataToUtf16ConvertLine( char* dst, T data )                  { return sprintf(dst, "0x%08X%08X", ((ULONG)(((ULLONG)data)>>32)), ((ULONG)(data)));  }
-template <> inline ULONG mlpiConvertSercosTimeDataToUtf16ConvertLine( char* dst, UCHAR data )  { return sprintf(dst, "0x%02X", data);                                                }
-template <> inline ULONG mlpiConvertSercosTimeDataToUtf16ConvertLine( char* dst, USHORT data ) { return sprintf(dst, "0x%04X", data);                                                }
-template <> inline ULONG mlpiConvertSercosTimeDataToUtf16ConvertLine( char* dst, ULONG data )  { return sprintf(dst, "0x%08X", data);                                                }
+template <> inline ULONG mlpiConvertSercosTimeDataToUtf16ConvertLine( char* dst, UCHAR data )  { return sprintf(dst, "0x%02X",  data);                                                }
+template <> inline ULONG mlpiConvertSercosTimeDataToUtf16ConvertLine( char* dst, USHORT data ) { return sprintf(dst, "0x%04X",  data);                                                }
+template <> inline ULONG mlpiConvertSercosTimeDataToUtf16ConvertLine( char* dst, ULONG data )  { return sprintf(dst, "0x%08X", static_cast<unsigned int>(data));                                                }
 template <> inline ULONG mlpiConvertSercosTimeDataToUtf16ConvertLine( char* dst, ULLONG data )
-{ 
+{
   ULONG dataBuffCnt = 0;
   utilParameterParseSercosTimeToString(data, dst, MLPI_CONVERT_VALUE_TO_WCHAR16_BUFFER_STACK_SIZE, &dataBuffCnt);
   if(dataBuffCnt!=0) dataBuffCnt--;
@@ -1792,7 +1798,7 @@ template <> inline MLPIRESULT mlpiConvertSercosTimeDataToUtf16( FLOAT data, WCHA
 template <> inline MLPIRESULT mlpiConvertSercosTimeDataToUtf16( DOUBLE data, WCHAR16* dataUtf16, const ULONG numElements, ULONG *numElementsRet ) { return MLPI_E_INVALIDSIGNATURE; }
 
 inline MLPIRESULT mlpiConvertTimeDataToUtf16(ULONG dataValue, WCHAR16* dataUtf16, const ULONG numElements, ULONG *numElementsRet)
-{ 
+{
   MLPIRESULT mlpiResult = MLPI_S_OK;
 
   if(dataUtf16==NULL) {
@@ -1809,13 +1815,13 @@ inline MLPIRESULT mlpiConvertTimeDataToUtf16(ULONG dataValue, WCHAR16* dataUtf16
     ULONG timeS  = dataValue % 60;   dataValue /= 60;
     ULONG timeM  = dataValue % 60;   dataValue /= 60;
     ULONG timeH  = dataValue % 24;   dataValue /= 24;
-    ULONG timeD  = dataValue; 
+    ULONG timeD  = dataValue;
 
-    if(timeD)  dataBuffCnt += sprintf(&dataUtf8[dataBuffCnt], "%ud", timeD);
-    if(timeH)  dataBuffCnt += sprintf(&dataUtf8[dataBuffCnt], "%uh", timeH);
-    if(timeM)  dataBuffCnt += sprintf(&dataUtf8[dataBuffCnt], "%um", timeM);
-    if(timeS)  dataBuffCnt += sprintf(&dataUtf8[dataBuffCnt], "%us", timeS);
-    if(timeMs) dataBuffCnt += sprintf(&dataUtf8[dataBuffCnt], "%ums", timeMs);
+    if(timeD)  dataBuffCnt += sprintf(&dataUtf8[dataBuffCnt], "%ud", static_cast<unsigned int>(timeD));
+    if(timeH)  dataBuffCnt += sprintf(&dataUtf8[dataBuffCnt], "%uh", static_cast<unsigned int>(timeH));
+    if(timeM)  dataBuffCnt += sprintf(&dataUtf8[dataBuffCnt], "%um", static_cast<unsigned int>(timeM));
+    if(timeS)  dataBuffCnt += sprintf(&dataUtf8[dataBuffCnt], "%us", static_cast<unsigned int>(timeS));
+    if(timeMs) dataBuffCnt += sprintf(&dataUtf8[dataBuffCnt], "%ums", static_cast<unsigned int>(timeMs));
 
     // Set length
     if(numElementsRet)
@@ -1832,7 +1838,7 @@ inline MLPIRESULT mlpiConvertTimeDataToUtf16(ULONG dataValue, WCHAR16* dataUtf16
 }
 
 inline MLPIRESULT mlpiConvertDateDataToUtf16(ULONG dataValue, WCHAR16* dataUtf16, const ULONG numElements, ULONG *numElementsRet)
-{ 
+{
   MLPIRESULT mlpiResult = MLPI_S_OK;
 
   if(dataUtf16==NULL) {
@@ -1843,7 +1849,7 @@ inline MLPIRESULT mlpiConvertDateDataToUtf16(ULONG dataValue, WCHAR16* dataUtf16
     const ULONG dataBuffLen = MLPI_CONVERT_VALUE_TO_WCHAR16_BUFFER_STACK_SIZE;
     CHAR dataUtf8[dataBuffLen] = "";
     ULONG dataBuffCnt = 0;
-    
+
 #if defined(TARGET_OS_WINCE32)
 #pragma message ("not supported on TARGET_OS_WINCE32")
     mlpiResult = MLPI_E_UNIMPLEMENTED;
@@ -1878,7 +1884,7 @@ inline MLPIRESULT mlpiConvertDateDataToUtf16(ULONG dataValue, WCHAR16* dataUtf16
 }
 
 inline MLPIRESULT mlpiConvertDateAndTimeDataToUtf16(ULONG dataValue, WCHAR16* dataUtf16, const ULONG numElements, ULONG *numElementsRet)
-{ 
+{
   MLPIRESULT mlpiResult = MLPI_S_OK;
 
   if(dataUtf16==NULL) {
@@ -1924,7 +1930,7 @@ inline MLPIRESULT mlpiConvertDateAndTimeDataToUtf16(ULONG dataValue, WCHAR16* da
 }
 
 inline MLPIRESULT mlpiConvertTimeOfDayDataToUtf16(ULONG dataValue, WCHAR16* dataUtf16, const ULONG numElements, ULONG *numElementsRet)
-{ 
+{
   MLPIRESULT mlpiResult = MLPI_S_OK;
 
   if(dataUtf16==NULL) {
@@ -1942,8 +1948,8 @@ inline MLPIRESULT mlpiConvertTimeOfDayDataToUtf16(ULONG dataValue, WCHAR16* data
     ULONG timeM  = dataValue % 60;   dataValue /= 60;
     ULONG timeH  = dataValue % 24;   dataValue /= 24;
 
-    dataBuffCnt = sprintf(dataUtf8, "%02u:%02u:%02u", timeH, timeM, timeS);
-    if(timeMs) dataBuffCnt += sprintf(&dataUtf8[dataBuffCnt], ".%u", timeMs);
+    dataBuffCnt = sprintf(dataUtf8, "%02u:%02u:%02u", static_cast<unsigned int>(timeH), static_cast<unsigned int>(timeM), static_cast<unsigned int>(timeS));
+    if(timeMs) dataBuffCnt += sprintf(&dataUtf8[dataBuffCnt], ".%u", static_cast<unsigned int>(timeMs));
 
     // Set length
     if(numElementsRet)
@@ -2386,15 +2392,5 @@ inline MLPIRESULT mlpiConvertUtf16ToSercosTimeData( const WCHAR16* dataUtf16, WC
 }
 template <> inline MLPIRESULT mlpiConvertUtf16ToSercosTimeData( const WCHAR16* dataUtf16, WCHAR16** dataUtf16Next, FLOAT *data )  { return MLPI_E_INVALIDSIGNATURE; }
 template <> inline MLPIRESULT mlpiConvertUtf16ToSercosTimeData( const WCHAR16* dataUtf16, WCHAR16** dataUtf16Next, DOUBLE *data ) { return MLPI_E_INVALIDSIGNATURE; }
-
-
-/*
-==============================================================================
-History
-------------------------------------------------------------------------------
-10-Sep-2012
-  - first version
-==============================================================================
-*/
 
 #endif /* __MLPIPARAMETERHELPER_H__ */

@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -594,14 +594,5 @@ inline MLPIRESULT mlpiLogicWriteMemoryAreaArrayLreal(const MLPIHANDLE connection
 }
 #endif
 
-
-/*
-==============================================================================
-History
-------------------------------------------------------------------------------
-01-Jan-2012
-  - first version
-==============================================================================
-*/
 
 #endif /* __MLPILOGICHELPER_H__ */

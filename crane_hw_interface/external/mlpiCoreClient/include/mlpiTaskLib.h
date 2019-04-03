@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -173,6 +173,66 @@
 //! @addtogroup TaskLibVersionPermission Version and Permission
 //! @ingroup TaskLib
 //! @{
+//! @addtogroup TaskLibVersionPermission_new Server version since 1.26.0.0 (MLC-FW: 14V22)
+//! @ingroup TaskLibVersionPermission
+//! @{
+//!
+//! @note Since firmware version 14V22 (MLPI-Server-Version: 1.26.0.0) a centralized permission management has been implemented in target 
+//! controls XM2, L75 and VPx. Some permissions have been summarized in order to improve their usability. 
+//! Additional information regarding the usage of older manifest files (i.e. accounts.xml) with newer server versions can be found in @ref newest_manifest.\n
+//! @note <b><span style="color:red">Users of other CML controls (i.e. L25, L45, L65) have to use the old permissions as defined in @ref TaskLibVersionPermission_old</span></b>
+//!
+//!
+//! @par List of valid permissions for mlpiTaskLib. These permissions shall be assigned to the groups (i.e. in the group manifest file groups.xml) rather than the users.
+//! <TABLE>
+//! <TR><TH> Permission-Ident               </TH><TH> Description                                                                                                 </TH></TR>                  
+//! <TR><TD id="st_e"> TASKLIB_SETUP        </TD><TD> Modify task priorities - Allows to start and stop tasks, to modify task priorities and to wait for events.  </TD></TR>  
+//! <TR><TD id="st_e"> TASKLIB_TASKEXECUTE  </TD><TD> Modify task triggers - Allows to modify task triggers.                                                      </TD></TR>  
+//! <TR><TD id="st_e"> TASKLIB_TASKEXECUTE  </TD><TD> Use task viewer - Allows to use the task viewer.                                                            </TD></TR>  
+//! </TABLE>
+//!
+//!  @par List of available functions in mlpiTaskLib and the permissions required for their use. 
+//! <TABLE>
+//! <TR><TH>           Function                         </TH><TH> Server version </TH><TH> Permission-Ident       </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskWaitForEvent        </TD><TD> 1.0.0.0        </TD><TD> "TASKLIB_SETUP"        </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskSetSystemPriority   </TD><TD> 1.0.0.0        </TD><TD> "TASKLIB_SETUP"        </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskGetSystemPriority   </TD><TD> 1.0.0.0        </TD><TD> "TASKLIB_SETUP"        </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskSetCurrentPriority  </TD><TD> 1.0.0.0        </TD><TD> "TASKLIB_SETUP"        </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskGetCurrentPriority  </TD><TD> 1.0.0.0        </TD><TD> "TASKLIB_SETUP"        </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskSetTriggerSetup     </TD><TD> 1.0.0.0        </TD><TD> "TASKLIB_SETUP"        </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskGetTriggerSetup     </TD><TD> 1.0.0.0        </TD><TD> "TASKLIB_SETUP"        </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskSetTrigger          </TD><TD> 1.0.0.0        </TD><TD> "TASKLIB_SETUP"        </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskGetTrigger          </TD><TD> 1.0.0.0        </TD><TD> "TASKLIB_SETUP"        </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskViewerStart         </TD><TD> 1.0.0.0        </TD><TD> "TASKLIB_TASKVIEWER"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskViewerStop          </TD><TD> 1.0.0.0        </TD><TD> "TASKLIB_TASKVIEWER"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskViewerAddItem       </TD><TD> 1.0.0.0        </TD><TD> "TASKLIB_TASKVIEWER"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskViewerTaskStart     </TD><TD> 1.5.0.0        </TD><TD> "TASKLIB_TASKVIEWER"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskViewerTaskStop      </TD><TD> 1.5.0.0        </TD><TD> "TASKLIB_TASKVIEWER"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskViewerGetState      </TD><TD> 1.14.0.0       </TD><TD> "TASKLIB_TASKVIEWER"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskExecuteFile         </TD><TD> 1.12.0.0       </TD><TD> "TASKLIB_TASKEXECUTE"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskExecuteGetStatus    </TD><TD> 1.12.0.0       </TD><TD> "TASKLIB_TASKEXECUTE"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskExecuteGetActive    </TD><TD> 1.12.0.0       </TD><TD> "TASKLIB_TASKEXECUTE"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskExecuteKill         </TD><TD> 1.12.0.0       </TD><TD> "TASKLIB_TASKEXECUTE"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTaskExecuteGetName      </TD><TD> 1.12.0.0       </TD><TD> "TASKLIB_TASKEXECUTE"  </TD></TR>
+//! </TABLE>
+//!
+//!
+//! @par List of the old permissions of mlpiTaskLib and their corresponding new permission.
+//! <TABLE>
+//! <TR><TH> Old permission                                         </TH><TH> new Permission      </TH></TR>
+//! <TR><TD id="st_e"> MLPI_TASKLIB_PERMISSION_ALWAYS               </TD><TD> IMPLICIT            </TD></TR>
+//! <TR><TD id="st_e"> MLPI_TASKLIB_PERMISSION_EVENT_SINK           </TD><TD> TASKLIB_SETUP       </TD></TR>
+//! <TR><TD id="st_e"> MLPI_TASKLIB_PERMISSION_TASK_SETUP           </TD><TD> TASKLIB_SETUP       </TD></TR>
+//! <TR><TD id="st_e"> MLPI_TASKLIB_PERMISSION_TASKVIEWER_USE       </TD><TD> TASKLIB_TASKVIEWER  </TD></TR>
+//! <TR><TD id="st_e"> MLPI_TASKLIB_PERMISSION_TASKTRIGGER          </TD><TD> TASKLIB_SETUP       </TD></TR>
+//! <TR><TD id="st_e"> MLPI_TASKLIB_PERMISSION_TASKEXECUTION        </TD><TD> TASKLIB_TASKEXECUTE </TD></TR>
+//! <TR><TD id="st_e"> MLPI_TASKLIB_PERMISSION_TASKEXECUTION_INFO   </TD><TD> TASKLIB_TASKEXECUTE </TD></TR>
+//! </TABLE>
+//!
+//! @}
+//! @addtogroup TaskLibVersionPermission_old Server versions before 1.26.0.0 
+//! @ingroup TaskLibVersionPermission
+//! @{
 //! @brief Version and permission information
 //!
 //! The table shows requirements regarding the minimum server version (@ref sec_ServerVersion) and the
@@ -225,6 +285,7 @@
 //!
 //! @see
 //! @ref sec_Permission
+//! @}
 //! @}
 
 //! @addtogroup TaskLibStructTypes Structs, Types, ...

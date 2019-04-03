@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -277,6 +277,71 @@
 //! @addtogroup ParameterLibVersionPermission Version and Permission
 //! @ingroup ParameterLib
 //! @{
+//! @addtogroup ParameterLibVersionPermission_new Server version since 1.26.0.0 (MLC-FW: 14V22)
+//! @ingroup ParameterLibVersionPermission
+//! @{
+//!
+//! @note Since firmware version 14V22 (MLPI-Server-Version: 1.26.0.0) a centralized permission management has been implemented in target 
+//! controls XM2, L75 and VPx. Some permissions have been summarized in order to improve their usability. 
+//! Additional information regarding the usage of older manifest files (i.e. accounts.xml) with newer server versions can be found in @ref newest_manifest.\n
+//! @note <b><span style="color:red">Users of other CML controls (i.e. L25, L45, L65) have to use the old permissions as defined in @ref ParameterLibVersionPermission_old</span></b>
+//!
+//!
+//! @par List of valid permissions for mlpiParameterLib. These permissions shall be assigned to the groups (i.e. in the group manifest file groups.xml) rather than the users.
+//! <TABLE>
+//! <TR><TH> Permission-Ident             </TH><TH> Description                                                                                                   </TH></TR>                  
+//! <TR><TD id="st_e"> PARAMETER_COMMAND  </TD><TD> Execute command via parameter - Allows to execute commands via command parameter and to read command status.  </TD></TR>  
+//! <TR><TD id="st_e"> PARAMETER_READ     </TD><TD> Read parameter value or status - Allows to read parameter value or status.                                    </TD></TR>  
+//! <TR><TD id="st_e"> PARAMETER_WRITE    </TD><TD> Write parameter value - Allows to write parameter values.                                                     </TD></TR>
+//! </TABLE>
+//!
+//! @par List of the old permissions of mlpiParameterLib and their corresponding new permission.
+//! <TABLE>
+//! <TR><TH>           Function                                           </TH><TH> Server version </TH><TH> Permission-Ident     </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterReadName                         </TD><TD> 1.0.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterReadAttribute                    </TD><TD> 1.0.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterReadUnit                         </TD><TD> 1.0.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterReadDataStatus                   </TD><TD> 1.0.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterCommand                          </TD><TD> 1.0.0.0        </TD><TD> "PARAMETER_COMMAND"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterReadCommandStatus                </TD><TD> 1.0.0.0        </TD><TD> "PARAMETER_COMMAND"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterReadListLength                   </TD><TD> 1.0.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterReadMinimumString                </TD><TD> 1.1.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e">      mlpiParameterReadMinimum...           (10x)   </TD><TD> 1.0.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterReadMaximumString                </TD><TD> 1.1.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e">      mlpiParameterReadMaximum...           (10x)   </TD><TD> 1.0.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e">      mlpiParameterReadData...              (20x)   </TD><TD> 1.0.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e">      mlpiParameterWriteData...             (20x)   </TD><TD> 1.0.0.0        </TD><TD> "PARAMETER_WRITE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterReadDefaultString                </TD><TD> 1.1.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e">      mlpiParameterReadDefault...           ( 8x)   </TD><TD> 1.0.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterImportFile                       </TD><TD> 1.0.13.0       </TD><TD> "PARAMETER_WRITE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterExportFile                       </TD><TD> 1.0.13.0       </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterReadEverything                   </TD><TD> 1.3.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterExportFileStartProcess           </TD><TD> 1.6.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterImportFileStartProcess           </TD><TD> 1.6.0.0        </TD><TD> "PARAMETER_WRITE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterImportExportStatus               </TD><TD> 1.6.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterImportExportGetInfo              </TD><TD> 1.6.0.0        </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterImportExportAbort                </TD><TD> 1.6.0.0        </TD><TD> "PARAMETER_WRITE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterWriteAccessSetup                 </TD><TD> 1.14.0.0       </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterWriteAccessStatus                </TD><TD> 1.14.0.0       </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiParameterWriteAccessAbort                 </TD><TD> 1.14.0.0       </TD><TD> "PARAMETER_READ"     </TD></TR>
+//! </TABLE>
+//!
+//! @par List of the old permissions of mlpiParameterLib and their corresponding new permission.
+//! <TABLE>
+//! <TR><TH> Old permission                                         </TH><TH> new Permission    </TH></TR>                  
+//! <TR><TD id="st_e"> MLPI_PARAMETERLIB_PERMISSION_ALWAYS          </TD><TD> IMPLICIT          </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_PARAMETERLIB_PERMISSION_PARAMETER_INFO  </TD><TD> PARAMETER_READ    </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_PARAMETERLIB_PERMISSION_DATA_INFO       </TD><TD> PARAMETER_READ    </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_PARAMETERLIB_PERMISSION_COMMAND         </TD><TD> PARAMETER_COMMAND </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_PARAMETERLIB_PERMISSION_DEFAULT_READ    </TD><TD> PARAMETER_READ    </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_PARAMETERLIB_PERMISSION_DATA_READ       </TD><TD> PARAMETER_READ    </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_PARAMETERLIB_PERMISSION_DATA_WRITE      </TD><TD> PARAMETER_WRITE   </TD></TR>  
+//! </TABLE>
+//!
+//! @}
+//! @addtogroup ParameterLibVersionPermission_old Server versions before 1.26.0.0 
+//! @ingroup ParameterLibVersionPermission
+//! @{
 //! @brief Version and permission information
 //!
 //! The table shows requirements regarding the minimum server version (@ref sec_ServerVersion) and the
@@ -337,6 +402,7 @@
 //!
 //! @see
 //! @ref sec_Permission
+//! @}
 //! @}
 
 //! @addtogroup ParameterLibStructTypes Structs, Types, ...

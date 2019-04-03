@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -313,6 +313,55 @@
 //! @addtogroup ContainerLibVersionPermission Version and Permission
 //! @ingroup ContainerLib
 //! @{
+//! @addtogroup ContainerLibVersionPermission_new Server version since 1.26.0.0 (MLC-FW: 14V22)
+//! @ingroup ContainerLibVersionPermission
+//! @{
+//!
+//! @note Since firmware version 14V22 (MLPI-Server-Version: 1.26.0.0) a centralized permission management has been implemented in target 
+//! controls XM2, L75 and VPx. Some permissions have been summarized in order to improve their usability. 
+//! Additional information regarding the usage of older manifest files (i.e. accounts.xml) with newer server versions can be found in @ref newest_manifest.\n
+//! @note <b><span style="color:red">Users of other CML controls (i.e. L25, L45, L65) have to use the old permissions as defined in @ref ContainerLibVersionPermission_old</span></b>
+//!
+//!
+//! @par List of valid permissions for mlpiContainerLib. These permissions shall be assigned to the groups (i.e. in the group manifest file groups.xml) rather than the users.
+//! <TABLE>
+//! <TR><TH> Permission-Ident                </TH><TH> Description                                                                            </TH></TR>                  
+//! <TR><TD id="st_e"> CONTAINER_BROWSE      </TD><TD> Browse - Allows to browse through existing containers                                  </TD></TR>  
+//! <TR><TD id="st_e"> CONTAINER_INFO        </TD><TD> Info - Allows to get information about containers, e.g. name, items etc.               </TD></TR>  
+//! <TR><TD id="st_e"> CONTAINER_SETUP       </TD><TD> Setup - Allows to create and delete containers and set container name.                 </TD></TR>
+//! <TR><TD id="st_e"> CONTAINER_UPDATE      </TD><TD> Update - Allows to read/write data from/to containers, depending on container type.    </TD></TR>
+//! </TABLE>
+//!
+//!  @par List of available functions in mlpiContainerLib and the permissions required for their use. 
+//! <TABLE>
+//! <TR><TH>           Function                                   </TH><TH> Server version </TH><TH> Permission-Ident   </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiContainerCreate                   </TD><TD> 1.0.0.0        </TD><TD> "CONTAINER_SETUP"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiContainerUpdate                   </TD><TD> 1.0.0.0        </TD><TD> "CONTAINER_UPDATE" </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiContainerDestroy                  </TD><TD> 1.0.0.0        </TD><TD> "CONTAINER_SETUP"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiContainerGetName                  </TD><TD> 1.0.0.0        </TD><TD> "CONTAINER_INFO"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiContainerSetName                  </TD><TD> 1.0.0.0        </TD><TD> "CONTAINER_SETUP"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiContainerGetInformation           </TD><TD> 1.0.0.0        </TD><TD> "CONTAINER_INFO"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiContainerGetTagList               </TD><TD> 1.0.0.0        </TD><TD> "CONTAINER_INFO"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiContainerGetItemInformation       </TD><TD> 1.0.0.0        </TD><TD> "CONTAINER_INFO"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiContainerGetSingleItemInformation </TD><TD> 1.0.0.0        </TD><TD> "CONTAINER_INFO"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiContainerGetNumberOfContainer     </TD><TD> 1.0.0.0        </TD><TD> "CONTAINER_BROWSE" </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiContainerGetHandlesOfContainer    </TD><TD> 1.0.0.0        </TD><TD> "CONTAINER_BROWSE" </TD></TR>
+//! </TABLE>
+//!
+//! @par List of the old permissions of mlpiContainerLib and their corresponding new permission.
+//! <TABLE>
+//! <TR><TH> Old permission                                 </TH><TH> new Permission    </TH></TR>   
+//! <TR><TD id="st_e"> MLPI_CONTAINERLIB_PERMISSION_ALWAYS  </TD><TD> IMPLICIT          </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_CONTAINERLIB_PERMISSION_SETUP   </TD><TD> CONTAINER_SETUP   </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_CONTAINERLIB_PERMISSION_UPDATE  </TD><TD> CONTAINER_UPDATE  </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_CONTAINERLIB_PERMISSION_INFO    </TD><TD> CONTAINER_INFO    </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_CONTAINERLIB_PERMISSION_BROWSE  </TD><TD> CONTAINER_BROWSE  </TD></TR>   
+//! </TABLE>
+//!
+//! @}
+//! @addtogroup ContainerLibVersionPermission_old Server versions before 1.26.0.0 
+//! @ingroup ContainerLibVersionPermission
+//! @{
 //! @brief Version and permission information
 //!
 //! The table shows requirements regarding the minimum server version (@ref sec_ServerVersion) and the user
@@ -331,7 +380,7 @@
 //! - MLPI_CONTAINERLIB_PERMISSION_UPDATE
 //!
 //! <TABLE>
-//! <TR><TH>           Function                                   </TH><TH> Server version </TH><TH> Permission                             </TH><TH> a(1) </TH><TH> i(1) </TH><TH> i(2) </TH><TH> i(3) </TH><TH> m(1) </TH></TR>
+//! <TR><TH>           Function                                   </TH><TH> Server version </TH><TH> Permission-Ident                             </TH><TH> a(1) </TH><TH> i(1) </TH><TH> i(2) </TH><TH> i(3) </TH><TH> m(1) </TH></TR>
 //! <TR><TD id="st_e"> @ref mlpiContainerCreate                   </TD><TD> 1.0.0.0        </TD><TD> "MLPI_CONTAINERLIB_PERMISSION_SETUP"   </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
 //! <TR><TD id="st_e"> @ref mlpiContainerUpdate                   </TD><TD> 1.0.0.0        </TD><TD> "MLPI_CONTAINERLIB_PERMISSION_UPDATE"  </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
 //! <TR><TD id="st_e"> @ref mlpiContainerDestroy                  </TD><TD> 1.0.0.0        </TD><TD> "MLPI_CONTAINERLIB_PERMISSION_SETUP"   </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
@@ -356,6 +405,7 @@
 //!
 //! @see
 //! @ref sec_Permission
+//! @}
 //! @}
 
 //! @addtogroup ContainerLibStructTypes Structs, Types, ...

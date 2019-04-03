@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2016
 //
@@ -71,8 +71,48 @@
 //!            If they are not needed, it is strongly recommended to turn them off. 
 //! @}
 
+
 //! @addtogroup SecurityLibVersionPermission Version and Permission
 //! @ingroup SecurityLib
+//! @{
+//! @addtogroup SecurityLibVersionPermission_new Server version since 1.26.0.0 (MLC-FW: 14V22)
+//! @ingroup SecurityLibVersionPermission
+//! @{
+//!
+//! @note Since firmware version 14V22 (MLPI-Server-Version: 1.26.0.0) a centralized permission management has been implemented in target 
+//! controls XM2, L75 and VPx. Some permissions have been summarized in order to improve their usability. 
+//! Additional information regarding the usage of older manifest files (i.e. accounts.xml) with newer server versions can be found in @ref newest_manifest.\n
+//! @note <b><span style="color:red">Users of other CML controls (i.e. L25, L45, L65) have to use the old permissions as defined in @ref SecurityLibVersionPermission_old</span></b>
+//!
+//!
+//! @par List of valid permissions for mlpiSecurityLib. These permissions shall be assigned to the groups (i.e. in the group manifest file groups.xml) rather than the users.
+//! <TABLE>
+//! <TR><TH> Permission-Ident         </TH><TH> Description                                                                                                                          </TH></TR>                  
+//! <TR><TD id="st_e"> SECURITY_INFO  </TD><TD> View network security settings - Allows to view network security settings, e.g. activation state of certain communication protocols. </TD></TR>  
+//! <TR><TD id="st_e"> SECURITY_SETUP </TD><TD> Modify network security settings - Allows to modify network security settings, e.g. deactivate certain communication protocols.      </TD></TR>  
+//! </TABLE>
+//!
+//!  @par List of available functions in mlpiSecurityLib and the permissions required for their use. 
+//! <TABLE>
+//! <TR><TH>           Function                                         </TH><TH> Server version  </TH><TH> Permission-Ident  </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiSecurityGetNetworkServiceInformation    </TD><TD> 1.15.0.0        </TD><TD> "SECURITY_INFO"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSecurityGetNetworkServiceActivation     </TD><TD> 1.15.0.0        </TD><TD> "SECURITY_INFO"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSecuritySetNetworkServiceActivation     </TD><TD> 1.15.0.0        </TD><TD> "SECURITY_SETUP"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSecurityGetNetworkServiceConfiguration  </TD><TD> 1.19.0.0        </TD><TD> "SECURITY_INFO"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSecuritySetNetworkServiceConfiguration  </TD><TD> 1.19.0.0        </TD><TD> "SECURITY_SETUP"  </TD></TR>
+//! </TABLE>
+//!
+//! @par List of the old permissions of mlpiSecurityLib and their corresponding new permission.
+//! <TABLE>
+//! <TR><TH> Old permission                               </TH><TH> new Permission  </TH></TR>                  
+//! <TR><TD id="st_e"> MLPI_SECURITYLIB_PERMISSION_ALWAYS </TD><TD> IMPLICIT        </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SECURITYLIB_PERMISSION_SETUP  </TD><TD> SECURITY_SETUP  </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SECURITYLIB_PERMISSION_INFO   </TD><TD> SECURITY_INFO   </TD></TR>  
+//! </TABLE>
+//!
+//! @}
+//! @addtogroup SecurityLibVersionPermission_old Server versions before 1.26.0.0 
+//! @ingroup SecurityLibVersionPermission
 //! @{
 //! @brief Version and permission information
 //!
@@ -109,6 +149,7 @@
 //! </TABLE>
 
 //! @}
+//! @}
 //! @addtogroup SecurityLibVersionStructs Structs, Types, ...
 //! @ingroup SecurityLib
 //! @{
@@ -134,6 +175,7 @@
 #define MLPI_SECURITY_NETWORKSERVICE_MLPI  L"MLPI"     //!< Motion Logic Programming Interface (not encrypted).
 #define MLPI_SECURITY_NETWORKSERVICE_MLPIS L"MLPIS"    //!< Motion Logic Programming Interface Secured (MLPI with TLS encryption). See @ref sec_Communication.
 #define MLPI_SECURITY_NETWORKSERVICE_OPCUA L"OPCUA"    //!< OPC Unified Architecture.
+#define MLPI_SECURITY_NETWORKSERVICE_SIS   L"SIS"      //!< Seriale Indramat Schnittstelle (i.e. Serial Indramat Interface).
 
 //-----------------------------------------------------------------------
 // GLOBAL ENUMERATIONS

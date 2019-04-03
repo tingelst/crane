@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -293,8 +293,95 @@
 //! </TABLE>
 //! @}
 
+
 //! @addtogroup LogicLibVersionPermission Version and Permission
 //! @ingroup LogicLib
+//! @{
+//! @addtogroup LogicLibVersionPermission_new Server version since 1.26.0.0 (MLC-FW: 14V22)
+//! @ingroup LogicLibVersionPermission
+//! @{
+//!
+//! @note Since firmware version 14V22 (MLPI-Server-Version: 1.26.0.0) a centralized permission management has been implemented in target 
+//! controls XM2, L75 and VPx. Some permissions have been summarized in order to improve their usability. 
+//! Additional information regarding the usage of older manifest files (i.e. accounts.xml) with newer server versions can be found in @ref newest_manifest.\n
+//! @note <b><span style="color:red">Users of other CML controls (i.e. L25, L45, L65) have to use the old permissions as defined in @ref LogicLibVersionPermission_old</span></b>
+//!
+//!
+//! @par List of valid permissions for mlpiLogicLib. These permissions shall be assigned to the groups (i.e. in the group manifest file groups.xml) rather than the users.
+//! <TABLE>
+//! <TR><TH> Permission-Ident          </TH><TH> Description                                                                                                                    </TH></TR>                  
+//! <TR><TD id="st_e"> LOGIC_CONFIG    </TD><TD> Load PLC application - Allows to load PLC applications.                                                                        </TD></TR>  
+//! <TR><TD id="st_e"> LOGIC_CONTROL   </TD><TD> Start, stop, reset and debug PLC application - Allows to start, stop, reset and debug PLC application.                         </TD></TR>  
+//! <TR><TD id="st_e"> LOGIC_INFO      </TD><TD> View PLC application status - Allows to view PLC application status.                                                           </TD></TR>
+//! <TR><TD id="st_e"> LOGIC_READ      </TD><TD> Read variables and memory areas an get address of symbols - Allows read variables and memory areas an get address of symbols.  </TD></TR>
+//! <TR><TD id="st_e"> LOGIC_WRITE     </TD><TD> Write variables and memory areas - Allows to write variables and memory areas.                                                 </TD></TR>
+//! </TABLE>
+//!
+//!  @par List of available functions in mlpiLogicLib and the permissions required for their use. 
+//! <TABLE>
+//! <TR><TH>           Function                                           </TH><TH> Server version </TH><TH> Permission-Ident </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetNumberOfApplications              </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetNameOfApplication                 </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicLoadBootApplication                  </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_CONFIG"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicStopApplication                      </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_CONTROL"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicStartApplication                     </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_CONTROL"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicRunSingleCycleApplication            </TD><TD> 1.4.0.0        </TD><TD> "LOGIC_CONTROL"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicResetApplication                     </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_CONTROL"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetStateOfApplication                </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetOperationStateOfApplication       </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetOperationStateOfApplicationUlong  </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetTaskInfoOfApplication             </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetInfoOfApplication                 </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicSaveRetainOfApplication              </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_CONFIG"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicRestoreRetainOfApplication           </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_CONFIG"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicWaitForEventOfApplication            </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_CONFIG"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetSymbolsOfApplication              </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetTypeOfSymbol                      </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetSizeOfSymbol                      </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetNumElementsOfSymbol               </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetDimensionOfSymbol                 </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetArrayRangeOfSymbol                </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetAccessRightsOfSymbol              </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetInformationOfSymbol               </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetInformationOfUserType             </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicPouExtensionRegister                 </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_CONFIG"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicPouExtensionUnregister               </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_CONFIG"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicPouExtensionUnregisterAll            </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_CONFIG"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicSetCapabilityOfOperation             </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_CONFIG"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetCapabilityOfOperation             </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_CONFIG"   </TD></TR>
+//! <TR><TD id="st_e">      mlpiLogicReadVariableBySymbol...  (24x)       </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_READ"     </TD></TR>
+//! <TR><TD id="st_e">      mlpiLogicWriteVariableBySymbol... (24x)       </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_WRITE"    </TD></TR>
+//! <TR><TD id="st_e">      mlpiLogicReadMemoryArea...        (21x)       </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_READ"     </TD></TR>
+//! <TR><TD id="st_e">      mlpiLogicWriteMemoryArea...       (21x)       </TD><TD> 1.0.0.0        </TD><TD> "LOGIC_WRITE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetAddressOfSymbol                   </TD><TD> 1.0.13.0       </TD><TD> "LOGIC_READ"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetStopAxesConfiguration             </TD><TD> 1.24.0.0       </TD><TD> "LOGIC_INFO"     </TD></TR>
+//! </TABLE>
+//!
+//! @par List of the old permissions of mlpiLogicLib and their corresponding new permission.
+//! <TABLE>
+//! <TR><TH> Old permission                                       </TH><TH> new Permission </TH></TR>                  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_ALWAYS            </TD><TD> IMPLICIT       </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_APPLICATION_LOAD  </TD><TD> LOGIC_CONFIG   </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_APPLICATION_STOP  </TD><TD> LOGIC_CONTROL  </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_APPLICATION_START </TD><TD> LOGIC_CONTROL  </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_APPLICATION_RESET </TD><TD> LOGIC_CONTROL  </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_APPLICATION_INFO  </TD><TD> LOGIC_INFO     </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_RETAIN_DATA       </TD><TD> LOGIC_CONFIG   </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_EVENT_SINK        </TD><TD> LOGIC_CONFIG   </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_SYMBOL_INFO       </TD><TD> LOGIC_INFO     </TD></TR> 
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_POU_EXTENSION     </TD><TD> LOGIC_CONFIG   </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_OP_CAPABILITY     </TD><TD> LOGIC_CONFIG   </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_VARIABLE_READ     </TD><TD> LOGIC_READ     </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_VARIABLE_WRITE    </TD><TD> LOGIC_WRITE    </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_MEMORY_READ       </TD><TD> LOGIC_READ     </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_MEMORY_WRITE      </TD><TD> LOGIC_WRITE    </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_SYMBOL_ADDRESS    </TD><TD> LOGIC_READ     </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_LOGICLIB_PERMISSION_APPLICATION_CYCLE </TD><TD> LOGIC_CONTROL  </TD></TR>  
+//! </TABLE>
+//!
+//! @}
+//! @addtogroup LogicLibVersionPermission_old Server versions before 1.26.0.0 
+//! @ingroup LogicLibVersionPermission
 //! @{
 //! @brief Version and permission information
 //!
@@ -361,6 +448,7 @@
 //! <TR><TD id="st_e">      mlpiLogicReadMemoryArea...        (21x)       </TD><TD> 1.0.0.0        </TD><TD> "MLPI_LOGICLIB_PERMISSION_MEMORY_READ"                   </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
 //! <TR><TD id="st_e">      mlpiLogicWriteMemoryArea...       (21x)       </TD><TD> 1.0.0.0        </TD><TD> "MLPI_LOGICLIB_PERMISSION_MEMORY_WRITE"                  </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
 //! <TR><TD id="st_e"> @ref mlpiLogicGetAddressOfSymbol                   </TD><TD> 1.0.13.0       </TD><TD> "MLPI_LOGICLIB_PERMISSION_SYMBOL_ADDRESS"                </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiLogicGetStopAxesConfiguration             </TD><TD> 1.24.0.0       </TD><TD> "MLPI_LOGICLIB_PERMISSION_APPLICATION_INFO"              </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD></TR>
 //! </TABLE>
 //!
 //! <TABLE>
@@ -374,6 +462,7 @@
 //!
 //! @see
 //! @ref sec_Permission
+//! @}
 //! @}
 
 
@@ -1098,8 +1187,25 @@ MLPI_API MLPIRESULT mlpiLogicRestoreRetainOfApplication(const MLPIHANDLE connect
 //! WCHAR16 application[] = L"Application";
 //! MLPIRESULT result = mlpiLogicWaitForEventOfApplication(connection, application, MLPI_APPLICATIONEVENT_ONLINE_CHANGE_INIT, MLPI_INFINITE);
 //! @endcode
-
 MLPI_API MLPIRESULT mlpiLogicWaitForEventOfApplication(const MLPIHANDLE connection, const WCHAR16* application, const MlpiApplicationEvent event, const ULONG timeout);
+
+
+//! @ingroup LogicLibApplication
+//! This function will return the active "StopAxes" and "StopAxesCommon" configuration of all applications.
+//! @param[in]    connection        Handle for multiple connections.
+//! @param[out]   configuration     Pointer to variable where the configuration of applications will be stored.
+//! @param[in]    numElements       Number of WCHAR16 elements in 'configuration' available to read.
+//! @param[out]   numElementsRet    Number of elements used.
+//! @return                         Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! // Read the active "StopAxes" and "StopAxesCommon" configuration of all applications.
+//! WCHAR16 configuration[256] = L"";
+//! ULONG index = 0;
+//! MLPIRESULT result = mlpiLogicGetStopAxesConfiguration(connection, configuration, _countof(configuration));
+//! @endcode
+MLPI_API MLPIRESULT mlpiLogicGetStopAxesConfiguration(const MLPIHANDLE connection, WCHAR16* configuration, const ULONG numElements, ULONG *numElementsRet);
 
 
 //! @ingroup LogicLibApplication
@@ -1368,7 +1474,7 @@ MLPI_API MLPIRESULT mlpiLogicSetCapabilityOfOperation(const MLPIHANDLE connectio
 MLPI_API MLPIRESULT mlpiLogicGetCapabilityOfOperation(const MLPIHANDLE connection, const MlpiLogicCapabilityOperation operation, MlpiLogicCapabilityOperationValue *value);
 
 
-#if defined (__VXWORKS__) && defined (_WRS_KERNEL)
+#if defined (TARGET_OS_VXWORKS_KERNEL) || (TARGET_OS_WINNT)
 
 //! @ingroup LogicLibPouExtension
 //! This function registers a C/C++ implementation of a POU (e.g. function block) from the MLPI real-time environment.

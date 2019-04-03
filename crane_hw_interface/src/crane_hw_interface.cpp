@@ -13,39 +13,44 @@ CraneHardwareInterface::CraneHardwareInterface()
   , joint_effort_(n_dof_, 0.0)
   , joint_velocity_command_(n_dof_, 0.0)
   , joint_names_(n_dof_)
-  , mlpi_connection_(0)
+  , mlpi_connection_(MLPI_INVALIDHANDLE)
 {
 }
 
 CraneHardwareInterface::~CraneHardwareInterface()
 {
+  MLPIRESULT result = mlpiApiDisconnect(&mlpi_connection_);
+  if (MLPI_FAILED(result))
+  {
+    ROS_ERROR_NAMED("crane_hardware_interface", "Could not disconnect from MLPI!");
+  }
 }
 
 void CraneHardwareInterface::init()
 {
-  std::string address;
-  std::string user;
-  std::string password;
+  MLPIRESULT result = MLPI_S_OK;
 
-  if (nh_.getParam("mlpi/address", address) && nh_.getParam("mlpi/user", user) &&
-      nh_.getParam("mlpi/password", password))
+  MlpiVersion versionInfo;
+  memset(&versionInfo, 0, sizeof(versionInfo));
+  result = mlpiApiGetClientCoreVersion(&versionInfo);
+  if (MLPI_FAILED(result))
   {
-    ROS_INFO_STREAM_NAMED("crane_hw_interface", "Connecting to MLPI");
+    ROS_INFO("call of MLPI function failed with 0x%08x!", (unsigned)result);
+  }
+  else
+  {
+    ROS_INFO("Version (Major, Minor, Bugfix, Patch): %d.%d.%d.%d Build: %d", versionInfo.major, versionInfo.minor,
+             versionInfo.bugfix, versionInfo.patch, versionInfo.build);
+  }
 
-    std::stringstream ss;
-    ss << address << " -user=" << user << " -password=" << password;
-    std::string ss_str = ss.str();
-    std::wstring connection_identifier = std::wstring(ss_str.begin(), ss_str.end());
-
-    MLPIRESULT result = mlpiApiConnect(connection_identifier.c_str(), &mlpi_connection_);
-    if (MLPI_FAILED(result))
-    {
-      ROS_ERROR_NAMED("crane_hw_interface", "Failed to connect to MLPI!");
-    }
-    else
-    {
-      ROS_INFO_NAMED("crane_hw_interface", "Successfully connected to MLPI!");
-    }
+  result = mlpiApiConnect(u"192.168.234.234 -user=boschrexroth -password=boschrexroth ", &mlpi_connection_);
+  if (MLPI_FAILED(result))
+  {
+    ROS_ERROR_NAMED("crane_hw_interface", "Failed to connect to MLPI with error code: 0x%08x", result);
+  }
+  else
+  {
+    ROS_INFO_NAMED("crane_hw_interface", "Successfully connected to MLPI!");
   }
 
   // Get controller joint names from parameter server
@@ -72,7 +77,7 @@ void CraneHardwareInterface::init()
   registerInterface(&velocity_joint_interface_);
 
   ROS_INFO_STREAM_NAMED("crane_hw_interface", "Loaded crane hardware interface");
-}
+}  // namespace crane_hw_interface
 
 void CraneHardwareInterface::start()
 {
@@ -81,20 +86,55 @@ void CraneHardwareInterface::start()
 
 void CraneHardwareInterface::read(const ros::Time& time, const ros::Duration& period)
 {
-  ULONG num_elements_ret = 0;
-  MLPIRESULT result;
-  result = mlpiLogicReadVariableBySymbolArrayDouble(mlpi_connection_, L"position", &joint_position_[0], n_dof_,
-                                                    &num_elements_ret);
-  result = mlpiLogicReadVariableBySymbolArrayDouble(mlpi_connection_, L"velocity", &joint_velocity_[0], n_dof_,
-                                                    &num_elements_ret);
-  result = mlpiLogicReadVariableBySymbolArrayDouble(mlpi_connection_, L"effort", &joint_effort_[0], n_dof_,
-                                                    &num_elements_ret);
+  MLPIRESULT result = MLPI_S_OK;
+
+  // Read joint positions from PLC
+  result = mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Slew.Pact_Slew",
+                                               &joint_position_[0]);
+  joint_position_[0] /= 364.7059;
+  if (MLPI_FAILED(result))
+  {
+    ROS_ERROR("Application.MotionProg_Slew.Pact_Slew");
+  }
+  result =
+      mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Boom1.L1", &joint_position_[1]);
+  if (MLPI_FAILED(result))
+  {
+    ROS_ERROR("Application.MotionProg_Boom1.L1");
+  }
+  result =
+      mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Boom2.L2", &joint_position_[2]);
+  if (MLPI_FAILED(result))
+  {
+    ROS_ERROR("Application.MotionProg_Boom2.L2");
+  }
+
+  // Read joint velocities from PLC
+  result = mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Slew.Vact_Slew",
+                                               &joint_velocity_[0]);
+  if (MLPI_FAILED(result))
+  {
+    ROS_ERROR("Application.MotionProg_Slew.Vact_Slew");
+  }
+  joint_velocity_[0] /= 364.7059;
+  result = mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Boom1.Vact_Boom1",
+                                               &joint_velocity_[1]);
+  if (MLPI_FAILED(result))
+  {
+    ROS_ERROR("Application.MotionProg_Boom1.Vact_Boom1");
+  }
+  result = mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Boom2.Vact_Boom2",
+                                               &joint_velocity_[2]);
+  if (MLPI_FAILED(result))
+  {
+    ROS_ERROR("Application.MotionProg_Boom2.Vact_Boom2");
+  }
 }
 
 void CraneHardwareInterface::write(const ros::Time& time, const ros::Duration& period)
 {
-  MLPIRESULT result =
-      mlpiLogicWriteVariableBySymbolArrayDouble(mlpi_connection_, L"velocity_cmd", &joint_velocity_[0], n_dof_);
+  // MLPIRESULT result =
+  //     mlpiLogicWriteVariableBySymbolArrayDouble(mlpi_connection_, L"velocity_cmd", &joint_velocity_[0], n_dof_);
 }
 
 }  // namespace crane_hw_interface

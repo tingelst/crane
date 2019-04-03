@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -1224,20 +1224,5 @@ inline MLPIRESULT utilMotionWaitAxisInterrupted(MLPIHANDLE connection, MlpiAxisR
   return result;
 }
 
-
-/*
-==============================================================================
-History
-------------------------------------------------------------------------------
-01-Jan-2012
-  - first version
-17-Feb-2014 BJK
-  - add check for empty motion handle in method utilMotionWait()
-25-Mar-2015 BJK
-  - add structure for torque scaling
-11-May-2015 BJK
-  - add break in setScaling method for torque
-==============================================================================
-*/
 
 #endif /* __MLPIMOTIONHELPER_H__ */

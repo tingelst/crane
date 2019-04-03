@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -541,24 +541,5 @@ WCHAR16* itow16_binary(T src, WCHAR16* dst, const size_t len)
   return dst;
 }
 
-
-/*
-==============================================================================
-History
-------------------------------------------------------------------------------
-01-Jan-2012
-  - first version
-14-Aug-2012
-  - added wcscat16, wcsspn16, wcspbrk16, wcstok_r16
-12-Dec-2012
-  - fixed wcstombs16 which converted to UTF-8 and not to extended ASCII
-    which is more convenient.
-17-Jan-2013 SK
-  - fixed implementation of wcsncmp16
-  - added simple implementation of wcsstr16
-25-Mar-2014 MER supervised by SK
-  - added comments to each function
-==============================================================================
-*/
 
 #endif /* __WCHAR16_H__ */

@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -401,6 +401,7 @@ typedef SHORT     MLPI_DATA_ALIGN(2)    MLPI_IEC_WSTRING;   //!< 2 byte signed i
 #define MLPI_E_USER_NOT_EXISTING            ((MLPIRESULT) 0xF0360026L)   //!< The given user does not exist on the control.
 #define MLPI_E_GROUP_NOT_EXISTING           ((MLPIRESULT) 0xF0360027L)   //!< The given group does not exist on the control.
 #define MLPI_E_MEMBERSHIP_NOT_EXISTING      ((MLPIRESULT) 0xF0360028L)   //!< The given user is not member of the given group.
+#define MLPI_E_PERMISSION_NOT_EXISTING      ((MLPIRESULT) 0xF0360029L)   //!< The given permission does not exist.
 
 #define MLPI_SUCCEEDED(hr)                ((MLPIRESULT)(hr) >= 0)      //!< Returns true if given error code was successful.
 #define MLPI_FAILED(hr)                   ((MLPIRESULT)(hr) < 0)       //!< Returns true if given error code was not successful.

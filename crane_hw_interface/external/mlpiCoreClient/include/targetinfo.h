@@ -220,7 +220,7 @@ At the moment, following defines are supported and will be set:
   #define TARGET_CPU_STRING "Hitachi SH4"
   #define TARGET_CPU_SH4 1
 
-#elif  defined(__arm64__) || defined(__arm64) || defined(_ARM64)
+#elif  defined(__arm64__) || defined(__arm64) || defined(_ARM64) || defined(__aarch64__)
   #define TARGET_CPU_STRING "ARM64"
   #define TARGET_CPU_ARM64 1
 

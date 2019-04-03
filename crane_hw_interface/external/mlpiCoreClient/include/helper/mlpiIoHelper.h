@@ -51,7 +51,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -315,14 +315,5 @@ inline MLPIRESULT mlpiIoWriteFieldbusIoArrayLreal(const MLPIHANDLE connection, c
 }
 #endif
 
-
-/*
-==============================================================================
-History
-------------------------------------------------------------------------------
-01-Jan-2012
-  - first version
-==============================================================================
-*/
 
 #endif /* __MLPIIOHELPER_H__ */

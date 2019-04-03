@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2016
 //
@@ -81,7 +81,67 @@
 //! @addtogroup AccessControlLibVersionPermission Version and Permission
 //! @ingroup AccessControlLib
 //! @{
-//! @brief Version and permission information
+//! @addtogroup AccessControlLibVersionPermission_new Server version since 1.26.0.0 (MLC-FW: 14V22)
+//! @ingroup AccessControlLibVersionPermission
+//! @{
+//!
+//! @note Since firmware version 14V22 (MLPI-Server-Version: 1.26.0.0) a centralized permission management has been implemented in target 
+//! controls XM2, L75 and VPx. Some permissions have been summarized in order to improve their usability. 
+//! Additional information regarding the usage of older manifest files (i.e. accounts.xml) with newer server versions can be found in @ref newest_manifest.\n
+//! @note <b><span style="color:red">Users of other CML controls (i.e. L25, L45, L65) have to use the old permissions as defined in @ref ApiVersionPermission_old</span></b>
+//!
+//!
+//! @par List of valid permissions for mlpiAccessControlLib. These permissions shall be assigned to the groups (i.e. in the group manifest file groups.xml) rather than the users.
+//! <TABLE>
+//! <TR><TH> Permission-Ident                  </TH><TH> Description                                                                                                        </TH></TR>                  
+//! <TR><TD id="st_e"> ACCESSCONTROL_INFO      </TD><TD> View users, groups and permissions	- Allows to view users, groups and permission assignment.                       </TD></TR>  
+//! <TR><TD id="st_e"> ACCESSCONTROL_SETUP     </TD><TD> Setup users, groups and permissions - Allows to create, edit and delete users, groups and permission assignment.   </TD></TR>  
+//! </TABLE>
+//!
+//!  @par List of available functions in mlpiAccessControlLib and the permissions required for their use. 
+//! <TABLE>
+//! <TR><TH>           Function                                               </TH><TH> Server version  </TH><TH> Permission-Ident        </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetUserPolicies                  </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetPasswordPolicies              </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetAllUserInfos                  </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlAddUser                          </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetUser                          </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlSetUser                          </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlDeleteUser                       </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlChangePassword                   </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_ALWAYS"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetAllGroupInfos                 </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetAllGroupsOfUser               </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetAllUsersOfGroup               </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlAddUserToGroup                   </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlRemoveUserFromGroup              </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlSetUsersOfGroup                  </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlSetGroupsOfUser                  </TD><TD> 1.19.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetGroupPolicies                 </TD><TD> 1.24.0.0        </TD><TD> "ACCESSCONTROL_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlResetPassword                    </TD><TD> 1.24.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlAddGroup                         </TD><TD> 1.24.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetGroup                         </TD><TD> 1.24.0.0        </TD><TD> "ACCESSCONTROL_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlSetGroup                         </TD><TD> 1.24.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlDeleteGroup                      </TD><TD> 1.24.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlSetPermissionsOfGroup            </TD><TD> 1.24.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetPermissionsOfGroup            </TD><TD> 1.24.0.0        </TD><TD> "ACCESSCONTROL_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlSetAuthorizedGroupsOfPermission  </TD><TD> 1.24.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetAuthorizedGroupsOfPermission  </TD><TD> 1.24.0.0        </TD><TD> "ACCESSCONTROL_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlAddPermissionToGroup             </TD><TD> 1.24.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlRemovePermissionFromGroup        </TD><TD> 1.24.0.0        </TD><TD> "ACCESSCONTROL_SETUP"   </TD></TR>
+//! </TABLE>
+//!
+//! @par List of the old permissions of mlpiAccessControlLib and their corresponding new permission.
+//! <TABLE>
+//! <TR><TH> Old permission                                         </TH><TH> new Permission      </TH></TR>                  
+//! <TR><TD id="st_e"> MLPI_ACCESSCONTROLLIB_PERMISSION_ALWAYS      </TD><TD> IMPLICIT            </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG      </TD><TD> ACCESSCONTROL_SETUP </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_ACCESSCONTROLLIB_PERMISSION_INFO        </TD><TD> ACCESSCONTROL_INFO  </TD></TR>  
+//! </TABLE>
+//!
+//! @}
+//! @addtogroup AccessControlLibVersionPermission_old Server versions before 1.26.0.0 
+//! @ingroup AccessControlLibVersionPermission
+//! @{
 //!
 //! The following table shows the requirements regarding the minimum server version (@ref sec_ServerVersion) and the
 //! user permissions needed to execute the desired functions. Furthermore, the table shows the current user
@@ -99,22 +159,34 @@
 //! - MLPI_ACCESSCONTROLLIB_PERMISSION_ALL
 //!
 //! <TABLE>
-//! <TR><TH>           Function                                         </TH><TH> Server version  </TH><TH> Permission                                    </TH><TH> a(1) </TH><TH> i(1) </TH><TH> i(2) </TH><TH> i(3) </TH><TH> m(1) </TH></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlGetUserPolicies            </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlGetPasswordPolicies        </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlGetAllUserInfos            </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlAddUser                    </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlGetUser                    </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlSetUser                    </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlDeleteUser                 </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlChangePassword             </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_ALWAYS"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlGetAllGroupInfos           </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlGetAllGroupsOfUser         </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlGetAllUsersOfGroup         </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlAddUserToGroup             </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlRemoveUserFromGroup        </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlSetUsersOfGroup            </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
-//! <TR><TD id="st_e"> @ref mlpiAccessControlSetGroupsOfUser            </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TH>           Function                                               </TH><TH> Server version  </TH><TH> Permission                                    </TH><TH> a(1) </TH><TH> i(1) </TH><TH> i(2) </TH><TH> i(3) </TH><TH> m(1) </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetUserPolicies                  </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetPasswordPolicies              </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetAllUserInfos                  </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlAddUser                          </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetUser                          </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlSetUser                          </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlDeleteUser                       </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlChangePassword                   </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_ALWAYS"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetAllGroupInfos                 </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetAllGroupsOfUser               </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetAllUsersOfGroup               </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlAddUserToGroup                   </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlRemoveUserFromGroup              </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlSetUsersOfGroup                  </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlSetGroupsOfUser                  </TD><TD> 1.19.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetGroupPolicies                 </TD><TD> 1.24.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlResetPassword                    </TD><TD> 1.24.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlAddGroup                         </TD><TD> 1.24.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetGroup                         </TD><TD> 1.24.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlSetGroup                         </TD><TD> 1.24.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlDeleteGroup                      </TD><TD> 1.24.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlSetPermissionsOfGroup            </TD><TD> 1.24.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetPermissionsOfGroup            </TD><TD> 1.24.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlSetAuthorizedGroupsOfPermission  </TD><TD> 1.24.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlGetAuthorizedGroupsOfPermission  </TD><TD> 1.24.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_INFO"       </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlAddPermissionToGroup             </TD><TD> 1.24.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiAccessControlRemovePermissionFromGroup        </TD><TD> 1.24.0.0        </TD><TD> "MLPI_ACCESSCONTROLLIB_PERMISSION_CONFIG"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
 //! </TABLE>
 //!
 //! <TABLE>
@@ -137,6 +209,7 @@
 // -----------------------------------------------------------------------
 
 //! @}
+//! @}
 //! @addtogroup AccessControlLibStructs Structs, Types, ...
 //! @ingroup AccessControlLib
 //! @{
@@ -148,6 +221,8 @@
 #define MLPI_MAX_GROUPNAME_LEN           (32)
 #define MLPI_MAX_INVALIDCHARS_LEN        (32)
 #define MLPI_MAX_USER_DESCRIPTION_LEN    (128)
+#define MLPI_MAX_GROUP_DESCRIPTION_LEN   (128)
+#define MLPI_MAX_PERMISSION_LEN          (128)
 
 //-----------------------------------------------------------------------
 // GLOBAL ENUMERATIONS
@@ -300,9 +375,47 @@ typedef struct MlpiGroupInfo
 {
   ULONG    MLPI_STRUCT_ALIGN_ULONG    groupId;
   WCHAR16  MLPI_STRUCT_ALIGN_WCHAR16  groupName[MLPI_MAX_GROUPNAME_LEN];
-  WCHAR16  MLPI_STRUCT_ALIGN_WCHAR16  description[MLPI_MAX_USER_DESCRIPTION_LEN];
+  WCHAR16  MLPI_STRUCT_ALIGN_WCHAR16  description[MLPI_MAX_GROUP_DESCRIPTION_LEN];
   BOOL8    MLPI_STRUCT_ALIGN_BOOL8    disabled;
 } MlpiGroupInfo;
+
+//! @typedef MlpiGroupPolicies
+//! @brief This structure contains the policies to be followed by a group. 
+//! @details Elements of struct MlpiGroupPolicies
+//! <TABLE>
+//! <TR><TH>           Type                           </TH><TH>           Element                   </TH><TH> Description                                                                               </TH></TR>
+//! <TR><TD id="st_t"> ULONG                          </TD><TD id="st_e"> groupNameMinLength        </TD><TD> Minimum group name length.                                                                </TD></TR>
+//! <TR><TD id="st_t"> ULONG                          </TD><TD id="st_e"> groupNameMaxLength        </TD><TD> Maximum group name length.                                                                </TD></TR>
+//! <TR><TD id="st_t"> WCHAR16                        </TD><TD id="st_e"> groupNameInvalidChars     </TD><TD> Contains the characters that are not allowed in a group name.                             </TD></TR>
+//! <TR><TD id="st_t"> ULONG                          </TD><TD id="st_e"> descriptionMinLength      </TD><TD> Minimum length of the group description.                                                  </TD></TR>
+//! <TR><TD id="st_t"> ULONG                          </TD><TD id="st_e"> descriptionMaxLength      </TD><TD> Maximum length of the group description.                                                  </TD></TR>
+//! </TABLE>
+typedef struct MlpiGroupPolicies
+{
+  ULONG    MLPI_STRUCT_ALIGN_ULONG    groupNameMinLength;
+  ULONG    MLPI_STRUCT_ALIGN_ULONG    groupNameMaxLength;
+  WCHAR16  MLPI_STRUCT_ALIGN_WCHAR16  groupNameInvalidChars[MLPI_MAX_INVALIDCHARS_LEN];  
+  ULONG    MLPI_STRUCT_ALIGN_ULONG    descriptionMinLength;
+  ULONG    MLPI_STRUCT_ALIGN_ULONG    descriptionMaxLength;
+} MlpiGroupPolicies;
+
+//! @typedef MlpiGroupDetails
+//! @brief This structure provides all detailed information about a specific group 
+//! @details Elements of struct MlpiGroupDetails
+//! <TABLE>
+//! <TR><TH>           Type                          </TH><TH>           Element                      </TH><TH> Description                                                                               </TH></TR>
+//! <TR><TD id="st_t"> ULONG                         </TD><TD id="st_e"> groupId                      </TD><TD> Group's unique identification number..                                                    </TD></TR>
+//! <TR><TD id="st_t"> WCHAR16                       </TD><TD id="st_e"> groupName                    </TD><TD> Name of the group                                                                         </TD></TR>
+//! <TR><TD id="st_t"> WCHAR16                       </TD><TD id="st_e"> description                  </TD><TD> Description of the group.                                                                 </TD></TR>
+//! <TR><TD id="st_t"> BOOL8                         </TD><TD id="st_e"> disabled                     </TD><TD> If true, the permissions assigned to the group are no longer valid for the group members. </TD></TR>
+//! </TABLE>
+typedef struct MlpiGroupDetails
+{
+  ULONG   MLPI_STRUCT_ALIGN_ULONG    groupId;
+  WCHAR16 MLPI_STRUCT_ALIGN_WCHAR16  groupName[MLPI_MAX_GROUPNAME_LEN];
+  WCHAR16 MLPI_STRUCT_ALIGN_WCHAR16  description[MLPI_MAX_GROUP_DESCRIPTION_LEN];
+  BOOL8   MLPI_STRUCT_ALIGN_BOOL8    disabled;
+} MlpiGroupDetails;
 
 #if !defined(TARGET_OS_VXWORKS)
 #pragma pack(pop)
@@ -411,7 +524,7 @@ MLPI_API MLPIRESULT mlpiAccessControlAddUser(const MLPIHANDLE connection, MlpiUs
 //! This function obtains the user details of a specific user.
 //! @param[in]   connection          Handle for multiple connections.
 //! @param[in]   username            Username that identifies the user, whose information will be retrieved.
-//! @param[in]   userDetails         Pointer to structure to be written containing the information of the indicated user.
+//! @param[out]  userDetails         Pointer to structure to be written containing the information of the indicated user.
 //! @return                          Return value indicating success (>=0) or error (<0).
 //!
 //! @par Example:
@@ -587,6 +700,218 @@ MLPI_API MLPIRESULT mlpiAccessControlSetUsersOfGroup(const MLPIHANDLE connection
 //! MLPIRESULT result = mlpiAccessControlSetGroupsOfUser(connection, username, groupNames);
 //! @endcode
 MLPI_API MLPIRESULT mlpiAccessControlSetGroupsOfUser(const MLPIHANDLE connection, const WCHAR16* username, const WCHAR16* groupNames);
+
+//! @ingroup UserControlLib
+//! This function returns information regarding the policies that apply to all groups.
+//! @param[in]   connection          Handle for multiple connections.
+//! @param[out]  groupPolicies       Pointer to structure where the group policies will be stored.
+//! @return                          Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! MlpiGroupPolicies groupPolicies;
+//! MLPIRESULT result = mlpiAccessControlGetGroupPolicies(connection, &groupPolicies);
+//! @endcode
+MLPI_API MLPIRESULT mlpiAccessControlGetGroupPolicies(const MLPIHANDLE connection, MlpiGroupPolicies* groupPolicies);
+
+//! @ingroup UserControlLib
+//! This function sets a new password for a specific user (password reset).  It is recommended that only users with high privileges (i.e. acting as administrators) have the permission to use this method.
+//! The assignment of these permissions should be carried out by adding a new group to which the privileges will be assigned (i.e. using @ref mlpiAccessControlAddGroup) or using a preexisting one, 
+//! adding the user(s) to the desired group (i.e. using @ref mlpiAccessControlAddUserToGroup or @ref mlpiAccessControlSetUsersOfGroup) and finally assigning the desired permissions (i.e. using @ref mlpiAccessControlAddPermissionToGroup). 
+//! Users without these privileges can only change their own password by using @ref mlpiAccessControlChangePassword.
+//!
+//! @param[in]   connection          Handle for multiple connections.
+//! @param[in]   username            Username that identifies the user, whose password will be changed.
+//! @param[in]   newPassword         String that identifies the new password to be set for the specified user.
+//! @return                          Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! WCHAR16 *username = L"testUsername";
+//! WCHAR16 *newPassword = L"testPassword";
+//!
+//! MLPIRESULT result = mlpiAccessControlResetPassword(connection, username, newPassword);
+//! @endcode
+MLPI_API MLPIRESULT mlpiAccessControlResetPassword(const MLPIHANDLE connection, const WCHAR16* username, const WCHAR16* newPassword);
+
+//! @ingroup UserControlLib
+//! This function adds a new group in the target that can be used for authorization. 
+//! @param[in]   connection          Handle for multiple connections.
+//! @param[in]   GroupDetails        Structure to be written containing the information of the new group (groupId is obsolete, as it is defined automatically on the target).
+//! @return                          Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! MlpiGroupDetails groupDetails;
+//! wcscpy16(groupDetails.groupName, L"testGroupname");
+//! wcscpy16(groupDetails.description, L"testDescription");
+//! groupDetails.disabled = false;
+//!
+//! MLPIRESULT result = mlpiAccessControlAddGroup(connection, groupDetails);
+//! @endcode
+MLPI_API MLPIRESULT mlpiAccessControlAddGroup(const MLPIHANDLE connection, MlpiGroupDetails groupDetails);
+
+
+//! @ingroup UserControlLib
+//! This function obtains the details of a specific group.
+//! @param[in]   connection          Handle for multiple connections.
+//! @param[in]   groupName           Name that identifies the group, about which the information will be retrieved.
+//! @param[out]  groupDetails        Pointer to structure to be written containing the information of the indicated group.
+//! @return                          Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! MlpiGroupDetails groupDetails;
+//! WCHAR16 *groupName = L"testGroupName";
+//!
+//! MLPIRESULT result = mlpiAccessControlGetGroup(connection, groupName, &groupDetails);
+//! @endcode
+MLPI_API MLPIRESULT mlpiAccessControlGetGroup(const MLPIHANDLE connection, const WCHAR16* groupName, MlpiGroupDetails* groupDetails);
+
+//! @ingroup UserControlLib
+//! This function allows to modify the information of a group. Within the groupDetails argument, the correct Id of the group (if known) or group name must be given.
+//! @param[in]   connection          Handle for multiple connections.
+//! @param[in]   groupDetails        Allows to modify the information of a specific group.
+//! @return                          Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! MlpiGroupDetails groupDetails;
+//! groupDetails.groupId = 0;
+//! wcscpy16(groupDetails.groupName, L"testGroupName");
+//! wcscpy16(groupDetails.description, L"TestDescriptionModified");
+//! groupDetails.disabled = true;
+//!
+//! MLPIRESULT result = mlpiAccessControlSetGroup(connection, groupDetails);
+//! @endcode
+MLPI_API MLPIRESULT mlpiAccessControlSetGroup(const MLPIHANDLE connection, MlpiGroupDetails groupDetails);
+
+//! @ingroup UserControlLib
+//! This function deletes the group specified by the given group name.
+//! @param[in]   connection          Handle for multiple connections.
+//! @param[in]   groupName           Name that identifies the group that is to be deleted.
+//! @return                          Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! WCHAR16 *groupName = L"testUsername";
+//!
+//! MLPIRESULT result = mlpiAccessControlDeleteGroup(connection, groupName);
+//! @endcode
+MLPI_API MLPIRESULT mlpiAccessControlDeleteGroup(const MLPIHANDLE connection, const WCHAR16* groupName);
+
+//! @ingroup UserControlLib
+//! This function sets the permissions of the group specified by the given group name.
+//! @param[in]   connection          Handle for multiple connections.
+//! @param[in]   groupName           Name that identifies the group that is to be deleted.
+//! @param[in]   permissions         The permissions to be added to the group (separated by semicolons).
+//! @return                          Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! WCHAR16 *groupName = L"myGroupName";
+//! WCHAR16 *groupPermissions = L"MLPI_APILIB_PERMISSION_ALL;MLPI_MOTIONLIB_PERMISSION_INFO";
+//!
+//! MLPIRESULT result = mlpiAccessControlSetPermissionsOfGroup(connection, groupName, groupPermissions);
+//! @endcode
+MLPI_API MLPIRESULT mlpiAccessControlSetPermissionsOfGroup(const MLPIHANDLE connection, const WCHAR16* groupName, const WCHAR16* permissions);
+
+//! @ingroup UserControlLib
+//! This function obtains the permissions of the specified group.
+//! @param[in]   connection          Handle for multiple connections.
+//! @param[in]   groupName           Name that identifies the group, whose users information will be retrieved.
+//! @param[out]  permissions         String where the permissions (separated by semicolons) will be stored.
+//! @param[in]   numElements         Number of WCHAR16 elements available in 'permissions'.
+//! @param[out]  numElementsRet      Total number of WCHAR16 elements returned.
+//! @return                          Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! WCHAR16 *groupName = L"myGroupName";
+//! WCHAR16 permissions[128] = L"";
+//! ULONG numElementsRet = 0;
+//! MLPIRESULT result = mlpiAccessControlGetAllPermissionsOfGroup(connection, groupName, permissions,  _countof(permissions), &numElementsRet);
+//! @endcode
+MLPI_API MLPIRESULT mlpiAccessControlGetAllPermissionsOfGroup(const MLPIHANDLE connection, const WCHAR16* groupName, WCHAR16* permissions, const ULONG numElements, ULONG* numElementsRet); 
+
+//! @ingroup UserControlLib
+//! This function obtains all permissions that are available (and therefore may be added to a group) on the target system.
+//! @param[in]   connection          Handle for multiple connections.
+//! @param[out]  permissions         String where the permissions (separated by semicolons) will be stored.
+//! @param[in]   numElements         Number of WCHAR16 elements available in 'permissions'.
+//! @param[out]  numElementsRet      Total number of WCHAR16 elements returned.
+//! @return                          Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! WCHAR16 permissions[4096] = L"";
+//! ULONG numElementsRet = 0;
+//! MLPIRESULT result = mlpiAccessControlGetAllPermissions(connection, permissions,  _countof(permissions), &numElementsRet);
+//! @endcode
+MLPI_API MLPIRESULT mlpiAccessControlGetAllPermissions(const MLPIHANDLE connection, WCHAR16* permissions, const ULONG numElements, ULONG* numElementsRet);
+
+//! @ingroup UserControlLib
+//! This function assigns the specified permission(s) to the specified groups.
+//! The purpose of the function is to provide a 'batch' functionality to add permissions to more than one group at a time.
+//! @param[in]   connection          Handle for multiple connections.
+//! @param[in]   permission          The permission to be added to the groups.
+//! @param[in]   groupNames          Names that identify the groups  (separated by semicolons) to which the permission is assigned.
+//! @return                          Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! WCHAR16 *permission = L"MLPI_APILIB_PERMISSION_ALL";
+//! WCHAR16 *groupNames = L"myGroupName1;myGroupName2;myGroupName3";
+//!
+//! MLPIRESULT result = mlpiAccessControlSetAuthorizedGroupsOfPermission(connection, permission, groupNames);
+//! @endcode
+MLPI_API MLPIRESULT mlpiAccessControlSetAuthorizedGroupsOfPermission(const MLPIHANDLE connection, const WCHAR16* permission, const WCHAR16* groupNames);
+
+//! @ingroup UserControlLib
+//! This function obtains the groups to which a specific permission is assigned.
+//! @param[in]   connection          Handle for multiple connections.
+//! @param[in]   permission          Name that identifies the permission, to which the information will be retrieved.
+//! @param[out]  groupNames          String where the group names (separated by semicolons) will be stored.
+//! @param[in]   numElements         Number of WCHAR16 elements available in 'groupNames'.
+//! @param[out]  numElementsRet      Total number of WCHAR16 elements returned.
+//! @return                          Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! WCHAR16 *permission = L"MLPI_APILIB_PERMISSION_ALL";
+//! WCHAR16 *groupNames = L"";
+//! ULONG numElementsRet = 0;
+//! MLPIRESULT result = mlpiAccessControlGetAllAuthorizedGroupsOfPermission(connection, permission, groupNames, _countof(groupNames), &numElementsRet);
+//! @endcode
+MLPI_API MLPIRESULT mlpiAccessControlGetAllAuthorizedGroupsOfPermission(const MLPIHANDLE connection, const WCHAR16* permission, WCHAR16* groupNames, const ULONG numElements, ULONG* numElementsRet);
+
+//! @ingroup UserControlLib
+//! This function add a permission to a specified group.
+//! @param[in]   connection          Handle for multiple connections.
+//! @param[in]   groupName           Name that identifies the group to which the specified permission will be assigned.
+//! @param[in]   permission          Name of the permission that will be assigned to the specified group.
+//! @return                          Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! WCHAR16 *groupName = L"myGroup";
+//! WCHAR16 *username = L"MLPI_APILIB_PERMISSION_ALL";
+//! MLPIRESULT result = mlpiAccessControlAddPermissionToGroup(connection, groupName, permission);
+MLPI_API MLPIRESULT mlpiAccessControlAddPermissionToGroup(const MLPIHANDLE connection, const WCHAR16* groupName, const WCHAR16* permission);
+
+//! @ingroup UserControlLib
+//! This function removes a permission from the specified group.
+//! @param[in]   connection          Handle for multiple connections.
+//! @param[in]   groupName           Name that identifies the group from which the specified permission will be removed.
+//! @param[in]   permission          Name of the permission that will be removed from the specified group.
+//! @return                          Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! WCHAR16 *groupName = L"myGroup";
+//! WCHAR16 *username = L"MLPI_APILIB_PERMISSION_ALL";
+//! MLPIRESULT result = mlpiAccessControlRemovePermissionFromGroup(connection, groupName, permission);
+MLPI_API MLPIRESULT mlpiAccessControlRemovePermissionFromGroup(const MLPIHANDLE connection, const WCHAR16* groupName, const WCHAR16* permission);
 
 #ifdef __cplusplus
 }

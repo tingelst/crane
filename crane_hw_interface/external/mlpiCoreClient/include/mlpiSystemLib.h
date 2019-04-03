@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -96,6 +96,109 @@
 
 //! @addtogroup SystemLibVersionPermission Version and Permission
 //! @ingroup SystemLib
+//! @{
+//! @addtogroup SystemLibVersionPermission_new Server version since 1.26.0.0 (MLC-FW: 14V22)
+//! @ingroup SystemLibVersionPermission
+//! @{
+//!
+//! @note Since firmware version 14V22 (MLPI-Server-Version: 1.26.0.0) a centralized permission management has been implemented in target 
+//! controls XM2, L75 and VPx. Some permissions have been summarized in order to improve their usability. 
+//! Additional information regarding the usage of older manifest files (i.e. accounts.xml) with newer server versions can be found in @ref newest_manifest.\n
+//! @note <b><span style="color:red">Users of other CML controls (i.e. L25, L45, L65) have to use the old permissions as defined in @ref SystemLibVersionPermission_old</span></b>
+//!
+//!
+//! @par List of valid permissions for mlpiSystemLib. These permissions shall be assigned to the groups (i.e. in the group manifest file groups.xml) rather than the users.
+//! <TABLE>
+//! <TR><TH> Permission-Ident                     </TH><TH> Description                                                                                                                                   </TH></TR>                  
+//! <TR><TD id="st_e"> SYSTEM_CLEANUP             </TD><TD> Factory reset - Allows to perform a facotry reset of the device.                                                                              </TD></TR>  
+//! <TR><TD id="st_e"> SYSTEM_SETUP               </TD><TD> Configure system settings - Allows to configure system settings e.g. IP address, date and time etc. and reboot the device.                    </TD></TR>  
+//! <TR><TD id="st_e"> SYSTEM_STATUS              </TD><TD> View system settings and status - Allows to view system settings and status e.g. IP address, date and time, system temperature, CPU load etc. </TD></TR>  
+//! <TR><TD id="st_e"> SYSTEM_TRANSMISSIONCLIENT  </TD><TD> Use the device as TFTP client - Allows to use the device as TFTP client, e.g. for IndraDrive firmware update.                                 </TD></TR>  
+//! </TABLE>
+//!
+//!  @par List of available functions in mlpiSystemLib and the permissions required for their use. 
+//! <TABLE>
+//! <TR><TH>           Function                                         </TH><TH> Server version </TH><TH> Permission-Ident             </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetVersionInfo                    </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetLanguage                       </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemSetLanguage                       </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_SETUP"               </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetName                           </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemSetName                           </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_SETUP"               </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetIpAddress                      </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemSetIpAddress                      </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_SETUP"               </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetSubnetMask                     </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemSetSubnetMask                     </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_SETUP"               </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetGateway                        </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemSetGateway                        </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_SETUP"               </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetCurrentMode                    </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemSetTargetMode                     </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_SETUP"               </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetTemperature                    </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetTemperatureMax                 </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetCpuLoad                        </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetCpuLoadMax                     </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetOperationHours                 </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetDateAndTimeUtc                 </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemSetDateAndTimeUtc                 </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_SETUP"               </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetSerialNumber                   </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetHardwareDetails                </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetLocalBusConfiguration          </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetFunctionModulBusConfiguration  </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetFunctionModuleHardwareDetails  </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetMacAddress                     </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetMemoryInfo                     </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetSpecialPath                    </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetSpecialPathInfo                </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemClearError                        </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_SETUP"               </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemReboot                            </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_SETUP"               </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemCleanup                           </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_CLEANUP"             </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetDisplayedDiagnosis             </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemSetDiagnosis                      </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_SETUP"               </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetNewestDiagnosisIndex           </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetOldestDiagnosisIndex           </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetDiagnosisLog                   </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemConvertDiagnosisNumberToText      </TD><TD> 1.0.0.0        </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemSetDateAndTimeUtcByNtp            </TD><TD> 1.11.0.0       </TD><TD> "SYSTEM_SETUP"               </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetRootPaths                      </TD><TD> 1.11.0.0       </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemStartTransmission                 </TD><TD> 1.14.0.0       </TD><TD> "SYSTEM_TRANSMISSIONCLIENT"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetTransmissionStatus             </TD><TD> 1.14.0.0       </TD><TD> "SYSTEM_TRANSMISSIONCLIENT"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetTransmissionInfo               </TD><TD> 1.14.0.0       </TD><TD> "SYSTEM_TRANSMISSIONCLIENT"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemTftpSetTimeout                    </TD><TD> 1.14.0.0       </TD><TD> "SYSTEM_TRANSMISSIONCLIENT"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemTftpGetTimeout                    </TD><TD> 1.14.0.0       </TD><TD> "SYSTEM_TRANSMISSIONCLIENT"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemTftpSetRetransmitCount            </TD><TD> 1.14.0.0       </TD><TD> "SYSTEM_TRANSMISSIONCLIENT"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemTftpGetRetransmitCount            </TD><TD> 1.14.0.0       </TD><TD> "SYSTEM_TRANSMISSIONCLIENT"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemSetBootLed                        </TD><TD> 1.18.0.0       </TD><TD> "SYSTEM_SETUP"               </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemClearBootLed                      </TD><TD> 1.18.0.0       </TD><TD> "SYSTEM_SETUP"               </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemResetTemperature                  </TD><TD> 1.18.0.0       </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemResetCpuLoad                      </TD><TD> 1.18.0.0       </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetLicenseInformation             </TD><TD> 1.18.0.0       </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetLimit                          </TD><TD> 1.24.0.0       </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetTargetId                       </TD><TD> 1.24.0.0       </TD><TD> "SYSTEM_STATUS"              </TD></TR>
+//! </TABLE>
+//!
+//!
+//! @par List of the old permissions of mlpiSystemLib and their corresponding new permission.
+//! <TABLE>
+//! <TR><TH> Old permission                                         </TH><TH> new Permission            </TH></TR>                  
+//! <TR><TD id="st_e"> MLPI_SYSTEMLIB_PERMISSION_ALWAYS             </TD><TD> IMPLICIT                  </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SYSTEMLIB_PERMISSION_ENGINEERING_PORT   </TD><TD> SYSTEM_SETUP              </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SYSTEMLIB_PERMISSION_TARGET_MODE        </TD><TD> SYSTEM_SETUP              </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SYSTEMLIB_PERMISSION_LANGUAGE           </TD><TD> SYSTEM_SETUP              </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SYSTEMLIB_PERMISSION_NAME               </TD><TD> SYSTEM_SETUP              </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SYSTEMLIB_PERMISSION_DATE_AND_TIME      </TD><TD> SYSTEM_SETUP              </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SYSTEMLIB_PERMISSION_CLEAR_ERROR        </TD><TD> SYSTEM_SETUP              </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SYSTEMLIB_PERMISSION_REBOOT             </TD><TD> SYSTEM_SETUP              </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SYSTEMLIB_PERMISSION_CLEANUP            </TD><TD> SYSTEM_CLEANUP            </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SYSTEMLIB_PERMISSION_DEVICE_INFO        </TD><TD> SYSTEM_STATUS             </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SYSTEMLIB_PERMISSION_DIAGNOSIS_INFO     </TD><TD> SYSTEM_STATUS             </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SYSTEMLIB_PERMISSION_DIAGNOSIS          </TD><TD> SYSTEM_SETUP              </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SYSTEMLIB_PERMISSION_TRANSMISSION       </TD><TD> SYSTEM_TRANSMISSIONCLIENT </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_SYSTEMLIB_PERMISSION_LED_BT             </TD><TD> SYSTEM_SETUP              </TD></TR>  
+//! </TABLE>
+//!
+//!
+//! @}
+//! @addtogroup SystemLibVersionPermission_old Server versions before 1.26.0.0 
+//! @ingroup SystemLibVersionPermission
 //! @{
 //! @brief Version and permission information
 //!
@@ -177,6 +280,8 @@
 //! <TR><TD id="st_e"> @ref mlpiSystemResetTemperature                  </TD><TD> 1.18.0.0       </TD><TD> "MLPI_SYSTEMLIB_PERMISSION_DEVICE_INFO"      </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD></TR>
 //! <TR><TD id="st_e"> @ref mlpiSystemResetCpuLoad                      </TD><TD> 1.18.0.0       </TD><TD> "MLPI_SYSTEMLIB_PERMISSION_DEVICE_INFO"      </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD></TR>
 //! <TR><TD id="st_e"> @ref mlpiSystemGetLicenseInformation             </TD><TD> 1.18.0.0       </TD><TD> "MLPI_SYSTEMLIB_PERMISSION_DEVICE_INFO"      </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetLimit                          </TD><TD> 1.24.0.0       </TD><TD> "MLPI_SYSTEMLIB_PERMISSION_DEVICE_INFO"      </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiSystemGetTargetId                       </TD><TD> 1.24.0.0       </TD><TD> "MLPI_SYSTEMLIB_PERMISSION_DEVICE_INFO"      </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD></TR>
 //! </TABLE>
 //!
 //! <TABLE>
@@ -190,6 +295,7 @@
 //!
 //! @see
 //! @ref sec_Permission
+//! @}
 //! @}
 
 //! @addtogroup SystemLibStructTypes Structs, types, ...
@@ -364,6 +470,21 @@ typedef enum MlpiLedPattern
   MLPI_LED_PATTERN_GREEN_RED_1000        =  9,  //!< Toggle LED green/red with 1Hz (1000ms).
   MLPI_LED_PATTERN_INVALID               = -1   //!< Invalid LED pattern.
 } MlpiLedPattern;
+
+
+//! @enum MlpiSystemLimit
+//! This enumeration provides different limit defines.
+typedef enum MlpiSystemLimit
+{
+  MLPI_SYSTEM_LIMIT_MAX_APPLICATIONS    =  0,   //!< Maximum number of application.
+  MLPI_SYSTEM_LIMIT_MAX_CONTROLS        =  1,   //!< Maximum number of controls.
+  MLPI_SYSTEM_LIMIT_MAX_AXIS            =  2,   //!< Maximum number of axis.
+  MLPI_SYSTEM_LIMIT_MAX_PLS             =  3,   //!< Maximum number of PLS.
+  MLPI_SYSTEM_LIMIT_MAX_KINEMATICS      =  4,   //!< Maximum number of kinematics.
+  MLPI_SYSTEM_LIMIT_MAX_TOUCHPROBES     =  5,   //!< Maximum number of touch probes.
+  MLPI_SYSTEM_LIMIT_MAX_OSCI_CHANNELS   =  6,   //!< Maximum number of oscilloscope channels.
+  MLPI_SYSTEM_LIMIT_INVALID             = -1    //!< Invalid limit.
+}MlpiSystemLimit;
 
 
 // -----------------------------------------------------------------------
@@ -781,6 +902,21 @@ MLPI_API MLPIRESULT mlpiSystemResetTemperature(const MLPIHANDLE connection);
 
 
 //! @ingroup SystemLibCommon
+//! This function reads the target ID of the device.
+//! @param[in]    connection        Handle for multiple connections.
+//! @param[out]   targetId          Pointer to variable where the target ID of the device will be stored.
+//! @return                         Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! // Get the target ID
+//! LLONG targetId = 0;
+//! MLPIRESULT result = mlpiSystemGetTargetId(connection, &targetId);
+//! @endcode
+MLPI_API MLPIRESULT mlpiSystemGetTargetId(const MLPIHANDLE connection, LLONG* targetId);
+
+
+//! @ingroup SystemLibCommon
 //! This function reads the current CPU load device in percent.
 //! @param[in]    connection        Handle for multiple connections.
 //! @param[out]   load              Pointer to variable where the current cpu load of the device will be stored.
@@ -890,9 +1026,9 @@ MLPI_API MLPIRESULT mlpiSystemSetDateAndTimeUtc(const MLPIHANDLE connection, Mlp
 //! @par Example:
 //! @code
 //! // Write the date and time of the device by a NTP server.
-//! WCHAR16 server[] = "192.168.1.1";
+//! WCHAR16 server[] = L"192.168.1.1";
 //! ULONG timeout = 5000;
-//! MLPIRESULT result = mlpiSystemSetDateAndTimeUtcByNtp(timeout, server);
+//! MLPIRESULT result = mlpiSystemSetDateAndTimeUtcByNtp(connection, timeout, server);
 //! @endcode
 MLPI_API MLPIRESULT mlpiSystemSetDateAndTimeUtcByNtp(const MLPIHANDLE connection, const ULONG timeout, const WCHAR16* server, const USHORT port=0);
 
@@ -1158,6 +1294,22 @@ MLPI_API MLPIRESULT mlpiSystemCleanup(const MLPIHANDLE connection);
 MLPI_API MLPIRESULT mlpiSystemGetLicenseInformation(const MLPIHANDLE connection, WCHAR16 *licenses, const ULONG numElements, ULONG* numElementsRet);
 
 
+//! @ingroup SystemLibCommon
+//! This function reads a limit (e.g. maximum number of applications) of the device (@ref MlpiSystemLimit).
+//! @param[in]    connection        Handle for multiple connections.
+//! @param[out]   limit             Limit selector.
+//! @param[out]   value             Limit value.
+//! @return                         Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! // Read the maximum number of application of device.
+//! LLONG max = 0;
+//! MLPIRESULT result = mlpiSystemGetLimit(connection, MLPI_SYSTEM_LIMIT_MAX_APPLICATIONS, &max);
+//! @endcode
+MLPI_API MLPIRESULT mlpiSystemGetLimit(const MLPIHANDLE connection, MlpiSystemLimit limit, LLONG *value);
+
+
 //! @ingroup SystemLibDiagnosis
 //! This function reads the displayed diagnostic message of the device.
 //! The displayed diagnosis is the diagnosis with the highest severity of all currently active diagnoses.
@@ -1372,7 +1524,7 @@ MLPI_API MLPIRESULT mlpiSystemClearBootLed(const MLPIHANDLE connection);
 //! @code
 //! // start TFTP put transfer
 //! MLPITASKHANDLE tftpHandle;
-//! MLPIRESULT result = mlpiSystemStartTransmission(connection, "file:///ata0b/local.txt", "tftp://172.168.31.1/remote.txt", &tftpHandle);
+//! MLPIRESULT result = mlpiSystemStartTransmission(connection, "file:///ata0b/local.txt", "tftp://172.168.31.1:69/remote.txt", &tftpHandle);
 //! @endcode
 MLPI_API MLPIRESULT mlpiSystemStartTransmission(const MLPIHANDLE connection, const WCHAR16* source, const WCHAR16* destination, MLPITASKHANDLE* handle);
 

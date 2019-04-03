@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -84,6 +84,104 @@
 
 //! @addtogroup RobotLibVersionPermission Version and Permission
 //! @ingroup RobotLib
+//! @{
+//! @addtogroup RobotLibVersionPermission_new Server version since 1.26.0.0 (MLC-FW: 14V22)
+//! @ingroup RobotLibVersionPermission
+//! @{
+//!
+//! @note Since firmware version 14V22 (MLPI-Server-Version: 1.26.0.0) a centralized permission management has been implemented in target 
+//! controls XM2, L75 and VPx. Some permissions have been summarized in order to improve their usability. 
+//! Additional information regarding the usage of older manifest files (i.e. accounts.xml) with newer server versions can be found in @ref newest_manifest.\n
+//! @note <b><span style="color:red">Users of other CML controls (i.e. L25, L45, L65) have to use the old permissions as defined in @ref RobotLibVersionPermission_old</span></b>
+//!
+//!
+//! @par List of valid permissions for mlpiRobotLib. These permissions shall be assigned to the groups (i.e. in the group manifest file groups.xml) rather than the users.
+//! <TABLE>
+//! <TR><TH> Permission-Ident         </TH><TH> Description                                                                                       </TH></TR>                  
+//! <TR><TD id="st_e"> ROBOT_INFO     </TD><TD> Read robots information - Allows to read robots information, e.g. position, status and diagnosis. </TD></TR>  
+//! <TR><TD id="st_e"> ROBOT_MOVE     </TD><TD> Move robots - Allows to move robots.                                                              </TD></TR>  
+//! <TR><TD id="st_e"> ROBOT_SETUP    </TD><TD> Setup robots and clear errors - Allows to setup robots and clear errors.                          </TD></TR>
+//! <TR><TD id="st_e"> ROBOT_TEACHIN  </TD><TD> Teach-in robots - Allows to teach-in positions for robots.                                        </TD></TR>
+//! </TABLE>
+//!
+//!  @par List of available functions in mlpiRobotLib and the permissions required for their use. 
+//! <TABLE>
+//! <TR><TH>           Function                                  </TH><TH> Server version </TH><TH> Permission-Ident  </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotReset                       </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotSetBeltConfiguration        </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotSetRotaryTableConfiguration </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotSetCartesianTransform       </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotSetCylindricTransform       </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotSetBeltErrorReaction        </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotGetBeltErrorReaction        </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotMoveLinearAbs               </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotMoveCircularAbs             </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotMoveCircularRel             </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotMoveLinearRel               </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotMoveDirectAbs               </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotMoveDirectRel               </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotMoveJumpAbs                 </TD><TD> 1.14.0.0       </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotSyncOnWithLimits            </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotSyncOffWithLimits           </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotOpenCyclicChannel           </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotWriteCyclicChannel          </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotStop                        </TD><TD> 1.0.17.0       </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotInterrupt                   </TD><TD> 1.0.17.0       </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotContinue                    </TD><TD> 1.0.17.0       </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotMotionGetStatus             </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotReadCyclicChannel           </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotReadPos                     </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotMovePoint                   </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotSetPerformanceEnable        </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotGetPerfomanceResult         </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotGetMechanicData             </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotGetTransform                </TD><TD> 1.0.18.0       </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotGetBeltConfiguration        </TD><TD> 1.0.18.0       </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotAddAllAxisToGroup           </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotRemAllAxisFromGroup         </TD><TD> 1.0.0.0        </TD><TD> "ROBOT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotGetKinematicsValues         </TD><TD> 1.1.1.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotGetDiagnosisText            </TD><TD> 1.1.1.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotGetKinematicsUnits          </TD><TD> 1.1.1.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotTransformPoint              </TD><TD> 1.1.1.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotWait                        </TD><TD> 1.2.1.0        </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotSetSafeZone                 </TD><TD> 1.3.1.0        </TD><TD> "ROBOT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotJogStep                     </TD><TD> 1.4.0.0        </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotJogCont                     </TD><TD> 1.4.0.0        </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotStopCmd                     </TD><TD> 1.4.0.0        </TD><TD> "ROBOT_MOVE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotSetBeltDesyncRelConfig      </TD><TD> 1.4.0.0        </TD><TD> "ROBOT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotGetBeltDesyncRelConfig      </TD><TD> 1.4.0.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotTeachInWritePoint           </TD><TD> 1.4.0.0        </TD><TD> "ROBOT_TEACHIN"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotTeachInReadPoint            </TD><TD> 1.4.0.0        </TD><TD> "ROBOT_TEACHIN"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotTeachInReadNextPoint        </TD><TD> 1.4.0.0        </TD><TD> "ROBOT_TEACHIN"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotTeachInDeletePoints         </TD><TD> 1.4.0.0        </TD><TD> "ROBOT_TEACHIN"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotTeachInSavePointFile        </TD><TD> 1.4.0.0        </TD><TD> "ROBOT_TEACHIN"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotTeachInLoadPointFile        </TD><TD> 1.4.0.0        </TD><TD> "ROBOT_TEACHIN"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotTeachInDeletePointFile      </TD><TD> 1.4.0.0        </TD><TD> "ROBOT_TEACHIN"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotGetCoordinateSystemInfo     </TD><TD> 1.6.0.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotGetStatusSummary            </TD><TD> 1.6.0.0        </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotGetSafeZones                </TD><TD> 1.11.0.0       </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotGetMoveId                   </TD><TD> 1.14.0.0       </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotSetMoveId                   </TD><TD> 1.14.0.0       </TD><TD> "ROBOT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotGetCmdInfo                  </TD><TD> 1.16.0.0       </TD><TD> "ROBOT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotChangeTool                  </TD><TD> 1.25.0.0       </TD><TD> "ROBOT_SETUP"     </TD></TR>
+//! </TABLE>
+//!
+//! @par List of the old permissions of mlpiRobotLib and their corresponding new permission.
+//! <TABLE>
+//! <TR><TH> Old permission                             </TH><TH> new Permission </TH></TR>                  
+//! <TR><TD id="st_e"> MLPI_ROBOTLIB_PERMISSION_ALWAYS  </TD><TD> IMPLICIT       </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_ROBOTLIB_PERMISSION_SETUP   </TD><TD> ROBOT_SETUP    </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_ROBOTLIB_PERMISSION_CONFIG  </TD><TD> ROBOT_SETUP    </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_ROBOTLIB_PERMISSION_CLEAR   </TD><TD> ROBOT_SETUP    </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_ROBOTLIB_PERMISSION_INFO    </TD><TD> ROBOT_INFO     </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_ROBOTLIB_PERMISSION_MOVE    </TD><TD> ROBOT_MOVE     </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_ROBOTLIB_PERMISSION_TEACHIN </TD><TD> ROBOT_TEACHIN  </TD></TR>  
+//!
+//! </TABLE>
+//!
+//! @}
+//! @addtogroup RobotLibVersionPermission_old Server versions before 1.26.0.0 
+//! @ingroup RobotLibVersionPermission
 //! @{
 //! @brief Version and permission information
 //!
@@ -161,6 +259,7 @@
 //! <TR><TD id="st_e"> @ref mlpiRobotGetMoveId                   </TD><TD> 1.14.0.0       </TD><TD> "MLPI_ROBOTLIB_PERMISSION_INFO"    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
 //! <TR><TD id="st_e"> @ref mlpiRobotSetMoveId                   </TD><TD> 1.14.0.0       </TD><TD> "MLPI_ROBOTLIB_PERMISSION_CONFIG"  </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
 //! <TR><TD id="st_e"> @ref mlpiRobotGetCmdInfo                  </TD><TD> 1.16.0.0       </TD><TD> "MLPI_ROBOTLIB_PERMISSION_INFO"    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiRobotChangeTool                  </TD><TD> 1.25.0.0       </TD><TD> "MLPI_ROBOTLIB_PERMISSION_CONFIG"  </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
 //! </TABLE>
 //!
 //! <TABLE>
@@ -172,6 +271,7 @@
 //! <TR><TD> m(1)     </TD><TD> MlcTrending             </TD></TR>
 //! </TABLE>
 //!
+//! @}
 //! @}
 
 //! @defgroup RobotLibMovement Movement functions
@@ -268,6 +368,7 @@ typedef enum MlpiRobotCoordinateSystem
   MLPI_ROBOT_CS_PCS14     = 0x0D03,  //!< product coordinate system 14
   MLPI_ROBOT_CS_PCS15     = 0x0E03,  //!< product coordinate system 15
   MLPI_ROBOT_CS_PCS16     = 0x0F03,  //!< product coordinate system 16
+  MLPI_ROBOT_CS_FCS       = 0x0004,  //!< flange coordinate system
 }MlpiRobotCoordinateSystem;
 
 //! This enumeration defines the type of the coordinate system
@@ -1159,21 +1260,21 @@ typedef struct MlpiRobotTeachInDataDeleteFileData
 //! </TABLE>
 typedef struct MlpiRobotGetStatusSummary
 {
-   // in
-   MlpiGroupRef          MLPI_STRUCT_ALIGN_STRUCT  group;                                            //!< Reference to the group.
-   ULONG                 MLPI_STRUCT_ALIGN_ULONG   coordSys;                                         //!< Coordinate system.
-   //outs
-   ULONG                 MLPI_STRUCT_ALIGN_ULONG   state;                                            //!< Kinematics state.
-   ULONG                 MLPI_STRUCT_ALIGN_ULONG   stateExtended;                                    //!< Extended kinematics state.
-   ULONG                 MLPI_STRUCT_ALIGN_ULONG   diagnosisNumber;                                  //!< Diagnosis number of the kinematics.
-   USHORT                MLPI_STRUCT_ALIGN_USHORT  dimension;                                        //!< Dimension of a point of the kinematics.
-   MlpiRobotPoint        MLPI_STRUCT_ALIGN_STRUCT  actualPosition;                                   //!< Actual position of the kinematics.
-   WCHAR16               MLPI_STRUCT_ALIGN_WCHAR16 actualPosUnit[MLPI_ROBOT_MAX_UNITS_LEN];          //!< Unit of actual position.
-   FLOAT                 MLPI_STRUCT_ALIGN_FLOAT   actualVelocity;                                   //!< Actual velocity of the kinematics.
-   FLOAT                 MLPI_STRUCT_ALIGN_FLOAT   actualAcceleration;                               //!< Actual acceleration of the kinematics.
-   FLOAT                 MLPI_STRUCT_ALIGN_FLOAT   actualJerk;                                       //!< Actual jerk of the kinematics.
-   WCHAR16               MLPI_STRUCT_ALIGN_WCHAR16 pathUnit[MLPI_ROBOT_MAX_UNIT_LEN];                //!< Unit of Vel, Acc and Jrk.
-   WCHAR16               MLPI_STRUCT_ALIGN_WCHAR16 timeBase[MLPI_ROBOT_MAX_UNIT_LEN];                //!< Unit of time.
+  // in
+  MlpiGroupRef          MLPI_STRUCT_ALIGN_STRUCT  group;                                            //!< Reference to the group.
+  ULONG                 MLPI_STRUCT_ALIGN_ULONG   coordSys;                                         //!< Coordinate system.
+  //outs
+  ULONG                 MLPI_STRUCT_ALIGN_ULONG   state;                                            //!< Kinematics state.
+  ULONG                 MLPI_STRUCT_ALIGN_ULONG   stateExtended;                                    //!< Extended kinematics state.
+  ULONG                 MLPI_STRUCT_ALIGN_ULONG   diagnosisNumber;                                  //!< Diagnosis number of the kinematics.
+  USHORT                MLPI_STRUCT_ALIGN_USHORT  dimension;                                        //!< Dimension of a point of the kinematics.
+  MlpiRobotPoint        MLPI_STRUCT_ALIGN_STRUCT  actualPosition;                                   //!< Actual position of the kinematics.
+  WCHAR16               MLPI_STRUCT_ALIGN_WCHAR16 actualPosUnit[MLPI_ROBOT_MAX_UNITS_LEN];          //!< Unit of actual position.
+  FLOAT                 MLPI_STRUCT_ALIGN_FLOAT   actualVelocity;                                   //!< Actual velocity of the kinematics.
+  FLOAT                 MLPI_STRUCT_ALIGN_FLOAT   actualAcceleration;                               //!< Actual acceleration of the kinematics.
+  FLOAT                 MLPI_STRUCT_ALIGN_FLOAT   actualJerk;                                       //!< Actual jerk of the kinematics.
+  WCHAR16               MLPI_STRUCT_ALIGN_WCHAR16 pathUnit[MLPI_ROBOT_MAX_UNIT_LEN];                //!< Unit of Vel, Acc and Jrk.
+  WCHAR16               MLPI_STRUCT_ALIGN_WCHAR16 timeBase[MLPI_ROBOT_MAX_UNIT_LEN];                //!< Unit of time.
 } MlpiRobotGetStatusSummary;
 
 //! @typedef MlpiRobotCoordinateSystemInfo
@@ -1210,6 +1311,29 @@ typedef struct MlpiRobotCmdInfo
   MlpiRobotCmdInfoType  MLPI_STRUCT_ALIGN_ENUM   infoType;     //!< Type of given information.
   DOUBLE                MLPI_STRUCT_ALIGN_DOUBLE value;        //!< Value of the information.
 }MlpiRobotCmdInfo;
+
+//! @typedef MlpiRobotChangeToolParameter
+//! @brief This structure defines the information for a tool change command.
+//! @details Elements of struct MlpiRobotChangeToolParameter
+//! <TABLE> 
+//! <TR><TH>          Type                </TH><TH>           Element       </TH><TH> Description                             </TH></TR>
+//! <TR><TD id="st_t">DOUBLE              </TD><TD id="st_e"> posX          </TD><TD> X position of the PCS in MCS.           </TD></TR>
+//! <TR><TD id="st_t">DOUBLE              </TD><TD id="st_e"> posY          </TD><TD> Y position of the PCS in MCS.           </TD></TR>
+//! <TR><TD id="st_t">DOUBLE              </TD><TD id="st_e"> posZ          </TD><TD> Z position of the PCS in MCS.           </TD></TR>
+//! <TR><TD id="st_t">DOUBLE              </TD><TD id="st_e"> rotA          </TD><TD> rotation of PCS around x axis in MCS.   </TD></TR>
+//! <TR><TD id="st_t">DOUBLE              </TD><TD id="st_e"> rotB          </TD><TD> rotation of PCS around y axis in MCS.   </TD></TR>
+//! <TR><TD id="st_t">DOUBLE              </TD><TD id="st_e"> rotC          </TD><TD> rotation of PCS around z axis in MCS.   </TD></TR>
+//! </TABLE>
+typedef struct MlpiRobotChangeToolParameter
+{
+  DOUBLE                    MLPI_STRUCT_ALIGN_DOUBLE   posX;          //!< X position of the PCS in MCS.
+  DOUBLE                    MLPI_STRUCT_ALIGN_DOUBLE   posY;          //!< Y position of the PCS in MCS.
+  DOUBLE                    MLPI_STRUCT_ALIGN_DOUBLE   posZ;          //!< Z position of the PCS in MCS.
+  DOUBLE                    MLPI_STRUCT_ALIGN_DOUBLE   rotA;          //!< rotation of PCS around x axis in MCS.
+  DOUBLE                    MLPI_STRUCT_ALIGN_DOUBLE   rotB;          //!< rotation of PCS around y axis in MCS.
+  DOUBLE                    MLPI_STRUCT_ALIGN_DOUBLE   rotC;          //!< rotation of PCS around z axis in MCS.
+}MlpiRobotChangeToolParameter;
+
 
 #if !defined(TARGET_OS_VXWORKS)
 #pragma pack(pop)
@@ -2612,6 +2736,32 @@ MLPI_API MLPIRESULT mlpiRobotSetMoveId(const MLPIHANDLE connection, const MlpiGr
 //! MLPIRESULT result = mlpiRobotGetCmdInfo(connection, group, infoType, cmdInfo, 100, &numElementsRet);
 //! @endcode
 MLPI_API MLPIRESULT mlpiRobotGetCmdInfo(const MLPIHANDLE connection, const MlpiGroupRef group, const MlpiRobotCmdInfoType infoType, MlpiRobotCmdInfo* cmdInfo, const ULONG numElements, ULONG *numElementsRet);
+
+//! @ingroup RobotLibConfig
+//! This function changes a tool.
+//! @param[in]   connection          Handle for multiple connections.
+//! @param[in]   group               Reference to group.
+//! @param[in]   paramSet            Structure containing all information necessary for the tool change command.
+//! @param[out]  motionHandle        Pointer to value where motion handle will be stored.
+//! @return                          Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! // Configure a tool change.
+//! MLPIMOTIONHANDLE motionHandle;
+//! MlpiGroupRef group;
+//! group.controlNo = MLPI_LOCAL_CONTROL;
+//! group.groupNo = MLPI_GROUP_1;
+//! MlpiRobotChangeToolParameter paramSet;
+//! paramSet.posX = 70.0;
+//! paramSet.posY = 50.0;
+//! paramSet.posZ = 0.0;
+//! paramSet.rotA = 90.0;
+//! paramSet.rotB = 0.0;
+//! paramSet.rotB = 0.0;
+//! MLPIRESULT result = mlpiRobotChangeTool(connection, group, &paramSet, &motionHandle);
+//! @endcode
+MLPI_API MLPIRESULT mlpiRobotChangeTool(const MLPIHANDLE connection, const MlpiGroupRef group, const MlpiRobotChangeToolParameter *paramSet, MLPIMOTIONHANDLE *motionHandle);
 
 
 #ifdef __cplusplus

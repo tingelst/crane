@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -101,6 +101,57 @@
 //! @addtogroup TraceLibVersionPermission Version and Permission
 //! @ingroup TraceLib
 //! @{
+//! @addtogroup TraceLibVersionPermission_new Server version since 1.26.0.0 (MLC-FW: 14V22)
+//! @ingroup TraceLibVersionPermission
+//! @{
+//!
+//! @note Since firmware version 14V22 (MLPI-Server-Version: 1.26.0.0) a centralized permission management has been implemented in target 
+//! controls XM2, L75 and VPx. Some permissions have been summarized in order to improve their usability. 
+//! Additional information regarding the usage of older manifest files (i.e. accounts.xml) with newer server versions can be found in @ref newest_manifest.\n
+//! @note <b><span style="color:red">Users of other CML controls (i.e. L25, L45, L65) have to use the old permissions as defined in @ref TraceLibVersionPermission_old</span></b>
+//!
+//!
+//! @par List of valid permissions for mlpiTraceLib. These permissions shall be assigned to the groups (i.e. in the group manifest file groups.xml) rather than the users.
+//! <TABLE>
+//! <TR><TH> Permission             </TH><TH> Description                                                                                     </TH></TR>                  
+//! <TR><TD id="st_e"> TRACE_INFO   </TD><TD> View tracing modules and messages - Allows to enumerate trace modules and view trace messages.  </TD></TR>  
+//! <TR><TD id="st_e"> TRACE_SETUP  </TD><TD> Enable or disable tracing modules - Allows to enable or disable tracing modules.                </TD></TR>  
+//! <TR><TD id="st_e"> TRACE_USE    </TD><TD> Trace message, warning or error - Allows to trace message, warning or error.                    </TD></TR>
+//! </TABLE>
+//!
+//!  @par List of available functions in mlpiTraceLib and the permissions required for their use. 
+//! <TABLE>
+//! <TR><TH>           Function                             </TH><TH> Server version </TH><TH> Permission-Ident </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceActivateModule         </TD><TD> 1.0.0.0        </TD><TD> "TRACE_SETUP"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceDeactivateModule       </TD><TD> 1.0.0.0        </TD><TD> "TRACE_SETUP"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceActivateAllModules     </TD><TD> 1.0.0.0        </TD><TD> "TRACE_SETUP"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceDeactivateAllModules   </TD><TD> 1.0.0.0        </TD><TD> "TRACE_SETUP"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceMessage                </TD><TD> 1.0.0.0        </TD><TD> "TRACE_USE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceWarning                </TD><TD> 1.0.0.0        </TD><TD> "TRACE_USE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceError                  </TD><TD> 1.0.0.0        </TD><TD> "TRACE_USE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceEvent                  </TD><TD> 1.0.0.0        </TD><TD> "TRACE_USE"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceGetNumberOfModules     </TD><TD> 1.0.0.0        </TD><TD> "TRACE_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceGetModuleList          </TD><TD> 1.0.0.0        </TD><TD> "TRACE_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceGetNumberOfBuffers     </TD><TD> 1.0.0.0        </TD><TD> "TRACE_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceGetBufferList          </TD><TD> 1.0.0.0        </TD><TD> "TRACE_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceReadBuffer             </TD><TD> 1.0.0.0        </TD><TD> "TRACE_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceGetNewestMessageIndex  </TD><TD> 1.0.0.0        </TD><TD> "TRACE_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceGetOldestMessageIndex  </TD><TD> 1.0.0.0        </TD><TD> "TRACE_INFO"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiTraceClearAllBuffers        </TD><TD> 1.0.0.0        </TD><TD> "TRACE_INFO"     </TD></TR>
+//! </TABLE>
+//!
+//! @par List of the old permissions of mlpiTraceLib and their corresponding new permission.
+//! <TABLE>
+//! <TR><TH> Old permission                            </TH><TH> new Permission  </TH></TR>                  
+//! <TR><TD id="st_e"> MLPI_TRACELIB_PERMISSION_SETUP  </TD><TD> TRACE_SETUP     </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_TRACELIB_PERMISSION_INFO   </TD><TD> TRACE_INFO      </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_TRACELIB_PERMISSION_USE    </TD><TD> TRACE_USE       </TD></TR>   
+//! </TABLE>
+//!
+//! @}
+//! @addtogroup TraceLibVersionPermission_old Server versions before 1.26.0.0 
+//! @ingroup TraceLibVersionPermission
+//! @{
 //! @brief Version and permission information
 //!
 //! The table shows requirements regarding the minimum server version (@ref sec_ServerVersion) and the
@@ -148,6 +199,7 @@
 //!
 //! @see
 //! @ref sec_Permission
+//! @}
 //! @}
 
 //! @addtogroup TraceLibStructTypes Structs, types, ...

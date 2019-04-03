@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -162,14 +162,5 @@ inline size_t utilSizeOfMlpiType(MlpiType type)
   }
 }
 
-
-/*
-==============================================================================
-History
-------------------------------------------------------------------------------
-01-Jan-2012
-  - first version
-==============================================================================
-*/
 
 #endif /* __MLPIGLOBALHELPER_H__ */

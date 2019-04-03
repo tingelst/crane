@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -282,14 +282,5 @@ typedef struct BundleInfo1
 
 //! @} // endof: @ingroup BundleLibStructTypes
 
-
-/*
-==============================================================================
-History
-------------------------------------------------------------------------------
-01-Jan-2012
-  - first version
-==============================================================================
-*/
 
 #endif // endof: #ifndef __BUNDLE_H__

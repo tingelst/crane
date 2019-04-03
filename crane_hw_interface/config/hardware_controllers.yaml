@@ -7,16 +7,16 @@ joint_state_controller:
 joint_trajectory_controller:
   type: "velocity_controllers/JointTrajectoryController"
   joints:
-    - joint_1
-    - joint_2
-    - joint_2
+    - slew
+    - boom_1
+    - boom_2
   gains:
-    joint_1: { p: 100, d: 1, i: 1, i_clamp: 1 }
-    joint_2: { p: 100, d: 1, i: 1, i_clamp: 1 }
-    joint_3: { p: 100, d: 1, i: 1, i_clamp: 1 }
+    slew: { p: 100, d: 1, i: 1, i_clamp: 1 }
+    boom_1: { p: 100, d: 1, i: 1, i_clamp: 1 }
+    boom_2: { p: 100, d: 1, i: 1, i_clamp: 1 }
   velocity_ff:
-    joint_1: 1.0
-    joint_2: 1.0
-    joint_3: 1.0
+    slew: 1.0
+    boom_1: 1.0
+    boom_2: 1.0
   state_publish_rate: 50
   action_monitor_rate: 20 

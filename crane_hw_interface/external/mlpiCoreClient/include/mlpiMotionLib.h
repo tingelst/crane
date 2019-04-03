@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -354,6 +354,127 @@
 //! @addtogroup MotionLibVersionPermission Version and Permission
 //! @ingroup MotionLib
 //! @{
+//! @addtogroup MotionLibVersionPermission_new Server version since 1.26.0.0 (MLC-FW: 14V22)
+//! @ingroup MotionLibVersionPermission
+//!
+//! @note Since firmware version 14V22 (MLPI-Server-Version: 1.26.0.0) a centralized permission management has been implemented in target 
+//! controls XM2, L75 and VPx. Some permissions have been summarized in order to improve their usability. 
+//! Additional information regarding the usage of older manifest files (i.e. accounts.xml) with newer server versions can be found in @ref newest_manifest.\n
+//! @note <b><span style="color:red">Users of other CML controls (i.e. L25, L45, L65) have to use the old permissions as defined in @ref MotionLibVersionPermission_old</span></b>
+//!
+//!
+//! @par List of valid permissions for mlpiMotionLib. These permissions shall be assigned to the groups (i.e. in the group manifest file groups.xml) rather than the users.
+//! <TABLE>
+//! <TR><TH> Permission-Ident        </TH><TH> Description                                                                          </TH></TR>                  
+//! <TR><TD id="st_e"> MOTION_INFO   </TD><TD> Monitor axes - Allows to monitor axes, e.g. current position, current velocity etc.  </TD></TR>  
+//! <TR><TD id="st_e"> MOTION_MOVE   </TD><TD> Move axes - Allows to move axes                                                      </TD></TR>  
+//! <TR><TD id="st_e"> MOTION_SETUP  </TD><TD> Create, delete and configure axes - Allows to create, delete and configure axes.     </TD></TR>
+//! </TABLE>
+//!
+//!  @par List of available functions in mlpiMotionLib and the permissions required for their use. 
+//! <TABLE>
+//! <TR><TH>           Function                                   </TH><TH> Server version </TH><TH> Permission-Ident </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetAbsoluteMeasurement      </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionChangeFlexProfileSet        </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionCreateAxis                  </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionDestroyAxis                 </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetConfiguredAxes           </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetActualPosition           </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetActualVelocity           </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetActualAcceleration       </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetActualTorque             </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetInterpolatedPosition     </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetInterpolatedVelocity     </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetInterpolatedTorque       </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetPositionLimitNeg         </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetPositionLimitNeg         </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetPositionLimitPos         </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetPositionLimitPos         </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetVelocityLimitPos         </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetVelocityLimitPos         </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetVelocityLimitNeg         </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetVelocityLimitNeg         </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetAccelerationLimitBip     </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetAccelerationLimitBip     </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetJerkLimitBip             </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetJerkLimitBip             </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetTorqueLimitBip           </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetTorqueLimitBip           </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetPositionScaling          </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetPositionScaling          </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetVelocityScaling          </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetVelocityScaling          </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetAccelerationScaling      </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetAccelerationScaling      </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetModulo                   </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetModulo                   </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetSlaveDriveFeedTravel     </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetSlaveDriveFeedTravel     </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetState                    </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetStateExtended            </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetDiagnosisNumber          </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetDiagnosisText            </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetName                     </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetName                     </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetAxisType                 </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetCondition                </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetCondition                </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionLoadDefaultParameters       </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionClearError                  </TD><TD> 1.0.0.0        </TD><TD> "MOTION_SETUP"   </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetAxisValues               </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetAxisUnits                </TD><TD> 1.0.0.0        </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetStatus                   </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionPower                       </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionStop                        </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionHome                        </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionMoveVelocity                </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionMoveAbsolute                </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionMoveAdditive                </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionMoveRelative                </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionTorqueControl               </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionOpenCyclicPositionChannel   </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionOpenCyclicVelocityChannel   </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionOpenCyclicAnalogChannel     </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionOpenCyclicTorqueChannel     </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionWriteCyclicPosition         </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionWriteCyclicVelocity         </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionWriteCyclicAnalog           </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionWriteCyclicTorque           </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionControlOn                   </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionControlOff                  </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGearIn                      </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGearInPos                   </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionCamIn                       </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionMotionProfile               </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionFlexProfile                 </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSynchronOut                 </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionPhasing                     </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionPhasingSlave                </TD><TD> 1.0.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionAddAxisToGroup              </TD><TD> 1.6.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionRemAxisFromGroup            </TD><TD> 1.6.0.0        </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetVelocityLimitBip         </TD><TD> 1.10.0.0       </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetVelocityLimitBip         </TD><TD> 1.10.0.0       </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetTorqueLimitPos           </TD><TD> 1.10.0.0       </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetTorqueLimitPos           </TD><TD> 1.10.0.0       </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetTorqueLimitNeg           </TD><TD> 1.10.0.0       </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionSetTorqueLimitNeg           </TD><TD> 1.10.0.0       </TD><TD> "MOTION_INFO"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionMoveContinuousAbsolute      </TD><TD> 1.12.0.0       </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionMoveContinuousRelative      </TD><TD> 1.12.0.0       </TD><TD> "MOTION_MOVE"    </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetAxisStatus               </TD><TD> 1.23.0.0       </TD><TD> "MOTION_INFO"    </TD></TR>
+//! </TABLE>                                                                                          
+//!
+//! @par List of the old permissions of mlpiMotionLib and their corresponding new permission.
+//! <TABLE>
+//! <TR><TH> Old permission                             </TH><TH> new Permission  </TH></TR>                  
+//! <TR><TD id="st_e"> MLPI_MOTIONLIB_PERMISSION_ALWAYS </TD><TD> IMPLICIT        </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_MOTIONLIB_PERMISSION_SETUP  </TD><TD> MOTION_SETUP    </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_MOTIONLIB_PERMISSION_INFO   </TD><TD> MOTION_INFO     </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_MOTIONLIB_PERMISSION_MOVE   </TD><TD> MOTION_MOVE     </TD></TR>  
+//! </TABLE>
+//!
+//! @addtogroup MotionLibVersionPermission_old Server versions before 1.26.0.0 
+//! @ingroup MotionLibVersionPermission
+//! @{
 //! @brief Version and permission information
 //!
 //! The table shows requirements regarding the minimum server version (@ref sec_ServerVersion) and the
@@ -458,6 +579,7 @@
 //! <TR><TD id="st_e"> @ref mlpiMotionSetTorqueLimitNeg           </TD><TD> 1.10.0.0       </TD><TD> "MLPI_MOTIONLIB_PERMISSION_INFO"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD></TR>
 //! <TR><TD id="st_e"> @ref mlpiMotionMoveContinuousAbsolute      </TD><TD> 1.12.0.0       </TD><TD> "MLPI_MOTIONLIB_PERMISSION_MOVE"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
 //! <TR><TD id="st_e"> @ref mlpiMotionMoveContinuousRelative      </TD><TD> 1.12.0.0       </TD><TD> "MLPI_MOTIONLIB_PERMISSION_MOVE"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiMotionGetAxisStatus               </TD><TD> 1.23.0.0       </TD><TD> "MLPI_MOTIONLIB_PERMISSION_INFO"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD></TR>
 //! </TABLE>
 //!
 //! <TABLE>
@@ -471,6 +593,7 @@
 //!
 //! @see
 //! @ref sec_Permission
+//! @}
 //! @}
 
 //! @addtogroup MotionLibStructTypes Structs, Types, ...
@@ -1258,6 +1381,30 @@ typedef struct MlpiAxisUnits
   WCHAR16 jerk[MLPI_MOTION_MAX_UNITS_LEN];              //!< Jerk unit of the axis. e.g. 'rad/sec^2'.
   WCHAR16 torque[MLPI_MOTION_MAX_UNITS_LEN];            //!< Torque unit of the axis. e.g. 'Nm'.
 }MlpiAxisUnits;
+
+//! @typedef MlpiAxisStatus
+//! Structure containing status information about an axis. These values do change as soon as the axis is in operation.
+//! You may want to use this structure to read several sets of axis status information using one single function call during operation of the axis.
+//! @details Elements of struct MlpiAxisStatus
+//! <TABLE>
+//! <TR><TH>           Type        </TH><TH> Direction </TH><TH>           Element            </TH><TH> Description                                                                   </TH></TR>
+//! <TR><TD id="st_t"> MlpiAxisRef </TD><TD> [in]      </TD><TD id="st_e"> axis               </TD><TD> Logical axis address.                                                         </TD></TR>
+//! <TR><TD id="st_t"> ULLONG      </TD><TD> [out]     </TD><TD id="st_e"> state              </TD><TD> Axis state of the axis. See @ref mlpiMotionGetState.                          </TD></TR>
+//! <TR><TD id="st_t"> ULONG       </TD><TD> [out]     </TD><TD id="st_e"> stateExtended      </TD><TD> Extended axis state of the axis. See @ref mlpiMotionGetStateExtended.         </TD></TR>
+//! <TR><TD id="st_t"> ULONG       </TD><TD> [out]     </TD><TD id="st_e"> diagnosisNumber    </TD><TD> Current diagnosis number of the axis. See @ref mlpiMotionGetDiagnosisNumber.  </TD></TR>
+//! <TR><TD id="st_t"> ULONG       </TD><TD> [out]     </TD><TD id="st_e"> condition          </TD><TD> Condition of the axis. See @ref mlpiMotionGetCondition.                       </TD></TR>
+//! </TABLE>
+typedef struct MlpiAxisStatus
+{
+  // Input Parameters
+  MlpiAxisRef       MLPI_STRUCT_ALIGN_STRUCT      axis;                                     //!< Logical axis address.
+
+  // Output Parameters:
+  ULLONG            MLPI_STRUCT_ALIGN_ULLONG      state;                                    //!< Axis state of the axis. See @ref mlpiMotionGetState.
+  ULONG             MLPI_STRUCT_ALIGN_ULONG       stateExtended;                            //!< Extended axis state of the axis. See @ref mlpiMotionGetStateExtended.
+  ULONG             MLPI_STRUCT_ALIGN_ULONG       diagnosisNumber;                          //!< Current diagnosis number of the axis. See @ref mlpiMotionGetDiagnosisNumber.
+  ULONG             MLPI_STRUCT_ALIGN_ULONG       condition;                                //!< Condition of the axis. See @ref mlpiMotionGetCondition.
+}MlpiAxisStatus;
 
 //! @typedef MlpiMotionStop
 //! @brief Structure to command stop to an axis.
@@ -2486,6 +2633,67 @@ MLPI_API MLPIRESULT mlpiMotionGetAxisValues(const MLPIHANDLE connection, MlpiAxi
 //! See @ref mlpiMotionGetAxisValues
 MLPI_API MLPIRESULT mlpiMotionGetAxisUnits(const MLPIHANDLE connection, MlpiAxisUnits* axisUnits, const ULONG numElements);
 
+//! @ingroup MotionLibConfiguration
+//! This function fills an array of MlpiAxisStatus structures. Use the @c axis element of the structure to specify the
+//! axis for which information should be read.
+//! You may want to use this function to read several sets of axis status information for several axes using one single
+//! function call during operation of the axes. This gives increased performance in comparison to reading the values
+//! with the function @ref mlpiMotionGetAxisValues, since the actual values of axes are not needed (e.g. actual position A-0-0101).
+//! @param[in]      connection        Handle for multiple connections.
+//! @param[in, out] axisStatus        Fills a struct with the current operation information about axes. AxisRef has to be set by the caller.
+//! @param[in]      numElements       Number of axes for which status values should be read. This is the array length of the parameter @c axisStatus.
+//! @return                           Return value indicating success (>=0) or error (<0).
+//!
+//! @note Elements of the struct that can not be read will be set to 0.
+//!
+//! @par Example:
+//! @code
+//! // This example reads a list of all current configured axes.
+//! // It uses this information to read the axis status values (state, stateExtended, diagnosis...)
+//! // of all axes.
+//! //
+//! // Please note that 2 different MLPI functions are used. This is due to performance
+//! // reasons. You may want to call mlpiMotionGetConfiguredAxes
+//! // only when the axis configuration is changed. In contrast, the function
+//! // mlpiMotionGetAxisStatus can be polled more often and contains status values which are
+//! // more dynamic (state, diagnosis...). You can also use it for
+//! // a subset of axes only.
+//!
+//! MLPIRESULT result;
+//! ULONG numAxes;
+//! MlpiAxisInformation configuredAxes[100];
+//!
+//! // read current axes configured from motion system to know which axes are available
+//! memset(configuredAxes, 0, sizeof(configuredAxes));
+//! result = mlpiMotionGetConfiguredAxes(connection, configuredAxes, _countof(configuredAxes), &numAxes);
+//!
+//! if (MLPI_FAILED(result)) {
+//!   printf("\ncall of MLPI function failed with 0x%08x!", result);
+//!   return result;
+//! }
+//! printf("\nFound %d configured axes:", numAxes);
+//!
+//! // build list of axis to read the status values for
+//! MlpiAxisStatus axisStatus[100];
+//! for (ULONG i=0; i<numAxes; i++) {
+//!   axisStatus[i].axis = configuredAxes[i].axis;
+//! }
+//!
+//! // read all axis status values for the given axes list
+//! result = mlpiMotionGetAxisStatus(connection, axisStatus, numAxes);
+//!
+//! if (MLPI_FAILED(result)) {
+//!   printf("\ncall of MLPI function failed with 0x%08x!", result);
+//!   return result;
+//! }
+//!
+//! // let's print some information of all axes
+//! for (ULONG i=0; i<numAxes; i++) {
+//!   printf("\n--- (%d) %s ---", axisStatus[i].axis.axisNo, W2A16(configuredAxes[i].name));
+//!   printf("\n Diagnosis:    0x%08X", axisStatus[i].diagnosisNumber);
+//! }
+//! @endcode
+MLPI_API MLPIRESULT mlpiMotionGetAxisStatus(const MLPIHANDLE connection, MlpiAxisStatus* axisStatus, const ULONG numElements);
 
 //! @ingroup MotionLibConfiguration
 //! This function creates an axis. If an axis already exists, it will be overwritten.

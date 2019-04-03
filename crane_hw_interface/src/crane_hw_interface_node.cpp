@@ -35,6 +35,7 @@ int main(int argc, char** argv)
   period.fromSec(std::chrono::duration_cast<std::chrono::duration<double>>(stopwatch_now - stopwatch_last).count());
   stopwatch_last = stopwatch_now;
 
+  ros::Rate r(10);  // 10 hz
   while (ros::ok())
   {
     // Receive current state from robot
@@ -51,6 +52,8 @@ int main(int argc, char** argv)
 
     // Send new setpoint to robot
     hardware_interface.write(timestamp, period);
+
+    r.sleep();
   }
 
   spinner.stop();

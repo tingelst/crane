@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2017
 //
@@ -153,6 +153,89 @@
 //! @addtogroup EthercatLibVersionPermission Version and Permission
 //! @ingroup EthercatLib
 //! @{
+//! @addtogroup EthercatLibVersionPermission_new Server version since 1.26.0.0 (MLC-FW: 14V22)
+//! @ingroup EthercatLibVersionPermission
+//! @{
+//!
+//! @note Since firmware version 14V22 (MLPI-Server-Version: 1.26.0.0) a centralized permission management has been implemented in target 
+//! controls XM2, L75 and VPx. Some permissions have been summarized in order to improve their usability. 
+//! Additional information regarding the usage of older manifest files (i.e. accounts.xml) with newer server versions can be found in @ref newest_manifest.\n
+//! @note <b><span style="color:red">Users of other CML controls (i.e. L25, L45, L65) have to use the old permissions as defined in @ref EthercatLibVersionPermission_old</span></b>
+//!
+//!
+//! @par List of valid permissions for mlpiEthercatLib. These permissions shall be assigned to the groups (i.e. in the group manifest file groups.xml) rather than the users.
+//! <TABLE>
+//! <TR><TH> Permission-Ident              </TH><TH> Description                                                                                                                  </TH></TR>                  
+//! <TR><TD id="st_e"> ETHERCAT_INFO       </TD><TD> Get status and configuration info of bus and devices - Allows get status and configuration info of EtherCAT bus and devices. </TD></TR>  
+//! <TR><TD id="st_e"> ETHERCAT_OPERATION  </TD><TD> Operation - Allows to set the bus state, perform bus scan and reset statistics.TD</                                              ></TR>  
+//! <TR><TD id="st_e"> ETHERCAT_READ       </TD><TD> Read data from devices - Allows to read data from EtherCAT devices.                                                          </TD></TR>
+//! <TR><TD id="st_e"> ETHERCAT_SETUP      </TD><TD> Setup and configure master and devices - Allows to setup and configure the EtherCAT master and devices.                      </TD></TR>
+//! <TR><TD id="st_e"> ETHERCAT_WRITE      </TD><TD> Write data to devices - Allows to write data to EtherCAT devices.                                                            </TD></TR>
+//! </TABLE>
+//!
+//!  @par List of available functions in mlpiEthercatLib and the permissions required for their use. 
+//! <TABLE>
+//! <TR><TH>           Function                                         </TH><TH> Server version </TH><TH> Permission-Ident     </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetTopologyStatus               </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetConfigFiles                  </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatSetConfigFiles                  </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatControl                         </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetMasterState                  </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatSetMasterState                  </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_OPERATION" </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetNumConfiguredSlaves          </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetNumConnectedSlaves           </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetSlaveState                   </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatSetSlaveState                   </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_OPERATION" </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetSlaveOnlineInfo              </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetSlaveConfigInfo              </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetSlavePortState               </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatReadSlaveRegister               </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_OPERATION" </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatWriteSlaveRegister              </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatResetSlaveController            </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatReadSlaveEeprom                 </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatWriteSlaveEeprom                </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatReloadSlaveEeprom               </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatAssignSlaveEeprom               </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatCheckSlaveEeprom                </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatReadSlaveIdentification         </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetSlaveStatistics              </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatResetSlaveStatistics            </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_OPERATION" </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatSetSlaveStatisticsPeriod        </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatCoeGetOdList                    </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatCoeGetObjectDescription         </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatCoeGetEntryDescription          </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatCoeSdoUpload                    </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_READ"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatCoeSdoDownload                  </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_WRITE"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatSoeRead                         </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_WRITE"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatSoeWrite                        </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_READ"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetVendorInfo                   </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGenerateEsi                     </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_SETUP"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatStartBusScan                    </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_OPERATION" </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetBusScanStatus                </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetBusScanSlaveInfo             </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetProcessData                  </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatSetProcessData                  </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_WRITE"     </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetProcessDataSize              </TD><TD> 1.18.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetMasterStatus                 </TD><TD> 1.23.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetSlaveStatus                  </TD><TD> 1.23.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetSlaveStatisticsPeriod        </TD><TD> 1.23.0.0       </TD><TD> "ETHERCAT_INFO"      </TD></TR>
+//! </TABLE>
+//!
+//! @par List of the old permissions of mlpiEthercatLib and their corresponding new permission.
+//! <TABLE>
+//! <TR><TH> Old permission                                   </TH><TH> new Permission      </TH></TR>                  
+//! <TR><TD id="st_e"> MLPI_ETHERCATLIB_PERMISSION_ALWAYS     </TD><TD> IMPLICIT            </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_ETHERCATLIB_PERMISSION_CONFIG     </TD><TD> ETHERCAT_SETUP      </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_ETHERCATLIB_PERMISSION_INFO       </TD><TD> ETHERCAT_INFO       </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_ETHERCATLIB_PERMISSION_OPERATION  </TD><TD> ETHERCAT_OPERATION  </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_ETHERCATLIB_PERMISSION_DATA_READ  </TD><TD> ETHERCAT_READ       </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_ETHERCATLIB_PERMISSION_DATA_WRITE </TD><TD> ETHERCAT_WRITE      </TD></TR>  
+//! </TABLE>
+//!
+//! @}
+//! @addtogroup EthercatLibVersionPermission_old Server versions before 1.26.0.0 
+//! @ingroup EthercatLibVersionPermission
+//! @{
 //! @brief Version and permission information
 //!
 //! The table shows requirements regarding the minimum server version (@ref sec_ServerVersion) and the
@@ -213,6 +296,9 @@
 //! <TR><TD id="st_e"> @ref mlpiEthercatGetProcessData                  </TD><TD> 1.18.0.0       </TD><TD> "MLPI_ETHERCATLIB_PERMISSION_INFO"           </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
 //! <TR><TD id="st_e"> @ref mlpiEthercatSetProcessData                  </TD><TD> 1.18.0.0       </TD><TD> "MLPI_ETHERCATLIB_PERMISSION_DATA_WRITE"     </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
 //! <TR><TD id="st_e"> @ref mlpiEthercatGetProcessDataSize              </TD><TD> 1.18.0.0       </TD><TD> "MLPI_ETHERCATLIB_PERMISSION_INFO"           </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetMasterStatus                 </TD><TD> 1.23.0.0       </TD><TD> "MLPI_ETHERCATLIB_PERMISSION_INFO"           </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetSlaveStatus                  </TD><TD> 1.23.0.0       </TD><TD> "MLPI_ETHERCATLIB_PERMISSION_INFO"           </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiEthercatGetSlaveStatisticsPeriod        </TD><TD> 1.23.0.0       </TD><TD> "MLPI_ETHERCATLIB_PERMISSION_INFO"           </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD> x    </TD><TD>      </TD></TR>
 //! </TABLE>
 //!
 //! <TABLE>
@@ -226,6 +312,7 @@
 //!
 //! @see
 //! @ref sec_Permission
+//! @}
 //! @}
 
 //! @addtogroup EthercatLibStructTypes Structs, types, ...
@@ -301,7 +388,7 @@ typedef enum MlpiEthercatOdListType
   MLPI_ETHERCAT_OD_LIST_TYPE_RXPDOMAP               = 2,     //!< Only pdo mappable objects.
   MLPI_ETHERCAT_OD_LIST_TYPE_TXPDOMAP               = 3,     //!< Only pdo mappable objects that can be changed.
   MLPI_ETHERCAT_OD_LIST_TYPE_STORED_FOR_REPLACEMENT = 4,     //!< Only stored for a device replacement objects.
-  MLPI_ETHERCAT_OD_LIST_TYPE_STARTUP_PARAM          = 8      //!< Only startup parameter objects.
+  MLPI_ETHERCAT_OD_LIST_TYPE_STARTUP_PARAM          = 5      //!< Only startup parameter objects.
 } MlpiEthercatOdListType;
 
 //! @enum MlpiEthercatProcessDataType
@@ -739,6 +826,23 @@ MLPI_API MLPIRESULT mlpiEthercatGetMasterState(const MLPIHANDLE connection, cons
 MLPI_API MLPIRESULT mlpiEthercatSetMasterState(const MLPIHANDLE connection, const ULONG interfaceNumber, const MlpiEthercatState state);
 
 //! @ingroup EthercatLibInfo
+//! This function returns the master status.
+//!
+//! @param[in]    connection        Handle for multiple connections.
+//! @param[in]    interfaceNumber   Master interface number.
+//! @param[out]   status            Master status.
+//! @return                         Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! // Get the master status.
+//! ULONG interfaceNumber = 0;
+//! ULONG status = 0;
+//! MLPIRESULT result = mlpiEthercatGetMasterStatus(connection, interfaceNumber, &status);
+//! @endcode
+MLPI_API MLPIRESULT mlpiEthercatGetMasterStatus(const MLPIHANDLE connection, const ULONG interfaceNumber, ULONG *status);
+
+//! @ingroup EthercatLibInfo
 //! This function returns the number of configured slaves.
 //!
 //! @param[in]    connection        Handle for multiple connections.
@@ -815,6 +919,27 @@ MLPI_API MLPIRESULT mlpiEthercatGetSlaveState(const MLPIHANDLE connection, const
 //! MLPIRESULT result = mlpiEthercatSetSlaveState(connection, interfaceNumber, addressType, address, slaveState);
 //! @endcode
 MLPI_API MLPIRESULT mlpiEthercatSetSlaveState(const MLPIHANDLE connection, const ULONG interfaceNumber, const MlpiEthercatAddressType addressType, const USHORT address, const MlpiEthercatState slaveState);
+
+//! @ingroup EthercatLibInfo
+//! This function returns the slave status.
+//!
+//! @param[in]    connection        Handle for multiple connections.
+//! @param[in]    interfaceNumber   Master interface number.
+//! @param[in]    addressType       Address type.
+//! @param[in]    address           Slave address (depending on addressType).
+//! @param[out]   status            Slave status.
+//! @return                         Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! // Get the slave status.
+//! ULONG interfaceNumber = 0;
+//! MlpiEthercatAddressType addressType = MLPI_ETHERCAT_AUTO_INCREMENT;
+//! USHORT address = 0;
+//! ULONG status = 0;
+//! MLPIRESULT result = mlpiEthercatGetSlaveStatus(connection, interfaceNumber, addressType, address, &status);
+//! @endcode
+MLPI_API MLPIRESULT mlpiEthercatGetSlaveStatus(const MLPIHANDLE connection, const ULONG interfaceNumber, const MlpiEthercatAddressType addressType, const USHORT address, ULONG *status);
 
 //! @ingroup EthercatLibInfo
 //! This function returns information about a slave connected to the EtherCAT bus.
@@ -1151,7 +1276,7 @@ MLPI_API MLPIRESULT mlpiEthercatResetSlaveStatistics(const MLPIHANDLE connection
 //!
 //! @param[in]    connection        Handle for multiple connections.
 //! @param[in]    interfaceNumber   Master interface number.
-//! @param[in]    periodMs          Period in ms.
+//! @param[in]    periodMs          Update period in unit of milliseconds (0 means disable feature).
 //! @return                         Return value indicating success (>=0) or error (<0).
 //!
 //! @par Example:
@@ -1162,6 +1287,23 @@ MLPI_API MLPIRESULT mlpiEthercatResetSlaveStatistics(const MLPIHANDLE connection
 //! MLPIRESULT result = mlpiEthercatSetSlaveStatisticsPeriod(connection, interfaceNumber, periodMs);
 //! @endcode
 MLPI_API MLPIRESULT mlpiEthercatSetSlaveStatisticsPeriod(const MLPIHANDLE connection, const ULONG interfaceNumber, const ULONG periodMs);
+
+//! @ingroup EthercatLibDll
+//! This function returns the update period of internal slave statistics collection.
+//!
+//! @param[in]    connection        Handle for multiple connections.
+//! @param[in]    interfaceNumber   Master interface number.
+//! @param[out]   periodMs          Update period in unit of milliseconds (0 means disabled feature).
+//! @return                         Return value indicating success (>=0) or error (<0).
+//!
+//! @par Example:
+//! @code
+//! // Get the update period of internal slave statistics collection.
+//! ULONG interfaceNumber = 0;
+//! ULONG periodMs = 0;
+//! MLPIRESULT result = mlpiEthercatGetSlaveStatisticsPeriod(connection, interfaceNumber, &periodMs);
+//! @endcode
+MLPI_API MLPIRESULT mlpiEthercatGetSlaveStatisticsPeriod(const MLPIHANDLE connection, const ULONG interfaceNumber, ULONG *periodMs);
 
 //! @ingroup EthercatLibCoE
 //! This function gets a list of object indices which are available in a EtherCAT CoE device.

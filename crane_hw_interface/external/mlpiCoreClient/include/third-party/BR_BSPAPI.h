@@ -366,12 +366,11 @@ BRIdentInfoFunc_t;
 #define IDENTINFO_BLP_NR           7     /**<board number: null terminated string */
 #define IDENTINFO_BLP_IND_NR       8     /**<board index: null terminated string */
 #define IDENTINFO_SYSTEM_DATA      9     /**<system specific data, upper 16bits of length parameter specify offset into data area*/
-
-/*@AS*/
 #define IDENTINFO_ETH_MAC_1        10     /**<ethernet mac address: null terminated string */
 #define IDENTINFO_ETH_MAC_2        11     /**<ethernet mac address: null terminated string */
+#define IDENTINFO_OPTICAL          12     /**<optical identification of device: char, see  IDENTINFO_OPTICAL_xxx */
 
-#define IDENTINFO_LAST             12     /**<last command (dummy)*/
+#define IDENTINFO_LAST             13     /**<last command (dummy)*/
 
 /*return values for ident functions*/
 #define IDENTFUNC_OK                    0x00 /**<no error*/
@@ -387,6 +386,14 @@ BRIdentInfoFunc_t;
 #define IDENTFUNC_ERROR_RW              0x0A /**<ident info read and write error*/
 #define IDENTFUNC_ERROR_PARAMETER       0x0B /**<ident info parameter error*/
 #define IDENTFUNC_ERROR_MOD_NOTPRESENT  0xff /**<no module present at this module location*/
+
+
+/*identinfo optical commands*/
+#define IDENTINFO_OPTICAL_OFF           0 /**<ident info optical: switch optical sequence off*/
+#define IDENTINFO_OPTICAL_ON            1 /**<ident info optical: switch optical sequence on*/
+#define IDENTINFO_OPTICAL_TRIG          2 /**<ident info optical: trigger optical sequence*/
+#define IDENTINFO_OPTICAL_NOP           3 /**<ident info optical: no operation/no command*/
+
 
 /**@}*/ /*end group ident_information*******************************************
 *******************************************************************************/
@@ -471,11 +478,19 @@ BRIdentInfoFunc_t;
 * 
 * \endcode
 * 
-* Interrupt handling of br devices:
-* =================================
+* 
+* 
+* Interrupt handling of br devices (old version):
+* ===============================================
+* 
+* 
+* Old command BRBSPAPI_DEVICES_MSI_CONFIG (only MSI)
+* --------------------------------------------------
 * 
 * For br devices only message signalled interrupts are supported. To configure
 * the interrupts, the BRBspApi command BRBSPAPI_DEVICES_MSI_CONFIG has to be used.
+* This command is still supported for compability purpose. For future please use 
+* command BRBSPAPI_DEVICES_MSI_CONF. The new command additionally supports MSI-X.
 * 
 * On the intel platform message signalled interrupts are handled by interrupt
 * vectors. A device, that sends an msi sends a vector to the local apic, which is
@@ -517,9 +532,11 @@ BRIdentInfoFunc_t;
 * !!! It is imporant, that the device does not generate an msi before the aproprate isr is
 * connected.
 * Later the command BRBSPAPI_DEVICES_MSI_CONFIG can be called again, to connect or exchange
-* the remaining isr's. In that case the priority must be configured to BR_DEVICE_INTPRIO_NOCHANGE.
+* the remaining isr's. In that case the priority must be configured to BR_DEVICE_INTPRIO_NOCHANGE
+* or the same priority must be used as the first time. Otherwise the api will return an error.
 * 
-* The msi index in the data structure defines the number, the msi has.  
+* The msi index in the data structure defines the number, the interrupt has at the device.
+* 
 * 
 * How to use the BRBspApi:
 * ------------------------
@@ -607,6 +624,53 @@ BRIdentInfoFunc_t;
 * 
 * Now 3 isr are connected to the specified vectors and the device is configured to use
 * those vectors. The interrupts are enabled in the system.
+* 
+* 
+* 
+* New command BRBSPAPI_DEVICES_MSI_CONF (MSI and MSI-X)
+* -----------------------------------------------------
+* 
+* The new command additionally allows to configure MSI-X. MSI-X means, that each
+* interrupt of a device may use a unique interrupt vector. The interrupts may be
+* of different priority groups. To support this, the new command
+* BRBSPAPI_DEVICES_MSI_CONF uses new data structures for pcInData and pvOutData
+* (BRdeviceMsiConf_t and BRdeviceMsiInfo_t). Compared to the old data structur,
+* additional variables are needed:
+* 
+* ulMode: specifies, if MSI or MSI-X is to be configured, or if the api is only
+*         used to read, which mode is available (none, MSI, MSI-X). see constants
+*         BR_DEVICE_MSIMODE_xxx.
+*  
+* ulBRdeviceMsiSubPrio: ulMode MSI:
+*                       specifies a sub priority inside a priority group (1..16)
+*                       1 is the highest subpriority, 16 the lowest.
+*                       ulMode MSI-X:
+*                       don't care (set to 0)
+*                       
+* For MSI-X ulBRdeviceMsiPrio and ulBRdeviceMsiSubPrio together will specify the
+* interrupt vector. For example if BR_DEVICE_INTPRIO_1 spezifies vector 0xD0 on
+* a dedicated intel hardware, the combination of
+* ulBRdeviceMsiPrio = BR_DEVICE_INTPRIO_1
+* ulBRdeviceMsiSubPrio = 2
+* configures the interrupt vector to 0xDE (2nd highest priority, highest would
+* be 0XDF).
+* 
+* The command BRBSPAPI_DEVICES_MSI_CONF returns an information in the data
+* structure BRdeviceMsiInfo_t:
+* 
+* ulError: returns an error value or success (see error codes BR_DEVICE_xxx)
+* 
+* ulModeAvailable: returns which modes are available (see BR_DEVICE_MSIMODE_xxx)
+*                  only if ulMode == BR_DEVICE_MSIMODE_INFO, else don't care
+* 
+* ulModeConfigured: returns which mode is configured (see BR_DEVICE_MSIMODE_xxx)
+*                   only if ulMode == BR_DEVICE_MSIMODE_INFO, else don't care
+* 
+* 
+* MSI and MSI-x cannot be mixed on one device. If this device is configured for
+* one mode, the command will return an error if one tries to configure it to
+* another mode.
+* 
 ********************************************************************************
 *******************************************************************************/
   
@@ -672,10 +736,15 @@ BRIdentInfoFunc_t;
 #define BR_DEVICE_INTPRIO_7          7    /**<interrupt priority 7                             */
 #define BR_DEVICE_INTPRIO_8          8    /**<interrupt priority 8 = lowest interrupt priority */
 
+/*interrupt subpriorities*/
+/*for msi-x subpriorities have to be configured between 1 and 16. 1 is highest subpriority 16 lowest*/
+#define BR_DEVICE_SUBPRIO_LIKEMSI    0xffffffff  /*automatically set the subprio like with msi*/
+
 /*interrupt instances*/
 #define BR_DEVICE_INTINDEX_UNDEF     0xFFFFFFFF  /**<only configure int priority, do not connect isr*/
 #define BR_DEVICE_INTINSTANCEMAX    16    /**<maximum number if instances per interrupt priority*/
 
+/*error codes BR_DEVICE_xxx*/
 #define BR_DEVICE_OK                 0    /**<ok*/
 #define BR_DEVICE_HANDLER_ERROR      1    /**<device handler wrong value*/
 #define BR_DEVICE_MISSING_FEATURE    2    /**<requested feature not available*/
@@ -719,11 +788,39 @@ typedef struct
   unsigned long ulBRdeviceHandle;                  /**<handle to the br device*/
   unsigned long ulBRdeviceMsiPrio;                 /**<interrupt priority for the device*/
   unsigned long ulBRdeviceMsiCpu;                  /**<index of dedicated cpu (only on multicore systems)*/
-  unsigned long ulBRdeviceMsiIndex;                /**<index of interrupt service routines if 0xffffffff -> no vector follows*/
+  unsigned long ulBRdeviceMsiIndex;                /**<interrupt number of device, if 0xffffffff -> no isr shall be connected*/
   void (*fpIsrHandler)(void *);                    /**<function pointer to the interrupt handler*/
   void * parg;                                     /**<pointer to arguments*/
 }
 BRdeviceMsiConfig_t;
+
+/*data structure used in the BRBspApi command BRBSPAPI_DEVICES_MSI_CONF*/
+typedef struct
+{
+  unsigned long ulBRdeviceHandle;                  /**<handle to the br device*/
+  unsigned long ulMode;                            /**<see bits BR_DEVICE_MSIMODE_xxx*/
+  unsigned long ulBRdeviceMsiPrio;                 /**<interrupt priority for the device*/
+  unsigned long ulBRdeviceMsiSubPrio;              /**<interrupt sub priority for the device. Only MSIX don't care if used for MSI*/
+  unsigned long ulBRdeviceMsiCpu;                  /**<index of dedicated cpu (only on multicore systems)*/
+  unsigned long ulBRdeviceMsiIndex;                /**<interrupt number of device, if 0xffffffff -> no isr shall be connected*/
+  void (*fpIsrHandler)(void *);                    /**<function pointer to the interrupt handler*/
+  void * parg;                                     /**<pointer to arguments*/
+}
+BRdeviceMsiConf_t;
+
+typedef struct
+{
+  unsigned long ulError;                           /**<see error codes BR_DEVICE_xxx*/
+  unsigned long ulModeAvailable;                   /**<available mode: see bits BR_DEVICE_MSIMODE_xxx*/
+  unsigned long ulModeConfigured;                  /**<configured mode: see bits BR_DEVICE_MSIMODE_xxx*/
+}
+BRdeviceMsiInfo_t;
+
+/*msi modes used in data structures BRdeviceMsiConf_t and BRdeviceMsiInfo_t*/
+#define BR_DEVICE_MSIMODE_INFO                0    /**<only read msi info*/
+#define BR_DEVICE_MSIMODE_NONE                0    /**<interrupt not configured (read back info)*/
+#define BR_DEVICE_MSIMODE_MSI                 1    /**<configure/d as msi*/
+#define BR_DEVICE_MSIMODE_MSIX                2    /**<configure/d as msi-x*/
 
 
 /**@}*/ /*end group br_devices**************************************************
@@ -1130,7 +1227,6 @@ unsigned long BRBspApi(unsigned long ulCommand, void * pvInData, void * pvOutDat
 #define NVRAM_TYPE_SD             (5)           /**<sd card emulates nvram*/
 #define NVRAM_TYPE_SHM            (6)           /**<shared mem emulates nvram*/
 #define NVRAM_TYPE_MRAM           (7)           /**<mram emulates nvram*/
-#define NVRAM_TYPE_TEST_XM4X      (8)           /*joerzimm todo: XM4x*/
 /**@}*/ /*end group bsp_api_commands_nvram_constants***************************/
 /**@}*/ /*end group bsp_api_commands_nvram*************************************/
 
@@ -2029,6 +2125,12 @@ BRmountPointName_t;
 
 /**************************************************************************/ /**
 * \brief      configure message signalled interrupts of br devices
+* 
+* \remarks    there is a newer version of this command available: BR_BSPAPI_DEVICES_MSI_CONF
+*             the new command additionally supports msi-x
+*             the old command stays available for compability purpose
+*             on new designs please use the new command
+* 
 * \ingroup    bsp_api_commands_brdevices
 *
 * - pvInData:  pointer to BRdeviceMsiConfig_t structure
@@ -2250,17 +2352,18 @@ BRsntpcOut_t;
 *
 * \remarks    This command must be called cyclic. Every 10 seconds is a good value
 *             to start with (temperature does not change so rapidly).
-*             When this command recognizes the temperature warning of the
-*             power supply (yellow led), it automatically saves the associated
-*             temperature value and calculates the critical temperature value
-*             (warning temperature + 2.5°C).
-*             
-*             If this command is called only a long time after the warning temperature
-*             was reached (e.g. because it is called too rarely), the value of the
-*             critical temperature may be set too high.
-*             
-*             When the error temperature is reached (warning temperature + 5°C),
-*             the power supply switches off the device (led red).
+*
+*             The main information is the temperature status. The temperature status
+*             may depend on more than one temperature sensor.
+*
+*             The range and the resolution of the one given temperature value can 
+*             differ on different hardware type.
+*
+*             On the same hardware type the value can differ by exactness of the
+*             temperature sensor or by component allowances.
+*
+*             Ignoring critical temperature status without sanctions can lead to
+*             hardware precautions until the power supply switches off the device.
 *
 * - pvInData:  not used (NULL), if != NULL -> printf outputs
 * - pvOutData: pointer to BRtempStatus_t data struct
@@ -2274,10 +2377,10 @@ typedef struct
 }
 BRtempStatus_t;
 
-#define BR_TEMPSTATUS_OK     0   /**<temperature ok        (led is green)*/
-#define BR_TEMPSTATUS_WARN   1   /**<temperature warning   (led is yellow)*/
-#define BR_TEMPSTATUS_CRIT   2   /**<temperature critical  (led is yellow, 2.5°C above warning)*/
-                                 /**<temperature error     (led is red,    5.0°C above warning)*/
+#define BR_TEMPSTATUS_OK     0   /**<temperature ok       */
+#define BR_TEMPSTATUS_WARN   1   /**<temperature warning  */
+#define BR_TEMPSTATUS_CRIT   2   /**<temperature critical */
+
 #define BR_TEMPSTATUS_ERR    3   /**<temperature error smb read*/
 
 /**@}*/ /*end group bsp_api_commands_temp**************************************/
@@ -3030,8 +3133,7 @@ typedef void (* BRduplicateIpHook_t)(BRdupIpInfo_t dupInfo);
 /**************************************************************************/ /**
 * \brief       set amount of fixed Cache via Cache Allocation Technologie
 * 
-* \remarks     use percentage of total LLC (last level cache) for this core, allowed values: 0, 30, 60, 90
-*              due to diffent portions of cache digits a finer granularity is not possible
+* \remarks     use percentage of total LLC (last level cache) for this core, allowed values: <= 100
 * 
 * \ingroup     bsp_api_commands_misc
 *
@@ -3047,7 +3149,7 @@ typedef void (* BRduplicateIpHook_t)(BRdupIpInfo_t dupInfo);
 
 #define BRBSPAPI_CAT_NOTAVAILABLE  -1
 
-/* constants for allowed values */
+/* constants for proposed values */
 #define BR_CAT_PERC_0      0
 #define BR_CAT_PERC_30    30
 #define BR_CAT_PERC_60    60
@@ -3073,7 +3175,7 @@ typedef void (* BRduplicateIpHook_t)(BRdupIpInfo_t dupInfo);
 /**************************************************************************/ /**
 * \brief       get amount of cache misses in LLC for the calling core
 * 
-* \remarks     how many cache misses at LLC happened (absolute)
+* \remarks     how many cache misses at LLC happened (since last call of function)
 *              
 *
 * \ingroup     bsp_api_commands_misc
@@ -3089,13 +3191,29 @@ typedef void (* BRduplicateIpHook_t)(BRdupIpInfo_t dupInfo);
 
 
 /**************************************************************************/ /**
+* \brief      configure message signalled interrupts of br devices
+*             available starting with IC_BR_BSPAPI_V14.20.14
+* 
+* \remarks    this command configures msi and msi-x for BR devices
+*             this command replaces the command BRBSPAPI_DEVICES_MSI_CONFIG
+*             BRBSPAPI_DEVICES_MSI_CONFIG is still available for compability
+* 
+* \ingroup    bsp_api_commands_brdevices
+*
+* - pvInData:  pointer to BRdeviceMsiConf_t structure
+* - pvOutData: pointer to BRdeviceMsiInfo_t structure
+*******************************************************************************/
+#define BRBSPAPI_DEVICES_MSI_CONF 111
+
+
+/**************************************************************************/ /**
 * \brief      last command = dummy
 * \ingroup    bsp_api_commands_misc
 *
 * - pvInData:  not used (NULL)
 * - pvOutData: not used (NULL)
 *******************************************************************************/
-#define BRBSPAPI_LAST 111
+#define BRBSPAPI_LAST 112
 
 
 /**@}*/ /*end group bsp_api_commands********************************************

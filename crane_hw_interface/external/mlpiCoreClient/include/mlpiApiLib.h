@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -96,6 +96,81 @@
 
 //! @addtogroup ApiVersionPermission Version and Permission
 //! @ingroup ApiLib
+//! @addtogroup ApiVersionPermission_new Server version since 1.26.0.0 (MLC-FW: 14V22)
+//! @ingroup ApiVersionPermission
+//! @{
+//!
+//! @note Since firmware version 14V22 (MLPI-Server-Version: 1.26.0.0) a centralized permission management has been implemented in target 
+//! controls XM2, L75 and VPx. Some permissions have been summarized in order to improve their usability. 
+//! Additional information regarding the usage of older manifest files (i.e. accounts.xml) with newer server versions can be found in @ref newest_manifest.\n
+//! @note <b><span style="color:red">Users of other CML controls (i.e. L25, L45, L65) have to use the old permissions as defined in @ref ApiVersionPermission_old</span></b>
+//!
+//!
+//! @par List of valid permissions for mlpiApiLib. These permissions shall be assigned to the groups (i.e. in the group manifest file groups.xml) rather than the users.
+//! <TABLE>
+//! <TR><TH> Permission-Ident                  </TH><TH> Description                                                                                                                     </TH></TR>                  
+//! <TR><TD id="st_e"> APILIB_DEBUG            </TD><TD> Debug connections - Allows to debug MLPI/MLPIS connections, e.g. benchmark and stability tests                                  </TD></TR>  
+//! <TR><TD id="st_e"> APILIB_STATUS           </TD><TD> Get connection status - Allows to get the status of of MLPI/MLPIS conntections                                                  </TD></TR>  
+//! <TR><TD id="st_e"> APILIB_MANAGEMENT       </TD><TD> Manage connections -	Allows to manage MLPI/MLPIS connections, e.g. enumerate connects or modify, close arbitrary connections    </TD></TR>  
+//! <TR><TD id="st_e"> APILIB_DEPRECATED       </TD><TD> Use deprecated functions - Allows to use deprecated functions, it is recommended to not use functions that need this permission </TD></TR>  
+//! </TABLE>
+//!
+//!
+//! The following table provides the minimum server version (@ref sec_ServerVersion) and the user permission required to execute each of the methods supported by the mlpiApiLib library. 
+//!
+//! @note Functions with permission "IMPLICIT" cannot be blocked. Everybody with the permission to use the MLPIS protocol
+//! is able to trigger this functions
+//!
+//!  @par List of available functions in mlpiApiLib and the permissions required for their use. 
+//! <TABLE>
+//! <TR><TH>           Function                                     </TH><TH> Server version </TH><TH> Permission-Ident     </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiConnect                          </TD><TD> 1.0.0.0        </TD><TD> "IMPLICIT"           </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiDisconnect                       </TD><TD> 1.0.0.0        </TD><TD> "IMPLICIT"           </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiSetDefaultTimeout                </TD><TD> 1.0.0.0        </TD><TD> "IMPLICIT"           </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiGetDefaultTimeout                </TD><TD> 1.0.0.0        </TD><TD> "IMPLICIT"           </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiIsConnected                      </TD><TD> 1.0.0.0        </TD><TD> "IMPLICIT"           </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiTestConnection                   </TD><TD> 1.0.0.0        </TD><TD> "APILIB_DEBUG"       </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiDelay                            </TD><TD> 1.0.0.0        </TD><TD> "APILIB_DEBUG"       </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiGetClientCoreVersion             </TD><TD> 1.0.0.0        </TD><TD> "IMPLICIT"           </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiGetServerCoreVersion             </TD><TD> 1.0.0.0        </TD><TD> "APILIB_STATUS"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiSetNameOfConnection              </TD><TD> 1.1.0.0        </TD><TD> "APILIB_STATUS"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiSetLabelOfConnection             </TD><TD> 1.1.0.0        </TD><TD> "APILIB_STATUS"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiGetOwnConnectionDescription      </TD><TD> 1.1.0.0        </TD><TD> "IMPLICIT"           </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiGetAllConnectionDescription      </TD><TD> 1.1.0.0        </TD><TD> "APILIB_STATUS"      </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiCloseConnectionByUid             </TD><TD> 1.1.0.0        </TD><TD> "APILIB_MANAGEMENT"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiCloseConnectionsByUser           </TD><TD> 1.1.0.0        </TD><TD> "APILIB_MANAGEMENT"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiCloseConnectionsByUri            </TD><TD> 1.1.0.0        </TD><TD> "APILIB_MANAGEMENT"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiUserAccountControlReload         </TD><TD> 1.1.0.0        </TD><TD> "APILIB_DEPRECATED"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiUserAccountControlLoadAccounts   </TD><TD> 1.4.0.0        </TD><TD> "APILIB_DEPRECATED"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiUserAccountControlUnloadAccounts </TD><TD> 1.4.0.0        </TD><TD> "APILIB_DEPRECATED"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiGetOwnPermissions                </TD><TD> 1.4.0.0        </TD><TD> "IMPLICIT"           </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiGetAccounts                      </TD><TD> 1.4.0.0        </TD><TD> "APILIB_DEPRECATED"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiGetAccountPermissions            </TD><TD> 1.4.0.0        </TD><TD> "APILIB_DEPRECATED"  </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiNotifyAlive                      </TD><TD> 1.4.0.0        </TD><TD> "IMPLICIT"           </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiApiGetLibrarySupport                </TD><TD> 1.8.0.0        </TD><TD> "IMPLICIT"           </TD></TR>
+//! </TABLE>
+//!
+//! @par List of the old permissions of mlpiApiLib and their corresponding new permission.
+//!
+//! <TABLE>
+//! <TR><TH> Old permission                                                 </TH><TH> new Permission    </TH></TR>                  
+//! <TR><TD id="st_e"> MLPI_APILIB_PERMISSION_ALL                           </TD><TD> IMPLICIT          </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_APILIB_PERMISSION_CONNECTION_INFO               </TD><TD> APILIB_DEBUG      </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_APILIB_PERMISSION_MLPI_INFO                     </TD><TD> APILIB_STATUS     </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_APILIB_PERMISSION_CONNECTION_OWN_DESCRIPTION    </TD><TD> IMPLICIT          </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_APILIB_PERMISSION_CONNECTION_ALL_DESCRIPTION    </TD><TD> APILIB_STATUS     </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_APILIB_PERMISSION_CONNECTION_CLOSE              </TD><TD> APILIB_MANAGEMENT </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_APILIB_PERMISSION_USER_ACCOUNT_CONTROL_RELOAD   </TD><TD> APILIB_DEPRECATED </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_APILIB_PERMISSION_USER_ACCOUNT_CONTROL_LOAD     </TD><TD> APILIB_DEPRECATED </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_APILIB_PERMISSION_USER_ACCOUNT_CONTROL_ACCESS   </TD><TD> APILIB_DEPRECATED </TD></TR>  
+//! </TABLE>
+//!
+//! @see
+//! @ref sec_Permission
+//! @}
+
+//! @addtogroup ApiVersionPermission_old Server versions before 1.26.0.0 
+//! @ingroup ApiVersionPermission
 //! @{
 //! @brief Version and permission information.
 //!
@@ -157,6 +232,7 @@
 //!
 //! @see
 //! @ref sec_Permission
+//! @}
 //! @}
 
 //! @addtogroup ApiLibStructTypes Structs, Types, ...
@@ -373,6 +449,7 @@ extern "C" {
 //! <TR><TD> @c @b keepalive_timeout_server=value     </TD><TD> Timeout used for sending MLPI keepalive telegram in milliseconds (default: 30000).                                          </TD></TR>
 //! <TR><TD> @c @b keepalive_probes_server=value      </TD><TD> Number of probes for sending MLPI keepalive telegram (default: 10).                                                         </TD></TR>
 //! <TR><TD> @c @b timeout_send_server=value          </TD><TD> Timeout of MLPI server used for sending data to client in milliseconds (default: 60000, infinite: MLPI_INFINITE).           </TD></TR>
+//! <TR><TD> @c @b timeout_recv_server=value          </TD><TD> Timeout of MLPI server used for receiving data from client in milliseconds (default: MLPI_INFINITE).                        </TD></TR>
 //! <TR><TD> @c @b require_hash=value                 </TD><TD> If true, then only logins to servers which support hashed password logins are allowed. Server version
 //!                                                             has to be greater than 1.1.1.0 (default: false).
 //!                                                             @note It's highly recommended to use this option if your control firmware corresponds to or it newer than 13V06.            </TD></TR>

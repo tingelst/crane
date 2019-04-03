@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2014
 //
@@ -248,16 +248,5 @@ static inline void enableFpuSupport(void)
 
 #endif
 
-
-/*
-==============================================================================
-History
-------------------------------------------------------------------------------
-01-Jan-2012
-  - first version
-01-Feb-2014
-  - support VxWorks 6.9
-==============================================================================
-*/
 
 #endif /* __VXWHELPER_H__ */

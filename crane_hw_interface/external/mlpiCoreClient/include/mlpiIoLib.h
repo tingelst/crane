@@ -52,7 +52,7 @@
 //!
 //! @copyright  Bosch Rexroth Corporation http://www.boschrexroth.com/oce
 //!
-//! @version    1.22.0
+//! @version    1.29.1
 //!
 //! @date       2013
 //
@@ -175,6 +175,52 @@
 //! @addtogroup IoLibVersionPermission Version and Permission
 //! @ingroup IoLib
 //! @{
+//! @addtogroup IoLibVersionPermission_new Server version since 1.26.0.0 (MLC-FW: 14V22)
+//! @ingroup IoLibVersionPermission
+//! @{
+//!
+//! @note Since firmware version 14V22 (MLPI-Server-Version: 1.26.0.0) a centralized permission management has been implemented in target 
+//! controls XM2, L75 and VPx. Some permissions have been summarized in order to improve their usability. 
+//! Additional information regarding the usage of older manifest files (i.e. accounts.xml) with newer server versions can be found in @ref newest_manifest.\n
+//! @note <b><span style="color:red">Users of other CML controls (i.e. L25, L45, L65) have to use the old permissions as defined in @ref IoLibVersionPermission_old</span></b>
+//!
+//!
+//! @par List of valid permissions for mlpiIoLib. These permissions shall be assigned to the groups (i.e. in the group manifest file groups.xml) rather than the users.
+//! <TABLE>
+//! <TR><TH> Permission-Ident      </TH><TH> Description                                                                                                                          </TH></TR>                  
+//! <TR><TD id="st_e"> IO_INFO     </TD><TD> Read inline and fieldbus master/slave lists and information - Allows to read inline and fieldbus master/slave lists and information. </TD></TR>  
+//! <TR><TD id="st_e"> IO_READ     </TD><TD> Read input - Allows to read from inputs.                                                                                             </TD></TR>  
+//! <TR><TD id="st_e"> IO_UPDATE   </TD><TD> Update I/Os - Allows to update I/Os.                                                                                                 </TD></TR>
+//! <TR><TD id="st_e"> IO_WRITE    </TD><TD> Write output - Allows to write to outputs                                                                    .                       </TD></TR>
+//! </TABLE>
+//!
+//!  @par List of available functions in mlpiIoLib and the permissions required for their use. 
+//! <TABLE>
+//! <TR><TH>           Function                                   </TH><TH> Server version </TH><TH> Permission-Ident </TH></TR>
+//! <TR><TD id="st_e"> @ref mlpiIoReadFieldbusMasterList          </TD><TD> 1.0.0.0        </TD><TD> "IO_INFO"        </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiIoReadFieldbusMasterInfo          </TD><TD> 1.0.0.0        </TD><TD> "IO_INFO"        </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiIoReadFieldbusSlaveList           </TD><TD> 1.0.0.0        </TD><TD> "IO_INFO"        </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiIoReadFieldbusSlaveInfo           </TD><TD> 1.0.0.0        </TD><TD> "IO_INFO"        </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiIoReadFieldbusSlaveInfos          </TD><TD> 1.0.0.0        </TD><TD> "IO_INFO"        </TD></TR>
+//! <TR><TD id="st_e"> @ref mlpiIoUpdateFieldbusIo                </TD><TD> 1.0.0.0        </TD><TD> "IO_UPDATE"      </TD></TR>
+//! <TR><TD id="st_e">      mlpiIoReadFieldbusIo...       (21x)   </TD><TD> 1.0.0.0        </TD><TD> "IO_READ"        </TD></TR>
+//! <TR><TD id="st_e">      mlpiIoWriteFieldbusIo...      (21x)   </TD><TD> 1.0.0.0        </TD><TD> "IO_WRITE"       </TD></TR>
+//! </TABLE>
+//!
+//! @par List of the old permissions of mlpiIoLib and their corresponding new permission.
+//! <TABLE>
+//! <TR><TH> Old permission                               </TH><TH> new Permission  </TH></TR>                  
+//! <TR><TD id="st_e"> MLPI_IOLIB_PERMISSION_ALWAYS       </TD><TD> IMPLICIT        </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_IOLIB_PERMISSION_INFO         </TD><TD> IO_INFO         </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_IOLIB_PERMISSION_UPDATE       </TD><TD> IO_UPDATE       </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_IOLIB_PERMISSION_IO_READ      </TD><TD> IO_READ         </TD></TR>  
+//! <TR><TD id="st_e"> MLPI_IOLIB_PERMISSION_IO_WRITE     </TD><TD> IO_WRITE        </TD></TR>  
+//! </TABLE>
+//!
+//! @}
+//! @addtogroup IoLibVersionPermission_old Server versions before 1.26.0.0 
+//! @ingroup IoLibVersionPermission
+//! @{
 //! @brief Version and permission information
 //!
 //! The table shows requirements regarding the minimum server version (@ref sec_ServerVersion) and the
@@ -215,6 +261,7 @@
 //!
 //! @see
 //! @ref sec_Permission
+//! @}
 //! @}
 
 //! @addtogroup IoLibStructTypes Structs, Types, ...
