@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:macro name="crane">
+
     <material name="white">
       <color rgba="1 1 1 1"/>
     </material>
@@ -10,6 +11,7 @@
     <material name="lessgray">
       <color rgba="0.75 0.75 0.75 1"/>
     </material>
+
     <link name="KingBot">
       <inertial>
         <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -51,7 +53,7 @@
         <material name="white"/>
       </visual>
     </link>
-    <link name="Cyl1">
+    <!-- <link name="Cyl1">
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
@@ -86,7 +88,7 @@
         </geometry>
         <material name="lessgray"/>
       </visual>
-    </link>
+    </link> -->
 
     <link name="tip">
     </link>
@@ -100,13 +102,13 @@
       <limit effort="0" lower="${radians(-185)}" upper="${radians(185)}" velocity="${radians(156)}"/>
     </joint>
 
-    <joint name="joint_2" type="prismatic">
+    <!-- <joint name="joint_2" type="prismatic">
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <parent link="Cyl1"/>
       <child link="Piston1"/>
       <axis xyz="1 0 0"/>
       <limit effort="0" lower="0" upper="0.1" velocity="${radians(156)}"/>
-    </joint>
+    </joint> -->
 
     <joint name="alpha_2" type="revolute">
       <origin xyz="0 0 0.706" rpy="0 0 0"/>
@@ -116,7 +118,7 @@
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
     </joint>
 
-    <joint name="beta_2" type="revolute">
+    <!-- <joint name="beta_2" type="revolute">
       <origin xyz="0.154236 0 0.156" rpy="0 0 0"/>
       <parent link="King"/>
       <child link="Cyl1"/>
@@ -130,7 +132,7 @@
       <child link="Piston2"/>
       <axis xyz="1 0 0"/>
       <limit effort="0" lower="0" upper="0.1" velocity="${radians(156)}"/>
-    </joint>
+    </joint> -->
 
     <joint name="alpha_3" type="revolute">
       <origin xyz="1.468171 0 0.308337" rpy="0 0 0"/>
@@ -140,13 +142,13 @@
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
     </joint>
 
-    <joint name="beta_3" type="revolute">
+    <!-- <joint name="beta_3" type="revolute">
       <origin xyz="0.767068 0 0.002395" rpy="0 0 0"/>
       <parent link="Boom1"/>
       <child link="Cyl2"/>
       <axis xyz="0 -1 0"/>
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
-    </joint>
+    </joint> -->
 
     <joint name="boom2_tip" type="fixed">
       <origin xyz="0.719737 0 -0.907615" rpy="0 0 0"/>

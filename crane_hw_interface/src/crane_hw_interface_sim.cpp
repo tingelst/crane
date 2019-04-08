@@ -3,25 +3,24 @@
 
 // Author: Lars Tingelstad (NTNU) <lars.tingelstad@ntnu.no>
 
-#include <crane_hw_interface/crane_hw_interface.h>
+#include <crane_hw_interface/crane_hw_interface_sim.h>
 
 namespace crane_hw_interface
 {
-CraneHardWareInterfaceSim::CraneHardWareInterfaceSim()
+CraneHardwareInterfaceSim::CraneHardwareInterfaceSim()
   : joint_position_(n_dof_, 0.0)
   , joint_velocity_(n_dof_, 0.0)
   , joint_effort_(n_dof_, 0.0)
   , joint_velocity_command_(n_dof_, 0.0)
   , joint_names_(n_dof_)
-  , mlpi_connection_(0)
 {
 }
 
-CraneHardWareInterfaceSim::~CraneHardWareInterfaceSim()
+CraneHardwareInterfaceSim::~CraneHardwareInterfaceSim()
 {
 }
 
-void CraneHardWareInterfaceSim::init()
+void CraneHardwareInterfaceSim::init()
 {
   // Get controller joint names from parameter server
   if (!nh_.getParam("controller_joint_names", joint_names_))
@@ -49,17 +48,22 @@ void CraneHardWareInterfaceSim::init()
   ROS_INFO_STREAM_NAMED("crane_hw_interface", "Loaded simulated crane hardware interface");
 }
 
-void CraneHardWareInterfaceSim::start()
+void CraneHardwareInterfaceSim::start()
 {
   ROS_INFO_NAMED("crane_hw_interface", "Started simulated crane hardware interface...");
 }
 
-void CraneHardWareInterfaceSim::read(const ros::Time& time, const ros::Duration& period)
+void CraneHardwareInterfaceSim::read(const ros::Time& time, const ros::Duration& period)
 {
 }
 
-void CraneHardWareInterfaceSim::write(const ros::Time& time, const ros::Duration& period)
+void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration& period)
 {
+  for (std::size_t i = 0; i < n_dof_; ++i)
+  {
+    joint_position_[i] = joint_position_[i] + joint_velocity_command_[i] * period.toSec();
+    joint_velocity_[i] = joint_velocity_command_[i];
+  }
 }
 
 }  // namespace crane_hw_interface

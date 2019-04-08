@@ -88,28 +88,16 @@ void CraneHardwareInterface::read(const ros::Time& time, const ros::Duration& pe
 {
   MLPIRESULT result = MLPI_S_OK;
 
-  // Read joint positions from PLC
+  // Read position of joint 1
   result = mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Slew.Pact_Slew",
                                                &joint_position_[0]);
-  joint_position_[0] /= 364.7059;
   if (MLPI_FAILED(result))
   {
     ROS_ERROR("Application.MotionProg_Slew.Pact_Slew");
   }
-  result =
-      mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Boom1.L1", &joint_position_[1]);
-  if (MLPI_FAILED(result))
-  {
-    ROS_ERROR("Application.MotionProg_Boom1.L1");
-  }
-  result =
-      mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Boom2.L2", &joint_position_[2]);
-  if (MLPI_FAILED(result))
-  {
-    ROS_ERROR("Application.MotionProg_Boom2.L2");
-  }
+  joint_position_[0] /= 364.7059;
 
-  // Read joint velocities from PLC
+  // Read velocity of joint 1
   result = mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Slew.Vact_Slew",
                                                &joint_velocity_[0]);
   if (MLPI_FAILED(result))
@@ -117,22 +105,64 @@ void CraneHardwareInterface::read(const ros::Time& time, const ros::Duration& pe
     ROS_ERROR("Application.MotionProg_Slew.Vact_Slew");
   }
   joint_velocity_[0] /= 364.7059;
+
+  // Read position (length) of cylinder 1 and convert to position (angle) of passive joint
+  result =
+      mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Boom1.L1", &joint_position_[1]);
+  if (MLPI_FAILED(result))
+  {
+    ROS_ERROR("Application.MotionProg_Boom1.L1");
+  }
+
+  double e1 = 0.154236;
+  double a1 = 0.550;
+  double e2 = 0.130;
+  double a2 = 0.600199;
+  double l = joint_position_[1];
+  double b1 = sqrt(a1 * a1 + e1 * e1);
+  double b2 = sqrt(a2 * a2 + e2 * e2);
+  double u = (l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2);
+  joint_position_[1] = acos(u) + atan(e1 / a1) + atan(e2 / a2) - PI_2;
+
+  // Read velocity of cylinder 1 and convert to velocity of passive joint
   result = mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Boom1.Vact_Boom1",
                                                &joint_velocity_[1]);
   if (MLPI_FAILED(result))
   {
     ROS_ERROR("Application.MotionProg_Boom1.Vact_Boom1");
   }
+  joint_velocity_[1] = (1.0 / sqrt(1 - u * u)) * (-l / (b1 * b2)) * joint_velocity_[1];
+
+  // Read position (length) of cylinder 2
+  result =
+      mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Boom2.L2", &joint_position_[2]);
+  if (MLPI_FAILED(result))
+  {
+    ROS_ERROR("Application.MotionProg_Boom2.L2");
+  }
+  e1 = 0.160;
+  a1 = 0.750;
+  e2 = 0.078714;
+  a2 = 0.165893;
+  l = joint_position_[2];
+  b1 = sqrt(a1 * a1 + e1 * e1);
+  b2 = sqrt(a2 * a2 + e2 * e2);
+  joint_position_[2] = acos((l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2)) + atan(e1 / a1) + atan(e2 / a2) + PI;
+
+  // Read velocity of cylinder 2 and convert to velocity of passive joint
   result = mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Boom2.Vact_Boom2",
                                                &joint_velocity_[2]);
   if (MLPI_FAILED(result))
   {
     ROS_ERROR("Application.MotionProg_Boom2.Vact_Boom2");
   }
+  joint_velocity_[2] = (1.0 / sqrt(1 - u * u)) * (-l / (b1 * b2)) * joint_velocity_[2];
 }
 
 void CraneHardwareInterface::write(const ros::Time& time, const ros::Duration& period)
 {
+
+
   // MLPIRESULT result =
   //     mlpiLogicWriteVariableBySymbolArrayDouble(mlpi_connection_, L"velocity_cmd", &joint_velocity_[0], n_dof_);
 }

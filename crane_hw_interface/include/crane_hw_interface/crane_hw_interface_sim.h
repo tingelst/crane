@@ -3,15 +3,12 @@
 
 // Author: Lars Tingelstad (NTNU) <lars.tingelstad@ntnu.no>
 
-#ifndef CRANE_HW_INTERFACE
-#define CRANE_HW_INTERFACE
+#ifndef CRANE_HW_INTERFACE_SIM
+#define CRANE_HW_INTERFACE_SIM
 
 #include <string>
 #include <vector>
 #include <cmath>
-
-#include <mlpiApiLib.h>
-#include <mlpiLogicLib.h>
 
 #include <controller_manager/controller_manager.h>
 #include <hardware_interface/joint_command_interface.h>
@@ -24,7 +21,7 @@ namespace crane_hw_interface
 constexpr double PI = 3.14159265358979323846;
 constexpr double PI_2 = 1.57079632679489661923;
 
-class CraneHardwareInterface : public hardware_interface::RobotHW
+class CraneHardwareInterfaceSim : public hardware_interface::RobotHW
 {
 private:
   ros::NodeHandle nh_;
@@ -45,12 +42,9 @@ private:
   hardware_interface::JointStateInterface joint_state_interface_;
   hardware_interface::VelocityJointInterface velocity_joint_interface_;
 
-  // MLPI
-  MLPIHANDLE mlpi_connection_;
-
 public:
-  CraneHardwareInterface();
-  ~CraneHardwareInterface();
+  CraneHardwareInterfaceSim();
+  ~CraneHardwareInterfaceSim();
 
   void init();
   void start();
@@ -60,4 +54,4 @@ public:
 
 }  // namespace crane_hw_interface
 
-#endif  // CRANE_HW_INTERFACE
+#endif  // CRANE_HW_INTERFACE_SIM

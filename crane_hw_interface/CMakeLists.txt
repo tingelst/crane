@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(crane_hw_interface)
 
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 find_package(catkin REQUIRED COMPONENTS
   angles
@@ -37,6 +37,7 @@ set_target_properties(mlpi PROPERTIES
 
 add_library(crane_hw_interface
   src/crane_hw_interface.cpp
+  src/crane_hw_interface_sim.cpp
 )
 
 target_link_libraries(crane_hw_interface
@@ -52,6 +53,14 @@ target_link_libraries(crane_hw_interface_node
   crane_hw_interface
 )
 
+add_executable(crane_hw_interface_node_sim
+  src/crane_hw_interface_node_sim.cpp
+)
+
+target_link_libraries(crane_hw_interface_node_sim
+  crane_hw_interface
+)
+
 install(
   TARGETS crane_hw_interface
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -60,4 +69,8 @@ install(
 
 install(
   TARGETS crane_hw_interface_node
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+install(
+  TARGETS crane_hw_interface_node_sim
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

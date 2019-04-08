@@ -1,1 +1,1 @@
-controller_joint_names: ["slew", "boom_1", "boom_2"]
+controller_joint_names: ["joint_1", "alpha_2", "alpha_3"]
