@@ -135,7 +135,7 @@
     </joint> -->
 
     <joint name="alpha_3" type="revolute">
-      <origin xyz="1.468171 0 0.308337" rpy="0 0 0"/>
+      <origin xyz="1.500199 0 0" rpy="0 0 0"/>
       <parent link="Boom1"/>
       <child link="Boom2"/>
       <axis xyz="0 -1 0"/>
