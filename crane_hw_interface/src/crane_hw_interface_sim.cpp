@@ -55,14 +55,15 @@ void CraneHardwareInterfaceSim::start()
 
 void CraneHardwareInterfaceSim::read(const ros::Time& time, const ros::Duration& period)
 {
+    // No need to read since our write() command populates our state for us
 }
 
 void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration& period)
 {
   for (std::size_t i = 0; i < n_dof_; ++i)
   {
-    joint_position_[i] = joint_position_[i] + joint_velocity_command_[i] * period.toSec();
     joint_velocity_[i] = joint_velocity_command_[i];
+    joint_position_[i] += joint_velocity_command_[i] * period.toSec();
   }
 }
 
