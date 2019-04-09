@@ -12,7 +12,14 @@
       <color rgba="0.75 0.75 0.75 1"/>
     </material>
 
-    <link name="KingBot">
+    <link name="base_link"/>
+
+    <joint name="fixed" type="fixed">
+      <parent link="base_link"/>
+      <child link="link1"/>
+    </joint>
+
+    <link name="link1">
       <inertial>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <mass value="2"/>
@@ -26,7 +33,8 @@
         <material name="gray"/>
       </visual>
     </link>
-    <link name="King">
+
+    <link name="link2">
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
@@ -35,7 +43,8 @@
         <material name="white"/>
       </visual>
     </link>
-    <link name="Boom1">
+
+    <link name="link3">
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
@@ -44,7 +53,8 @@
         <material name="white"/>
       </visual>
     </link>
-    <link name="Boom2">
+
+    <link name="link4">
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
@@ -90,14 +100,12 @@
       </visual>
     </link> -->
 
-    <link name="tip">
-    </link>
+    <link name="tip"/>
 
-
-    <joint name="joint_1" type="revolute">
+    <joint name="joint1" type="revolute">
       <origin xyz="0 0 0.628" rpy="0 0 0"/>
-      <parent link="KingBot"/>
-      <child link="King"/>
+      <parent link="link1"/>
+      <child link="link2"/>
       <axis xyz="0 0 1"/>
       <limit effort="0" lower="${radians(-185)}" upper="${radians(185)}" velocity="${radians(156)}"/>
     </joint>
@@ -110,10 +118,10 @@
       <limit effort="0" lower="0" upper="0.1" velocity="${radians(156)}"/>
     </joint> -->
 
-    <joint name="alpha_2" type="revolute">
+    <joint name="joint2" type="revolute">
       <origin xyz="0 0 0.706" rpy="0 0 0"/>
-      <parent link="King"/>
-      <child link="Boom1"/>
+      <parent link="link2"/>
+      <child link="link3"/>
       <axis xyz="0 -1 0"/>
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
     </joint>
@@ -134,10 +142,10 @@
       <limit effort="0" lower="0" upper="0.1" velocity="${radians(156)}"/>
     </joint> -->
 
-    <joint name="alpha_3" type="revolute">
+    <joint name="joint3" type="revolute">
       <origin xyz="1.500199 0 0" rpy="0 0 0"/>
-      <parent link="Boom1"/>
-      <child link="Boom2"/>
+      <parent link="link3"/>
+      <child link="link4"/>
       <axis xyz="0 -1 0"/>
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
     </joint>
@@ -150,9 +158,9 @@
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
     </joint> -->
 
-    <joint name="boom2_tip" type="fixed">
-      <origin xyz="0.719737 0 -0.907615" rpy="0 0 0"/>
-      <parent link="Boom2"/>
+    <joint name="tip_joint" type="fixed">
+      <origin xyz="0.963823 0 -0.642519" rpy="0 0 0"/>
+      <parent link="link4"/>
       <child link="tip"/>
     </joint>
 

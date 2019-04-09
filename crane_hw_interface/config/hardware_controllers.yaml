@@ -7,13 +7,12 @@ joint_state_controller:
 joint_trajectory_controller:
   type: "velocity_controllers/JointTrajectoryController"
   joints:
-    - joint_1
-    - alpha_2
-    - alpha_3
+    - joint1
+    - joint2
+    - joint3
   gains:
-    joint_1: { p: 100, d: 0.01, i: 10.0 }
-    alpha_2: { p: 100, d: 0.01, i: 10.0 }
-    alpha_3: { p: 1, d: 0.01, i: 10.0 }
+    joint1: { p: 100, d: 0.01, i: 10.0 }
+    joint2: { p: 100, d: 0.01, i: 10.0 }
+    joint3: { p: 100, d: 0.01, i: 10.0 }
   state_publish_rate: 50
   action_monitor_rate: 20 
-pid: {p: 100.0, i: 0.01, d: 10.0}
