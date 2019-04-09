@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   kdl_conversions
   geometry_msgs
   hardware_interface
+  sensor_msgs
   message_generation
   pluginlib
   realtime_tools
@@ -28,6 +29,7 @@ catkin_package(
     kdl_conversions
     geometry_msgs
     hardware_interface
+    sensor_msgs
     message_runtime
     pluginlib
     realtime_tools
@@ -36,6 +38,7 @@ catkin_package(
 
 add_library(crane_controllers
   src/crane_controller.cpp
+  src/joint_state_controller.cpp
 )
 
 target_link_libraries(crane_controllers PUBLIC

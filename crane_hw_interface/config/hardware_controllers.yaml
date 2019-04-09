@@ -1,6 +1,6 @@
 #Publish all joint states
 joint_state_controller:
-  type: joint_state_controller/JointStateController
+  type: crane_controllers/JointStateController
   publish_rate: 50
 
 # Joint trajectory controller

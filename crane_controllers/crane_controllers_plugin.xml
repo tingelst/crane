@@ -2,4 +2,9 @@
   <class name="crane_controllers/CraneControllerller" type="crane_controllers::CraneController" base_class_type="controller_interface::ControllerBase">
     <description>A crane controller.</description>
   </class>
+  <class name="crane_controllers/JointStateController" type="crane_controllers::JointStateController" base_class_type="controller_interface::ControllerBase">
+    <description>
+    The joint state controller is publishes the current joint state as a sensor_msgs/JointState message. The joint state controller expects a JointStateInterface type of hardware interface.
+    </description>
+  </class>
 </library>
