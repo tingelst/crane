@@ -18,7 +18,7 @@
 
 namespace crane_controllers
 {
-class CraneController
+class CraneTipVelocityController
   : public controller_interface::MultiInterfaceController<hardware_interface::PositionJointInterface>
 {
 public:
