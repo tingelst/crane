@@ -104,7 +104,7 @@
       </visual>
     </link> 
 
-    <link name="tip"/>
+    <link name="tip_link"/>
 
     <joint name="joint1" type="revolute">
       <origin xyz="0 0 0.628" rpy="0 0 0"/>
@@ -165,7 +165,7 @@
     <joint name="tip_joint" type="fixed">
       <origin xyz="0.963823 0 -0.642519" rpy="0 0 0"/>
       <parent link="link4"/>
-      <child link="tip"/>
+      <child link="tip_link"/>
     </joint>
 
 

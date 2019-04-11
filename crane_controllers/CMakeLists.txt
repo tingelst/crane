@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   pluginlib
   realtime_tools
   roscpp
+  urdf
 )
 
 find_package(Eigen3 REQUIRED)
@@ -34,10 +35,11 @@ catkin_package(
     pluginlib
     realtime_tools
     roscpp
+    urdf
 )
 
 add_library(crane_controllers
-  src/crane_controller.cpp
+  src/crane_tip_velocity_controller.cpp
   src/joint_state_controller.cpp
 )
 
