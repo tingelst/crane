@@ -11,6 +11,9 @@ CraneHardwareInterfaceSim::CraneHardwareInterfaceSim()
   : joint_position_(n_dof_, 0.0)
   , joint_velocity_(n_dof_, 0.0)
   , joint_effort_(n_dof_, 0.0)
+  , actuator_position_(n_dof_, 0.0)
+  , actuator_velocity_(n_dof_, 0.0)
+  , actuator_effort_(n_dof_, 0.0)
   , joint_velocity_command_(n_dof_, 0.0)
   , joint_names_(n_dof_)
 {
@@ -55,7 +58,7 @@ void CraneHardwareInterfaceSim::start()
 
 void CraneHardwareInterfaceSim::read(const ros::Time& time, const ros::Duration& period)
 {
-    // No need to read since our write() command populates our state for us
+  // No need to read since our write() command populates our state for us
 }
 
 void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration& period)

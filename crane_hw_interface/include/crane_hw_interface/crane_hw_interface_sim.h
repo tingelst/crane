@@ -27,11 +27,18 @@ private:
   ros::NodeHandle nh_;
 
   const unsigned int n_dof_ = 3;
+
   std::vector<std::string> joint_names_;
   std::vector<double> joint_position_;
   std::vector<double> joint_velocity_;
   std::vector<double> joint_effort_;
   std::vector<double> joint_velocity_command_;
+
+  std::vector<double> actuator_position_;
+  std::vector<double> actuator_velocity_;
+  std::vector<double> actuator_effort_;
+  std::vector<double> actuator_velocity_command_;
+
 
   // Timing
   ros::Duration control_period_;
