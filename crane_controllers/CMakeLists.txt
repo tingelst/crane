@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   controller_interface
   dynamic_reconfigure
   kdl_conversions
+  kdl_parser
   geometry_msgs
   hardware_interface
   sensor_msgs
@@ -28,6 +29,7 @@ catkin_package(
     controller_interface
     dynamic_reconfigure
     kdl_conversions
+    kdl_parser
     geometry_msgs
     hardware_interface
     sensor_msgs

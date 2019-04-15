@@ -22,6 +22,7 @@
   <depend>controller_interface</depend>
   <depend>dynamic_reconfigure</depend>
   <depend>kdl_conversions</depend>
+  <depend>kdl_parser</depend>
   <depend>hardware_interface</depend>
   <depend>pluginlib</depend>
   <depend>sensor_msgs</depend>

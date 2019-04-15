@@ -30,7 +30,7 @@
 namespace crane_controllers
 {
 class CraneTipVelocityController
-  : public controller_interface::MultiInterfaceController<hardware_interface::PositionJointInterface>
+  : public controller_interface::MultiInterfaceController<hardware_interface::VelocityJointInterface>
 {
 public:
   bool init(hardware_interface::RobotHW* robot_hardware, ros::NodeHandle& node_handle) override;
@@ -52,7 +52,6 @@ private:
   KDL::JntArray tgt_jnt_vel_;
   KDL::JntArray last_tgt_jnt_vel_;
 
-  ros::Publisher feedback_pub_;
   ros::Subscriber command_sub_;
 
   boost::mutex mutex_;

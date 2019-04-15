@@ -1,10 +1,12 @@
 <library path="lib/libcrane_controllers">
-  <class name="crane_controllers/CraneControllerller" type="crane_controllers::CraneController" base_class_type="controller_interface::ControllerBase">
-    <description>A crane controller.</description>
+  <class name="crane_controllers/CraneTipVelocityController" type="crane_controllers::CraneTipVelocityController" base_class_type="controller_interface::ControllerBase">
+    <description>
+      A crane tip cartesian velocity controller
+    </description>
   </class>
   <class name="crane_controllers/JointStateController" type="crane_controllers::JointStateController" base_class_type="controller_interface::ControllerBase">
     <description>
-    The joint state controller is publishes the current joint state as a sensor_msgs/JointState message. The joint state controller expects a JointStateInterface type of hardware interface.
+      The joint state controller is publishes the current joint state as a sensor_msgs/JointState message. The joint state controller expects a JointStateInterface type of hardware interface.
     </description>
   </class>
 </library>

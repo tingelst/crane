@@ -1,9 +1,10 @@
-#Publish all joint states
 joint_state_controller:
   type: crane_controllers/JointStateController
   publish_rate: 50
 
-# Joint trajectory controller
+crane_tip_velocity_controller:
+  type: crane_controllers/CraneTipVelocityController
+
 joint_trajectory_controller:
   type: "velocity_controllers/JointTrajectoryController"
   joints:
