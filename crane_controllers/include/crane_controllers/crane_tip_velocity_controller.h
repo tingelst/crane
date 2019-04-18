@@ -36,7 +36,6 @@ public:
   bool init(hardware_interface::RobotHW* robot_hardware, ros::NodeHandle& node_handle) override;
   void starting(const ros::Time&) override;
   void update(const ros::Time&, const ros::Duration& period) override;
-
   void command(const geometry_msgs::TwistStamped::ConstPtr& goal);
 
 private:
@@ -48,11 +47,17 @@ private:
   KDL::Chain kdl_chain_;
   boost::shared_ptr<KDL::ChainIkSolverVel_wdls> solver_;
   boost::shared_ptr<KDL::ChainFkSolverPos_recursive> fksolver_;
-  KDL::JntArray tgt_jnt_pos_;
-  KDL::JntArray tgt_jnt_vel_;
-  KDL::JntArray last_tgt_jnt_vel_;
+
+  KDL::JntArray joint_position_;
+  KDL::JntArray joint_velocity_;
+  KDL::JntArray joint_velocity_command_;
+  KDL::JntArray last_joint_velocity_command_;
 
   ros::Subscriber command_sub_;
+
+  struct TwistCommand {
+
+  };
 
   boost::mutex mutex_;
   KDL::Twist twist_command_;
