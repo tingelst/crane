@@ -33,18 +33,20 @@
 #include <algorithm>
 #include <cstddef>
 
-#include "crane_controllers/joint_state_controller.h"
+#include "crane_controllers/crane_state_controller.h"
 
 namespace crane_controllers
 {
-bool JointStateController::init(hardware_interface::JointStateInterface* hw, ros::NodeHandle& root_nh,
+bool CraneStateController::init(hardware_interface::JointStateInterface* hw, ros::NodeHandle& root_nh,
                                 ros::NodeHandle& controller_nh)
 {
   // get all joint names from the hardware interface
   const std::vector<std::string>& joint_names = hw->getNames();
   num_hw_joints_ = joint_names.size();
   for (unsigned i = 0; i < num_hw_joints_; i++)
+  {
     ROS_DEBUG("Got joint %s", joint_names[i].c_str());
+  }
 
   // get publishing period
   if (!controller_nh.getParam("publish_rate", publish_rate_))
@@ -65,18 +67,34 @@ bool JointStateController::init(hardware_interface::JointStateInterface* hw, ros
     realtime_pub_->msg_.velocity.push_back(0.0);
     realtime_pub_->msg_.effort.push_back(0.0);
   }
-  addExtraJoints(controller_nh, realtime_pub_->msg_);
+
+  realtime_pub_->msg_.name.push_back("link2_cylinder1_joint");
+  realtime_pub_->msg_.position.push_back(0.0);
+  realtime_pub_->msg_.velocity.push_back(0.0);
+  realtime_pub_->msg_.effort.push_back(0.0);
+  realtime_pub_->msg_.name.push_back("cylinder1_piston1_joint");
+  realtime_pub_->msg_.position.push_back(0.0);
+  realtime_pub_->msg_.velocity.push_back(0.0);
+  realtime_pub_->msg_.effort.push_back(0.0);
+  realtime_pub_->msg_.name.push_back("link3_cylinder2_joint");
+  realtime_pub_->msg_.position.push_back(0.0);
+  realtime_pub_->msg_.velocity.push_back(0.0);
+  realtime_pub_->msg_.effort.push_back(0.0);
+  realtime_pub_->msg_.name.push_back("cylinder2_piston2_joint");
+  realtime_pub_->msg_.position.push_back(0.0);
+  realtime_pub_->msg_.velocity.push_back(0.0);
+  realtime_pub_->msg_.effort.push_back(0.0);
 
   return true;
 }
 
-void JointStateController::starting(const ros::Time& time)
+void CraneStateController::starting(const ros::Time& time)
 {
   // initialize time
   last_publish_time_ = time;
 }
 
-void JointStateController::update(const ros::Time& time, const ros::Duration& /*period*/)
+void CraneStateController::update(const ros::Time& time, const ros::Duration& /*period*/)
 {
   // limit rate of publishing
   if (publish_rate_ > 0.0 && last_publish_time_ + ros::Duration(1.0 / publish_rate_) < time)
@@ -102,83 +120,24 @@ void JointStateController::update(const ros::Time& time, const ros::Duration& /*
   }
 }
 
-void JointStateController::stopping(const ros::Time& /*time*/)
+void CraneStateController::stopping(const ros::Time& /*time*/)
 {
 }
 
-void JointStateController::addExtraJoints(const ros::NodeHandle& nh, sensor_msgs::JointState& msg)
+void CraneStateController::addExtraJoints(sensor_msgs::JointState& msg)
 {
-  // Preconditions
-  XmlRpc::XmlRpcValue list;
-  if (!nh.getParam("extra_joints", list))
-  {
-    ROS_DEBUG("No extra joints specification found.");
-    return;
-  }
+  std::string name = "actuator_joint2";
+  double pos = 0.0;
+  double vel = 0.0;
+  double eff = 0.0;
 
-  if (list.getType() != XmlRpc::XmlRpcValue::TypeArray)
-  {
-    ROS_ERROR("Extra joints specification is not an array. Ignoring.");
-    return;
-  }
-
-  for (std::size_t i = 0; i < list.size(); ++i)
-  {
-    XmlRpc::XmlRpcValue& elem = list[i];
-
-    if (elem.getType() != XmlRpc::XmlRpcValue::TypeStruct)
-    {
-      ROS_ERROR_STREAM("Extra joint specification is not a struct, but rather '" << elem.getType() << "'. Ignoring.");
-      continue;
-    }
-
-    if (!elem.hasMember("name"))
-    {
-      ROS_ERROR_STREAM("Extra joint does not specify name. Ignoring.");
-      continue;
-    }
-
-    const std::string name = elem["name"];
-    if (std::find(msg.name.begin(), msg.name.end(), name) != msg.name.end())
-    {
-      ROS_WARN_STREAM("Joint state interface already contains specified extra joint '" << name << "'.");
-      continue;
-    }
-
-    const bool has_pos = elem.hasMember("position");
-    const bool has_vel = elem.hasMember("velocity");
-    const bool has_eff = elem.hasMember("effort");
-
-    const XmlRpc::XmlRpcValue::Type typeDouble = XmlRpc::XmlRpcValue::TypeDouble;
-    if (has_pos && elem["position"].getType() != typeDouble)
-    {
-      ROS_ERROR_STREAM("Extra joint '" << name << "' does not specify a valid default position. Ignoring.");
-      continue;
-    }
-    if (has_vel && elem["velocity"].getType() != typeDouble)
-    {
-      ROS_ERROR_STREAM("Extra joint '" << name << "' does not specify a valid default velocity. Ignoring.");
-      continue;
-    }
-    if (has_eff && elem["effort"].getType() != typeDouble)
-    {
-      ROS_ERROR_STREAM("Extra joint '" << name << "' does not specify a valid default effort. Ignoring.");
-      continue;
-    }
-
-    // State of extra joint
-    const double pos = has_pos ? static_cast<double>(elem["position"]) : 0.0;
-    const double vel = has_vel ? static_cast<double>(elem["velocity"]) : 0.0;
-    const double eff = has_eff ? static_cast<double>(elem["effort"]) : 0.0;
-
-    // Add extra joints to message
-    msg.name.push_back(name);
-    msg.position.push_back(pos);
-    msg.velocity.push_back(vel);
-    msg.effort.push_back(eff);
-  }
+  // Add extra joints to message
+  msg.name.push_back(name);
+  msg.position.push_back(pos);
+  msg.velocity.push_back(vel);
+  msg.effort.push_back(eff);
 }
 
 }  // namespace crane_controllers
 
-PLUGINLIB_EXPORT_CLASS(crane_controllers::JointStateController, controller_interface::ControllerBase)
+PLUGINLIB_EXPORT_CLASS(crane_controllers::CraneStateController, controller_interface::ControllerBase)

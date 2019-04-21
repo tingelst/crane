@@ -42,7 +42,7 @@ catkin_package(
 
 add_library(crane_controllers
   src/crane_tip_velocity_controller.cpp
-  src/joint_state_controller.cpp
+  src/crane_state_controller.cpp
 )
 
 target_link_libraries(crane_controllers PUBLIC

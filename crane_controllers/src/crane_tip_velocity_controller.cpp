@@ -155,10 +155,10 @@ void CraneTipVelocityController::update(const ros::Time& now, const ros::Duratio
 void CraneTipVelocityController::command(const geometry_msgs::TwistStamped::ConstPtr& goal)
 {
 
-  if (goal->header.frame_id.empty())
-  {
-    return;
-  }
+  // if (goal->header.frame_id.empty())
+  // {
+  //   return;
+  // }
 
   KDL::Twist twist;
   twist(0) = goal->twist.linear.x;

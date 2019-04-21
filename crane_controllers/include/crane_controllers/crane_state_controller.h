@@ -50,7 +50,7 @@ namespace crane_controllers
  *
  * \code
  * joint_state_controller:
- *   type: joint_state_controller/JointStateController
+ *   type: joint_state_controller/CraneStateController
  *   publish_rate: 50
  * \endcode
  *
@@ -60,7 +60,7 @@ namespace crane_controllers
  *
  * \code
  * joint_state_controller:
- *   type: joint_state_controller/JointStateController
+ *   type: joint_state_controller/CraneStateController
  *   publish_rate: 50
  *   extra_joints:
  *     - name:     'extra1'
@@ -76,10 +76,10 @@ namespace crane_controllers
  *
  * An unspecified position, velocity or acceleration defaults to zero.
  */
-class JointStateController : public controller_interface::Controller<hardware_interface::JointStateInterface>
+class CraneStateController : public controller_interface::Controller<hardware_interface::JointStateInterface>
 {
 public:
-  JointStateController() : publish_rate_(0.0)
+  CraneStateController() : publish_rate_(0.0)
   {
   }
 
@@ -96,7 +96,7 @@ private:
   double publish_rate_;
   unsigned int num_hw_joints_;  ///< Number of joints present in the JointStateInterface, excluding extra joints
 
-  void addExtraJoints(const ros::NodeHandle& nh, sensor_msgs::JointState& msg);
+  void addExtraJoints(sensor_msgs::JointState& msg);
 };
 
 }  // namespace crane_controllers

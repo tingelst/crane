@@ -114,7 +114,15 @@
       <limit effort="0" lower="${radians(-185)}" upper="${radians(185)}" velocity="${radians(156)}"/>
     </joint>
 
-    <joint name="actuator_joint2" type="prismatic">
+    <joint name="link2_cylinder1_joint" type="revolute">
+      <origin xyz="0.154236 0 0.156" rpy="0 0 0"/>
+      <parent link="link2"/>
+      <child link="cylinder1"/>
+      <axis xyz="0 -1 0"/>
+      <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
+    </joint>
+
+    <joint name="cylinder1_piston1_joint" type="prismatic">
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <parent link="cylinder1"/>
       <child link="piston1"/>
@@ -130,15 +138,15 @@
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
     </joint>
 
-    <joint name="link2_cylinder1_joint" type="revolute">
-      <origin xyz="0.154236 0 0.156" rpy="0 0 0"/>
-      <parent link="link2"/>
-      <child link="cylinder1"/>
+    <joint name="link3_cylinder2_joint" type="revolute">
+      <origin xyz="0.767068 0 0.002395" rpy="0 0 0"/>
+      <parent link="link3"/>
+      <child link="cylinder2"/>
       <axis xyz="0 -1 0"/>
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
-    </joint>
+    </joint> 
 
-    <joint name="actuator_joint3" type="prismatic">
+    <joint name="cylinder2_piston2_joint" type="prismatic">
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <parent link="cylinder2"/>
       <child link="piston2"/>
@@ -153,14 +161,6 @@
       <axis xyz="0 -1 0"/>
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
     </joint>
-
-    <joint name="link3_cylinder2_joint" type="revolute">
-      <origin xyz="0.767068 0 0.002395" rpy="0 0 0"/>
-      <parent link="link3"/>
-      <child link="cylinder2"/>
-      <axis xyz="0 -1 0"/>
-      <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
-    </joint> 
 
     <joint name="tip_joint" type="fixed">
       <origin xyz="0.963823 0 -0.642519" rpy="0 0 0"/>

@@ -4,7 +4,7 @@
       A crane tip cartesian velocity controller
     </description>
   </class>
-  <class name="crane_controllers/JointStateController" type="crane_controllers::JointStateController" base_class_type="controller_interface::ControllerBase">
+  <class name="crane_controllers/CraneStateController" type="crane_controllers::CraneStateController" base_class_type="controller_interface::ControllerBase">
     <description>
       The joint state controller is publishes the current joint state as a sensor_msgs/JointState message. The joint state controller expects a JointStateInterface type of hardware interface.
     </description>
