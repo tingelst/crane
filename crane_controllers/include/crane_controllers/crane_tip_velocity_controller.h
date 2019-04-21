@@ -55,14 +55,16 @@ private:
 
   ros::Subscriber command_sub_;
 
-  struct TwistCommand {
-
+  struct TwistCommand
+  {
+    KDL::Twist command_;
+    std::string command_frame_;
+    ros::Time last_command_time_;
   };
 
+  realtime_tools::RealtimeBuffer<TwistCommand> twist_command_buffer_;
+
   boost::mutex mutex_;
-  KDL::Twist twist_command_;
-  std::string twist_command_frame_;
-  ros::Time last_command_time_;
   bool is_active_;
 };
 }  // namespace crane_controllers

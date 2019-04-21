@@ -160,24 +160,28 @@ void CraneTipVelocityController::command(const geometry_msgs::TwistStamped::Cons
     return;
   }
 
-  KDL::Twist twist;
-  twist(0) = goal->twist.linear.x;
-  twist(1) = goal->twist.linear.y;
-  twist(2) = goal->twist.linear.z;
-  twist(3) = goal->twist.angular.x;
-  twist(4) = goal->twist.angular.y;
-  twist(5) = goal->twist.angular.z;
+  TwistCommand twist_command;
+  twist_command(0) = goal->twist_command.linear.x;
+  twist_command(1) = goal->twist_command.linear.y;
+  twist_command(2) = goal->twist_command.linear.z;
+  twist_command(3) = goal->twist_command.angular.x;
+  twist_command(4) = goal->twist_command.angular.y;
+  twist_command(5) = goal->twist_command.angular.z;
 
   for (int i = 0; i < 6; ++i)
   {
-    if (!std::isfinite(twist(i)))
+    if (!std::isfinite(twist_command(i)))
     {
       ROS_ERROR_THROTTLE(1.0, "Twist command value (%d) is not finite : %f", i, twist(i));
       twist(i) = 0.0;
     }
   }
 
+
   ros::Time now(ros::Time::now());
+
+  twist_command.
+
 
   {
     boost::mutex::scoped_lock lock(mutex_);
