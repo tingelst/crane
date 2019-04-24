@@ -139,7 +139,7 @@
     </joint>
 
     <joint name="link3_cylinder2_joint" type="revolute">
-      <origin xyz="0.767068 0 0.002395" rpy="0 0 0"/>
+      <origin xyz="0.75020 0 -0.160" rpy="0 0 0"/>
       <parent link="link3"/>
       <child link="cylinder2"/>
       <axis xyz="0 -1 0"/>
