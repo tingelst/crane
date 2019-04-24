@@ -72,7 +72,7 @@ bool CraneStateController::init(hardware_interface::JointStateInterface* hw, ros
   realtime_pub_->msg_.position.push_back(0.0);
   realtime_pub_->msg_.velocity.push_back(0.0);
   realtime_pub_->msg_.effort.push_back(0.0);
-  realtime_pub_->msg_.name.push_back("cylinder1_piston1_joint");
+  realtime_pub_->msg_.name.push_back("actuator2");
   realtime_pub_->msg_.position.push_back(0.0);
   realtime_pub_->msg_.velocity.push_back(0.0);
   realtime_pub_->msg_.effort.push_back(0.0);
@@ -80,7 +80,7 @@ bool CraneStateController::init(hardware_interface::JointStateInterface* hw, ros
   realtime_pub_->msg_.position.push_back(0.0);
   realtime_pub_->msg_.velocity.push_back(0.0);
   realtime_pub_->msg_.effort.push_back(0.0);
-  realtime_pub_->msg_.name.push_back("cylinder2_piston2_joint");
+  realtime_pub_->msg_.name.push_back("actuator3");
   realtime_pub_->msg_.position.push_back(0.0);
   realtime_pub_->msg_.velocity.push_back(0.0);
   realtime_pub_->msg_.effort.push_back(0.0);

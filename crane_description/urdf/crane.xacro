@@ -122,7 +122,7 @@
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
     </joint>
 
-    <joint name="cylinder1_piston1_joint" type="prismatic">
+    <joint name="actuator2" type="prismatic">
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <parent link="cylinder1"/>
       <child link="piston1"/>
@@ -146,7 +146,7 @@
       <limit effort="0" lower="${radians(-90)}" upper="${0}" velocity="${radians(156)}"/>
     </joint> 
 
-    <joint name="cylinder2_piston2_joint" type="prismatic">
+    <joint name="actuator3" type="prismatic">
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <parent link="cylinder2"/>
       <child link="piston2"/>

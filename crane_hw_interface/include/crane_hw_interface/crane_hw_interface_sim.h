@@ -34,11 +34,11 @@ private:
   std::vector<double> joint_effort_;
   std::vector<double> joint_velocity_command_;
 
+  std::vector<std::string> actuator_names_;
   std::vector<double> actuator_position_;
   std::vector<double> actuator_velocity_;
   std::vector<double> actuator_effort_;
   std::vector<double> actuator_velocity_command_;
-
 
   // Timing
   ros::Duration control_period_;
@@ -47,6 +47,7 @@ private:
 
   // Interfaces
   hardware_interface::JointStateInterface joint_state_interface_;
+  hardware_interface::JointStateInterface actuator_state_interface_;
   hardware_interface::VelocityJointInterface velocity_joint_interface_;
 
 public:

@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
-    <!-- Start in simulation or not -->
-    <arg name="sim" default="true" />
+  <!-- Start in simulation or not -->
+  <arg name="sim" default="true" />
 
-    <include file="$(find crane_description)/launch/test_crane.launch" />
+  <include file="$(find crane_description)/launch/test_crane.launch" />
 
-    <!-- Load joint controller configurations from YAML file to parameter server -->
-    <rosparam file="$(find crane_hw_interface)/config/hardware_controllers.yaml" command="load"/>
-    <!-- Load standard kuka controller joint names from YAML file to parameter server -->
-    <rosparam file="$(find crane_hw_interface)/config/controller_joint_names.yaml" command="load"/>
+  <!-- Load joint controller configurations from YAML file to parameter server -->
+  <rosparam file="$(find crane_hw_interface)/config/hardware_controllers.yaml" command="load"/>
+  <!-- Load standard kuka controller joint names from YAML file to parameter server -->
+  <rosparam file="$(find crane_hw_interface)/config/controller_joint_names.yaml" command="load"/>
 
-    <!-- main 'driver node': the crane hardware interface -->
-    <node name="crane_hw_interface_sim" pkg="crane_hw_interface" type="crane_hw_interface_node_sim" output="screen" respawn="false" if="$(arg sim)"/>
+  <!-- main 'driver node': the crane hardware interface -->
+  <node name="crane_hw_interface_sim" pkg="crane_hw_interface" type="crane_hw_interface_node_sim" output="screen" respawn="false" if="$(arg sim)">
+    <rosparam>
+      joint_names: ["joint1", "joint2", "joint3"]
+      actuator_names: ["actuator1", "actuator2", "actuator3"]
+      initial_actuator_position: [0.0, 0.75, 0.75]
+    </rosparam>
+  </node>
 
-    <node name="crane_hw_interface" pkg="crane_hw_interface" type="crane_hw_interface_node" output="screen" respawn="false" unless="$(arg sim)"/>
+  <node name="crane_hw_interface" pkg="crane_hw_interface" type="crane_hw_interface_node" output="screen" respawn="false" unless="$(arg sim)"/>
 
-    <!-- Load controllers -->
-    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" 
-        args="crane_tip_velocity_controller crane_state_controller"/>
+  <!-- Load controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="crane_tip_velocity_controller crane_state_controller"/>
 </launch>

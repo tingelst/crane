@@ -16,6 +16,8 @@ CraneHardwareInterfaceSim::CraneHardwareInterfaceSim()
   , actuator_effort_(n_dof_, 0.0)
   , joint_velocity_command_(n_dof_, 0.0)
   , joint_names_(n_dof_)
+  , actuator_names_(n_dof_)
+  , nh_("~")
 {
 }
 
@@ -26,10 +28,20 @@ CraneHardwareInterfaceSim::~CraneHardwareInterfaceSim()
 void CraneHardwareInterfaceSim::init()
 {
   // Get controller joint names from parameter server
-  if (!nh_.getParam("controller_joint_names", joint_names_))
+  if (!nh_.getParam("joint_names", joint_names_))
   {
-    ROS_ERROR("Cannot find required parameter 'controller_joint_names' on the parameter server.");
-    throw std::runtime_error("Cannot find required parameter 'controller_joint_names' on the parameter server.");
+    ROS_ERROR("Cannot find required parameter 'joint_names' on the parameter server.");
+    throw std::runtime_error("Cannot find required parameter 'joint_names' on the parameter server.");
+  }
+  if (!nh_.getParam("actuator_names", actuator_names_))
+  {
+    ROS_ERROR("Cannot find required parameter 'actuator_names' on the parameter server.");
+    throw std::runtime_error("Cannot find required parameter 'actuator_names' on the parameter server.");
+  }
+  if (!nh_.getParam("initial_actuator_position", actuator_position_))
+  {
+    ROS_ERROR("Cannot find required parameter 'initial_actuator_position' on the parameter server.");
+    throw std::runtime_error("Cannot find required parameter 'initial_actuator_position' on the parameter server.");
   }
 
   // Create ros_control interfaces (joint state and position joint for all dof's)
@@ -39,6 +51,10 @@ void CraneHardwareInterfaceSim::init()
     joint_state_interface_.registerHandle(hardware_interface::JointStateHandle(joint_names_[i], &joint_position_[i],
                                                                                &joint_velocity_[i], &joint_effort_[i]));
 
+    // Actuator state interface
+    actuator_state_interface_.registerHandle(hardware_interface::JointStateHandle(
+        actuator_names_[i], &actuator_position_[i], &actuator_velocity_[i], &actuator_effort_[i]));
+
     // Joint velocity control interface
     velocity_joint_interface_.registerHandle(hardware_interface::JointHandle(
         joint_state_interface_.getHandle(joint_names_[i]), &joint_velocity_command_[i]));
@@ -46,6 +62,7 @@ void CraneHardwareInterfaceSim::init()
 
   // Register interfaces
   registerInterface(&joint_state_interface_);
+  registerInterface(&actuator_state_interface_);
   registerInterface(&velocity_joint_interface_);
 
   ROS_INFO_STREAM_NAMED("crane_hw_interface", "Loaded simulated crane hardware interface");
