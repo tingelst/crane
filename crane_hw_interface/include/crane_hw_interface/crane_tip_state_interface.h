@@ -1,3 +1,8 @@
+// Copyright (c) 2019 Norwegian University of Science and Technology
+// Use of this source code is governed by the MIT license, see LICENSE
+
+// Author: Lars Tingelstad (NTNU) <lars.tingelstad@ntnu.no>
+
 #ifndef CRANE_HARDWARE_INTERFACE_CRANE_TIP_VELOCITY_STATE_INTERFACE_H
 #define CRANE_HARDWARE_INTERFACE_CRANE_TIP_VELOCITY_STATE_INTERFACE_H
 
