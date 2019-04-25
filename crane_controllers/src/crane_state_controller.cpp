@@ -140,7 +140,7 @@ void CraneStateController::update(const ros::Time& time, const ros::Duration& /*
       double b1 = sqrt(a1 * a1 + e1 * e1);
       double b2 = sqrt(a2 * a2 + e2 * e2);
       double u = (l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2);
-      realtime_pub_->msg_.position[3] = -acos((b2*b2 - b1*b1 - l*l) / (-2.0*b1*l)) - atan(a1/e1) + PI;
+      realtime_pub_->msg_.position[3] = -acos((b2 * b2 - b1 * b1 - l * l) / (-2.0 * b1 * l)) - atan(a1 / e1) + PI;
       realtime_pub_->msg_.velocity[3] = 0.0;
       realtime_pub_->msg_.effort[3] = 0.0;
 
@@ -157,10 +157,10 @@ void CraneStateController::update(const ros::Time& time, const ros::Duration& /*
       l = actuator_state_[2].getPosition();
       b1 = sqrt(a1 * a1 + e1 * e1);
       b2 = sqrt(a2 * a2 + e2 * e2);
-      realtime_pub_->msg_.position[5] = -acos((b2*b2 - b1*b1 - l*l) / (-2.0*b1*l)) - atan(a1/e1) + PI_2;
+      realtime_pub_->msg_.position[5] = -acos((b2 * b2 - b1 * b1 - l * l) / (-2.0 * b1 * l)) - atan(a1 / e1) + PI_2;
       realtime_pub_->msg_.velocity[5] = 0.0;
       realtime_pub_->msg_.effort[5] = 0.0;
-      
+
       // actuator3
       realtime_pub_->msg_.position[6] = actuator_state_[2].getPosition();
       realtime_pub_->msg_.velocity[6] = actuator_state_[2].getVelocity();

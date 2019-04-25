@@ -86,10 +86,18 @@ void CraneHardwareInterface::init()
         joint_state_interface_.getHandle(joint_names_[i]), &joint_velocity_command_[i]));
   }
 
+  crane_tip_state_interface_.registerHandle(
+      CraneTipStateHandle("crane_tip", &crane_tip_position_, &crane_tip_velocity_));
+      
+  crane_tip_velocity_command_interface_.registerHandle(
+      CraneTipVelocityHandle(crane_tip_state_interface_.getHandle("crane_tip"), &crane_tip_velocity_command_));
+
   // Register interfaces
   registerInterface(&joint_state_interface_);
   registerInterface(&actuator_state_interface_);
   registerInterface(&velocity_joint_interface_);
+  registerInterface(&crane_tip_state_interface_);
+  registerInterface(&crane_tip_velocity_command_interface_);
 
   ROS_INFO_STREAM_NAMED("crane_hw_interface", "Loaded crane hardware interface");
 }  // namespace crane_hw_interface
@@ -127,7 +135,6 @@ void CraneHardwareInterface::read(const ros::Time& time, const ros::Duration& pe
   double b2 = sqrt(a2 * a2 + e2 * e2);
   double u = (l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2);
   joint_position_[1] = acos(u) + atan(e1 / a1) + atan(e2 / a2) - PI_2;
-  // joint_velocity_[1] = (1.0 / sqrt(1 - u * u)) * (-l / (b1 * b2)) * joint_velocity_[1];
 
   e1 = 0.160;
   a1 = 0.750;
@@ -137,8 +144,6 @@ void CraneHardwareInterface::read(const ros::Time& time, const ros::Duration& pe
   b1 = sqrt(a1 * a1 + e1 * e1);
   b2 = sqrt(a2 * a2 + e2 * e2);
   joint_position_[2] = acos((l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2)) + atan(e1 / a1) + atan(e2 / a2) + PI;
-
-  // joint_velocity_[2] = (1.0 / sqrt(1 - u * u)) * (-l / (b1 * b2)) * joint_velocity_[2];
 }
 
 void CraneHardwareInterface::write(const ros::Time& time, const ros::Duration& period)

@@ -20,6 +20,8 @@
 #include <hardware_interface/robot_hw.h>
 #include <ros/ros.h>
 
+#include <crane_hw_interface/crane_tip_velocity_command_interface.h>
+
 namespace crane_hw_interface
 {
 constexpr double PI = 3.14159265358979323846;
@@ -45,6 +47,10 @@ private:
   std::vector<double> actuator_effort_;
   std::vector<double> actuator_velocity_command_;
 
+  std::array<double, 2> crane_tip_position_;
+  std::array<double, 2> crane_tip_velocity_;
+  std::array<double, 2> crane_tip_velocity_command_;
+
   // Timing
   ros::Duration control_period_;
   ros::Duration elapsed_time_;
@@ -54,6 +60,9 @@ private:
   hardware_interface::JointStateInterface joint_state_interface_;
   hardware_interface::ActuatorStateInterface actuator_state_interface_;
   hardware_interface::VelocityJointInterface velocity_joint_interface_;
+
+  CraneTipStateInterface crane_tip_state_interface_;
+  CraneTipVelocityCommandInterface crane_tip_velocity_command_interface_;
 
   // MLPI
   MLPIHANDLE mlpi_connection_;
