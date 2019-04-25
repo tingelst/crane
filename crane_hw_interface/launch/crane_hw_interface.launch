@@ -19,8 +19,14 @@
     </rosparam>
   </node>
 
-  <node name="crane_hw_interface" pkg="crane_hw_interface" type="crane_hw_interface_node" output="screen" respawn="false" unless="$(arg sim)"/>
+  <node name="crane_hw_interface" pkg="crane_hw_interface" type="crane_hw_interface_node" output="screen" respawn="false" unless="$(arg sim)">
+    <rosparam>
+      joint_names: ["joint1", "joint2", "joint3"]
+      actuator_names: ["actuator1", "actuator2", "actuator3"]
+    </rosparam>
+  </node>>
 
   <!-- Load controllers -->
-  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="crane_tip_velocity_controller crane_state_controller"/>
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" 
+  args="crane_state_controller"/>
 </launch>

@@ -52,7 +52,7 @@ void CraneHardwareInterfaceSim::init()
                                                                                &joint_velocity_[i], &joint_effort_[i]));
 
     // Actuator state interface
-    actuator_state_interface_.registerHandle(hardware_interface::JointStateHandle(
+    actuator_state_interface_.registerHandle(hardware_interface::ActuatorStateHandle(
         actuator_names_[i], &actuator_position_[i], &actuator_velocity_[i], &actuator_effort_[i]));
 
     // Joint velocity control interface

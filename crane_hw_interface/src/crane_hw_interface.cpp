@@ -12,8 +12,13 @@ CraneHardwareInterface::CraneHardwareInterface()
   , joint_velocity_(n_dof_, 0.0)
   , joint_effort_(n_dof_, 0.0)
   , joint_velocity_command_(n_dof_, 0.0)
+  , actuator_position_(n_dof_, 0.0)
+  , actuator_velocity_(n_dof_, 0.0)
+  , actuator_effort_(n_dof_, 0.0)
+  , actuator_names_(n_dof_)
   , joint_names_(n_dof_)
   , mlpi_connection_(MLPI_INVALIDHANDLE)
+  , nh_("~")
 {
 }
 
@@ -28,6 +33,18 @@ CraneHardwareInterface::~CraneHardwareInterface()
 
 void CraneHardwareInterface::init()
 {
+  // Get controller joint names from parameter server
+  if (!nh_.getParam("joint_names", joint_names_))
+  {
+    ROS_ERROR("Cannot find required parameter 'joint_names' on the parameter server.");
+    throw std::runtime_error("Cannot find required parameter 'joint_names' on the parameter server.");
+  }
+
+  if (!nh_.getParam("actuator_names", actuator_names_))
+  {
+    ROS_ERROR("Cannot find required parameter 'actuator_names' on the parameter server.");
+    throw std::runtime_error("Cannot find required parameter 'actuator_names' on the parameter server.");
+  }
   MLPIRESULT result = MLPI_S_OK;
 
   MlpiVersion versionInfo;
@@ -53,19 +70,16 @@ void CraneHardwareInterface::init()
     ROS_INFO_NAMED("crane_hw_interface", "Successfully connected to MLPI!");
   }
 
-  // Get controller joint names from parameter server
-  if (!nh_.getParam("controller_joint_names", joint_names_))
-  {
-    ROS_ERROR("Cannot find required parameter 'controller_joint_names' on the parameter server.");
-    throw std::runtime_error("Cannot find required parameter 'controller_joint_names' on the parameter server.");
-  }
-
   // Create ros_control interfaces (joint state and position joint for all dof's)
   for (std::size_t i = 0; i < n_dof_; ++i)
   {
     // Joint state interface
     joint_state_interface_.registerHandle(hardware_interface::JointStateHandle(joint_names_[i], &joint_position_[i],
                                                                                &joint_velocity_[i], &joint_effort_[i]));
+
+    // Actuator state interface
+    actuator_state_interface_.registerHandle(hardware_interface::ActuatorStateHandle(
+        actuator_names_[i], &actuator_position_[i], &actuator_velocity_[i], &actuator_effort_[i]));
 
     // Joint velocity control interface
     velocity_joint_interface_.registerHandle(hardware_interface::JointHandle(
@@ -74,6 +88,7 @@ void CraneHardwareInterface::init()
 
   // Register interfaces
   registerInterface(&joint_state_interface_);
+  registerInterface(&actuator_state_interface_);
   registerInterface(&velocity_joint_interface_);
 
   ROS_INFO_STREAM_NAMED("crane_hw_interface", "Loaded crane hardware interface");
@@ -86,83 +101,48 @@ void CraneHardwareInterface::start()
 
 void CraneHardwareInterface::read(const ros::Time& time, const ros::Duration& period)
 {
-  MLPIRESULT result = MLPI_S_OK;
-
-  // Read position of joint 1
-  result = mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Slew.Pact_Slew",
-                                               &joint_position_[0]);
+  std::array<double, 6> vars_cont;
+  MLPIRESULT result = mlpiLogicReadVariableBySymbolArrayDouble(mlpi_connection_, u"Application.PlcProg.VARS_cont",
+                                                               &vars_cont[0], 6, nullptr);
   if (MLPI_FAILED(result))
   {
-    ROS_ERROR("Application.MotionProg_Slew.Pact_Slew");
+    ROS_ERROR("Application.PlcProg.VARS_cont");
   }
-  joint_position_[0] /= 364.7059;
 
-  // Read velocity of joint 1
-  result = mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Slew.Vact_Slew",
-                                               &joint_velocity_[0]);
-  if (MLPI_FAILED(result))
-  {
-    ROS_ERROR("Application.MotionProg_Slew.Vact_Slew");
-  }
-  joint_velocity_[0] /= 364.7059;
+  actuator_position_[0] = vars_cont[2];
+  actuator_position_[1] = vars_cont[0];
+  actuator_position_[2] = vars_cont[1];
+  actuator_velocity_[0] = vars_cont[3];
+  actuator_velocity_[1] = vars_cont[4];
+  actuator_velocity_[2] = vars_cont[5];
 
-  // Read position (length) of cylinder 1 and convert to position (angle) of passive joint
-  result =
-      mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Boom1.L1", &joint_position_[1]);
-  if (MLPI_FAILED(result))
-  {
-    ROS_ERROR("Application.MotionProg_Boom1.L1");
-  }
+  joint_position_[0] = actuator_position_[0] * DEG2RAD;
 
   double e1 = 0.154236;
   double a1 = 0.550;
   double e2 = 0.130;
   double a2 = 0.600199;
-  double l = joint_position_[1];
+  double l = actuator_position_[1];
   double b1 = sqrt(a1 * a1 + e1 * e1);
   double b2 = sqrt(a2 * a2 + e2 * e2);
   double u = (l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2);
   joint_position_[1] = acos(u) + atan(e1 / a1) + atan(e2 / a2) - PI_2;
+  // joint_velocity_[1] = (1.0 / sqrt(1 - u * u)) * (-l / (b1 * b2)) * joint_velocity_[1];
 
-  // Read velocity of cylinder 1 and convert to velocity of passive joint
-  result = mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Boom1.Vact_Boom1",
-                                               &joint_velocity_[1]);
-  if (MLPI_FAILED(result))
-  {
-    ROS_ERROR("Application.MotionProg_Boom1.Vact_Boom1");
-  }
-  joint_velocity_[1] = (1.0 / sqrt(1 - u * u)) * (-l / (b1 * b2)) * joint_velocity_[1];
-
-  // Read position (length) of cylinder 2
-  result =
-      mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Boom2.L2", &joint_position_[2]);
-  if (MLPI_FAILED(result))
-  {
-    ROS_ERROR("Application.MotionProg_Boom2.L2");
-  }
   e1 = 0.160;
   a1 = 0.750;
   e2 = 0.078714;
   a2 = 0.165893;
-  l = joint_position_[2];
+  l = actuator_position_[2];
   b1 = sqrt(a1 * a1 + e1 * e1);
   b2 = sqrt(a2 * a2 + e2 * e2);
   joint_position_[2] = acos((l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2)) + atan(e1 / a1) + atan(e2 / a2) + PI;
 
-  // Read velocity of cylinder 2 and convert to velocity of passive joint
-  result = mlpiLogicReadVariableBySymbolDouble(mlpi_connection_, u"Application.MotionProg_Boom2.Vact_Boom2",
-                                               &joint_velocity_[2]);
-  if (MLPI_FAILED(result))
-  {
-    ROS_ERROR("Application.MotionProg_Boom2.Vact_Boom2");
-  }
-  joint_velocity_[2] = (1.0 / sqrt(1 - u * u)) * (-l / (b1 * b2)) * joint_velocity_[2];
+  // joint_velocity_[2] = (1.0 / sqrt(1 - u * u)) * (-l / (b1 * b2)) * joint_velocity_[2];
 }
 
 void CraneHardwareInterface::write(const ros::Time& time, const ros::Duration& period)
 {
-
-
   // MLPIRESULT result =
   //     mlpiLogicWriteVariableBySymbolArrayDouble(mlpi_connection_, L"velocity_cmd", &joint_velocity_[0], n_dof_);
 }

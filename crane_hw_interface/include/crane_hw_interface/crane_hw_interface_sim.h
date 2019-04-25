@@ -13,6 +13,7 @@
 #include <controller_manager/controller_manager.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
+#include <hardware_interface/actuator_state_interface.h>
 #include <hardware_interface/robot_hw.h>
 #include <ros/ros.h>
 
@@ -47,7 +48,7 @@ private:
 
   // Interfaces
   hardware_interface::JointStateInterface joint_state_interface_;
-  hardware_interface::JointStateInterface actuator_state_interface_;
+  hardware_interface::ActuatorStateInterface actuator_state_interface_;
   hardware_interface::VelocityJointInterface velocity_joint_interface_;
 
 public:
