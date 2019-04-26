@@ -81,9 +81,9 @@ def DLT(c0, c1, c2, P0, P1, P2):
     return X
 
 
-def FindLine(center01, center02, center11, center12, center21, center22):
+def FindLine(center01, center02, center11, center12, center21, center22, P0, P1, P2):
     ''' Find  direction vector of the line through the spheres, given in camera coordinates'''
-    X1 = DLT(center01, center11, center21)
-    X2 = DLT(center02, center12, center22)
+    X1 = DLT(center01, center11, center21, P0, P1, P2)
+    X2 = DLT(center02, center12, center22, P0, P1, P2)
     Lc0 = X2[0:3]-X1[0:3]
     return Lc0

@@ -8,6 +8,7 @@ import numpy as np
 
 from crane_vision.vision import DLT, FindCenter, FindLine
 from crane_vision.transformations import TransMat
+from crane_vision.ekf import EKF
 
 
 class Camera(object):
@@ -20,7 +21,7 @@ class Camera(object):
         self._cam.set(4, y)
 
 
-class PendulumEstimator(object):
+class PayloadOscillationEstimator(object):
 
     def __init__(self):
         # Initialize cameras and downsize image capture
@@ -108,23 +109,24 @@ class PendulumEstimator(object):
 
                 # Find direction vector of a line through the spheres, given in camera coordinates
                 Lc0 = FindLine(center01, center02, center11,
-                               center12, center21, center22)
+                               center12, center21, center22,
+                               self._P0, self._P1, self._P2)
 
                 # find direction vector of a line through the spheres, given in inertial coordinates
-                Lvec = np.dot(np.array([[-cos(Obj.q1), 0, sin(Obj.q1)],
-                                        [sin(Obj.q1), 0, cos(Obj.q1)],
+                Lvec = np.dot(np.array([[-np.cos(Obj.q1), 0, np.sin(Obj.q1)],
+                                        [np.sin(Obj.q1), 0, np.cos(Obj.q1)],
                                         [0, 1,       0]]), Lc0)
 
-                if linalg.norm(Lvec) > 0.00001:
-                    Lvec = Lvec/linalg.norm(Lvec)
+                if np.linalg.norm(Lvec) > 0.00001:
+                    Lvec = Lvec/np.linalg.norm(Lvec)
 
                 # Extended Kalman Filter
                 hat_thetak, hat_Pk, zk = EKF(Lvec,
-                                             np.array([Obj.ddx, Obj.ddy]), 
-                                             hat_Pkm1, 
-                                             hat_thetakm1, 
-                                             Obj.q1, 
-                                             Obj.Lhat, 
+                                             np.array([Obj.ddx, Obj.ddy]),
+                                             hat_Pkm1,
+                                             hat_thetakm1,
+                                             Obj.q1,
+                                             Obj.Lhat,
                                              current_time()-tk)
 
                 # Collect estimated payload oscillation angles and rates, bias of payload oscillation angle, and measurement of payload oscillation angle
