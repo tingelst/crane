@@ -12,5 +12,14 @@
   <author>Geir O. Tysse</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>python-catkin-pkg</buildtool_depend>
 
+  <depend>rospy</depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+
+  <exec_depend>python-numpy</exec_depend>
+  <exec_depend>python-scipy</exec_depend>
+  <exec_depend>python-opencv</exec_depend>
+  <exec_depend>python-scipy</exec_depend>
 </package>
