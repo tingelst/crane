@@ -25,7 +25,7 @@ def rotz(theta):
     return R_z
 
 
-def TransMat(R, t):
+def trf(R, t):
     '''Homogeneous transformation matrix'''
     T = np.array([[R[0][0],   R[0][1],    R[0][2],   t[0]],
                   [R[1][0],   R[1][1],    R[1][2],   t[1]],
