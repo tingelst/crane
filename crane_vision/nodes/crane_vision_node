@@ -11,14 +11,6 @@ from crane_vision.transformations import TransMat
 from crane_vision.ekf import EKF
 
 
-class Camera(object):
-    def __init__(self, device):
-        self._cam = cv2.VideoCapture(device)
-
-    def downscale_image(self, size):
-        x, y = size
-        self._cam.set(3, x)
-        self._cam.set(4, y)
 
 
 class PayloadOscillationEstimator(object):
@@ -113,31 +105,31 @@ class PayloadOscillationEstimator(object):
                                self._P0, self._P1, self._P2)
 
                 # find direction vector of a line through the spheres, given in inertial coordinates
-                Lvec = np.dot(np.array([[-np.cos(Obj.q1), 0, np.sin(Obj.q1)],
-                                        [np.sin(Obj.q1), 0, np.cos(Obj.q1)],
-                                        [0, 1,       0]]), Lc0)
+                # Lvec = np.dot(np.array([[-np.cos(Obj.q1), 0, np.sin(Obj.q1)],
+                #                         [np.sin(Obj.q1), 0, np.cos(Obj.q1)],
+                #                         [0, 1,       0]]), Lc0)
 
-                if np.linalg.norm(Lvec) > 0.00001:
-                    Lvec = Lvec/np.linalg.norm(Lvec)
+                # if np.linalg.norm(Lvec) > 0.00001:
+                #     Lvec = Lvec/np.linalg.norm(Lvec)
 
                 # Extended Kalman Filter
-                hat_thetak, hat_Pk, zk = EKF(Lvec,
-                                             np.array([Obj.ddx, Obj.ddy]),
-                                             hat_Pkm1,
-                                             hat_thetakm1,
-                                             Obj.q1,
-                                             Obj.Lhat,
-                                             current_time()-tk)
+                # hat_thetak, hat_Pk, zk = EKF(Lvec,
+                #                              np.array([Obj.ddx, Obj.ddy]),
+                #                              hat_Pkm1,
+                #                              hat_thetakm1,
+                #                              Obj.q1,
+                #                              Obj.Lhat,
+                #                              current_time()-tk)
 
                 # Collect estimated payload oscillation angles and rates, bias of payload oscillation angle, and measurement of payload oscillation angle
                 # Obj.senddata = np.array([hat_thetak[0], hat_thetak[1], hat_thetak[2],
                 #                          hat_thetak[3], hat_thetak[4], hat_thetak[5], zk[0], zk[1]])
-                msgToMatlab.put(hat_thetak)
-                Obj.senddata
-                hat_thetakm1 = hat_thetak
-                hat_Pkm1 = hat_Pk
-                StoredData.update(zk, hat_thetak, start, tk)
-                tk = current_time()
+                # msgToMatlab.put(hat_thetak)
+                # Obj.senddata
+                # hat_thetakm1 = hat_thetak
+                # hat_Pkm1 = hat_Pk
+                # StoredData.update(zk, hat_thetak, start, tk)
+                # tk = current_time()
 
         except rospy.ROSInterruptException:
             pass
