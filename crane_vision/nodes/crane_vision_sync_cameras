@@ -8,7 +8,7 @@ pub = rospy.Publisher(
     'republish', Image, queue_size=3)
 
 def callback(image0, image1, image2):
-rospy.loginfo('callback')
+    rospy.loginfo('callback')
     pub.publish(image0)
 
 
@@ -18,7 +18,7 @@ camera0_sub = message_filters.Subscriber('/camera0/image_raw', Image)
 camera1_sub = message_filters.Subscriber('/camera1/image_raw', Image)
 camera2_sub = message_filters.Subscriber('/camera2/image_raw', Image)
 
-ts = message_filters.TimeSynchronizer([camera0_sub, camera1_sub, camera2_sub], 10)
+ts = message_filters.ApproximateTimeSynchronizer([camera0_sub, camera1_sub, camera2_sub], 10, 1.0/30.0)
 ts.registerCallback(callback)
 rospy.spin()
 
