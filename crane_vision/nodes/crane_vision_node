@@ -39,7 +39,7 @@ P2 = np.dot(np.dot(K2, PII), trf(np.eye(3), t_31))
 def main():
     rospy.init_node('crane_vision_node')
 
-    cams = CameraArray([0, 1, 2], (1280, 720))
+    cams = CameraArray([0, 1, 2])
 
     center01 = (0, 0)
     center02 = (0, 0)
@@ -93,15 +93,10 @@ def main():
                 dt = current_time - previous_time
                 previous_time = current_time
 
-                rospy.loginfo(1.0 / dt)
+                hat_thetak, hat_Pk, zk = ekf(Lvec, np.array(
+                    [ddx, ddy]), hat_Pkm1, hat_thetakm1, q1, Lhat, dt)
 
-                hat_thetak, hat_Pk, zk = ekf(Lvec,
-                                             np.array([ddx, ddy]),
-                                             hat_Pkm1,
-                                             hat_thetakm1,
-                                             q1,
-                                             Lhat,
-                                             dt)
+                rospy.loginfo(1.0 / dt)
 
     except rospy.ROSInterruptException:
         pass

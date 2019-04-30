@@ -4,12 +4,12 @@ import numpy as np
 
 
 class Camera(object):
-    def __init__(self, device, size):
+    def __init__(self, device, size=(1280, 720), fps=30):
         self._cam = cv2.VideoCapture(device)
         x, y = size
         self._cam.set(3, x)
         self._cam.set(4, y)
-        self._cam.set(5, 60)
+        self._cam.set(5, fps)
 
     def read(self):
         return self._cam.read()
@@ -19,7 +19,7 @@ class Camera(object):
 
 
 class CameraArray(object):
-    def __init__(self, devices, size):
+    def __init__(self, devices, size=(1280, 720)):
         self._cameras = [Camera(device, size) for device in devices]
 
         # Initialize camera array
