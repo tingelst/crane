@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="pendulum" params="prefix length">
+
+    <material name="white">
+      <color rgba="1 1 1 1"/>
+    </material>
+    <material name="gray">
+      <color rgba="0.5 0.5 0.5 1"/>
+    </material>
+    <material name="lessgray">
+      <color rgba="0.75 0.75 0.75 1"/>
+    </material>
+    <material name="red">
+      <color rgba="1 0 0 1"/>
+    </material>
+
+    <link name="${prefix}base_link"/>
+    <link name="${prefix}frame1"/>
+    <link name="${prefix}frame2"/>
+
+    <joint name="phix_joint" type="continuous">
+      <parent link="${prefix}base_link"/>
+      <child link="${prefix}frame1"/>
+      <axis xyz="1 0 0" />
+    </joint>
+
+    <joint name="phiy_joint" type="continuous">
+      <parent link="${prefix}frame1"/>
+      <child link="${prefix}frame2"/>
+      <axis xyz="0 1 0" />
+    </joint>
+
+    <joint name="${prefix}frame2_wire_joint" type="fixed">
+      <parent link="${prefix}frame2"/>
+      <child link="${prefix}wire"/>
+    </joint>
+
+    <link name="${prefix}wire">
+      <visual>
+        <origin xyz="0.0 0.0 ${length/2}" rpy="0 0 0" />
+        <geometry>
+          <cylinder radius="0.005" length="${length}"/>
+        </geometry>
+        <material name="lessgray"/>
+      </visual>
+    </link>
+
+    <joint name="${prefix}wire_payload_joint" type="fixed">
+      <parent link="${prefix}wire"/>
+      <child link="${prefix}payload"/>
+    </joint>
+
+    <link name="${prefix}payload">
+      <visual>
+        <origin xyz="0 0 ${length}" rpy="0 0 0"/>
+        <geometry>
+          <sphere radius="0.1"/>
+        </geometry>
+        <material name="red"/>
+      </visual>
+    </link>
+
+  </xacro:macro>
+</robot> 
