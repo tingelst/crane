@@ -15,7 +15,7 @@ class SphericalPendulumVisualization(object):
 
     def run(self):
 
-        q = np.array([np.pi/12, 0.0, np.pi/12, 0.0])
+        q = np.array([np.pi/12, 0.0, np.pi/6, 0.0])
 
         start_time = time.time()
         current_time = start_time

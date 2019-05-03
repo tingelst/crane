@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="crane">
+  <xacro:include filename="$(find crane_description)/urdf/crane.xacro" />
+  <xacro:include filename="$(find crane_description)/urdf/pendulum.xacro" />
+  <xacro:pendulum prefix="crane" />
+  <xacro:pendulum prefix="pendulum" length="1.05" />
+  <link name="world"/>
+  <joint name="crane_tip_pendulum" type="fixed">
+    <origin xyz="0 0 0" rpy="0 ${radians(180)} 0"/>
+    <parent link="world"/>
+    <child link="base_link"/>
+  </joint>
+</robot>
