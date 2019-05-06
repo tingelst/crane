@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   kdl_parser
   geometry_msgs
   hardware_interface
+  crane_hw_interface
   sensor_msgs
   message_generation
   pluginlib
@@ -32,6 +33,7 @@ catkin_package(
     kdl_parser
     geometry_msgs
     hardware_interface
+    crane_hw_interface
     sensor_msgs
     message_runtime
     pluginlib
@@ -42,6 +44,7 @@ catkin_package(
 
 add_library(crane_controllers
   src/crane_tip_velocity_controller.cpp
+  src/crane_tip_velocity_forward_controller.cpp
   src/crane_state_controller.cpp
 )
 

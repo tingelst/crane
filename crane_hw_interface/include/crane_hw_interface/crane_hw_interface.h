@@ -20,6 +20,15 @@
 #include <hardware_interface/robot_hw.h>
 #include <ros/ros.h>
 
+#include <kdl/chain.hpp>
+#include <kdl/chainiksolvervel_wdls.hpp>
+#include <kdl/chainfksolver.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
+#include <kdl/frames.hpp>
+
+#include <urdf/model.h>
+#include <kdl_parser/kdl_parser.hpp>
+
 #include <crane_hw_interface/crane_tip_velocity_command_interface.h>
 
 namespace crane_hw_interface

@@ -48,7 +48,7 @@ private:
   std::array<double, 2>* cmd_;
 };
 
-class CraneTipVelocityCommandInterface : public HardwareResourceManager<CraneTipStateHandle>
+class CraneTipVelocityCommandInterface : public HardwareResourceManager<CraneTipVelocityHandle>
 {
 };
 

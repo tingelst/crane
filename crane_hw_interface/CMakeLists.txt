@@ -10,6 +10,9 @@ find_package(catkin REQUIRED COMPONENTS
   hardware_interface
   joint_limits_interface
   roscpp
+  kdl_conversions
+  kdl_parser
+  urdf
 )
 
 catkin_package(
@@ -22,6 +25,9 @@ catkin_package(
     hardware_interface
     joint_limits_interface
     roscpp
+    kdl_conversions
+    kdl_parser
+    urdf
 )
 
 include_directories(

@@ -17,10 +17,22 @@
 #include <hardware_interface/robot_hw.h>
 #include <ros/ros.h>
 
+#include <kdl/chain.hpp>
+#include <kdl/chainiksolvervel_wdls.hpp>
+#include <kdl/chainfksolver.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
+#include <kdl/frames.hpp>
+
+#include <urdf/model.h>
+#include <kdl_parser/kdl_parser.hpp>
+
+#include <crane_hw_interface/crane_tip_velocity_command_interface.h>
+
 namespace crane_hw_interface
 {
 constexpr double PI = 3.14159265358979323846;
 constexpr double PI_2 = 1.57079632679489661923;
+constexpr double DEG2RAD = 0.017453292519943295;
 
 class CraneHardwareInterfaceSim : public hardware_interface::RobotHW
 {
@@ -41,6 +53,15 @@ private:
   std::vector<double> actuator_effort_;
   std::vector<double> actuator_velocity_command_;
 
+  std::array<double, 2> crane_tip_position_;
+  std::array<double, 2> crane_tip_velocity_;
+  std::array<double, 2> crane_tip_velocity_command_;
+
+  KDL::Chain kdl_chain_;
+  boost::shared_ptr<KDL::ChainIkSolverVel_wdls> solver_;
+  boost::shared_ptr<KDL::ChainFkSolverPos_recursive> fksolver_;
+  std::string twist_command_frame_{"base_frame"};
+
   // Timing
   ros::Duration control_period_;
   ros::Duration elapsed_time_;
@@ -50,6 +71,9 @@ private:
   hardware_interface::JointStateInterface joint_state_interface_;
   hardware_interface::ActuatorStateInterface actuator_state_interface_;
   hardware_interface::VelocityJointInterface velocity_joint_interface_;
+
+  CraneTipStateInterface crane_tip_state_interface_;
+  CraneTipVelocityCommandInterface crane_tip_velocity_command_interface_;
 
 public:
   CraneHardwareInterfaceSim();

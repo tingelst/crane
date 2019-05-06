@@ -14,9 +14,14 @@
 
   <build_depend>angles</build_depend>
   <build_depend>cmake_modules</build_depend>
+  <build_depend>eigen</build_depend>
 
   <depend>controller_manager</depend>
   <depend>hardware_interface</depend>
   <depend>joint_limits_interface</depend>
   <depend>roscpp</depend>
+  <depend>kdl_conversions</depend>
+  <depend>kdl_parser</depend>
+  <depend>urdf</depend>
+
 </package>

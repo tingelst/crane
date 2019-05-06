@@ -5,6 +5,9 @@ crane_state_controller:
 crane_tip_velocity_controller:
   type: crane_controllers/CraneTipVelocityController
 
+crane_tip_velocity_forward_controller:
+  type: crane_controllers/CraneTipVelocityForwardController
+
 joint_state_controller:
   type: joint_state_controller/JointStateController
   publish_rate: 50
