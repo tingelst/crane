@@ -13,6 +13,6 @@ catkin_python_setup()
 catkin_package()
 
 catkin_install_python(PROGRAMS
-   scripts/simple_pendulum.py
+   scripts/spherical_pendulum_visualization
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
