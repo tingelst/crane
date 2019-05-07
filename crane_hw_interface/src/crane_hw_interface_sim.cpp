@@ -117,7 +117,8 @@ void CraneHardwareInterfaceSim::read(const ros::Time& time, const ros::Duration&
 {
   // No need to read actuator_states since our write() command populates our state for us
 
-  joint_position_[0] = actuator_position_[0] * DEG2RAD;
+  /*
+  joint_position_[0] = actuator_position_[0];
 
   double e1 = 0.154236;
   double a1 = 0.550;
@@ -138,6 +139,7 @@ void CraneHardwareInterfaceSim::read(const ros::Time& time, const ros::Duration&
   b2 = sqrt(a2 * a2 + e2 * e2);
   u = (l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2);
   joint_position_[2] = acos(u) + atan(e1 / a1) + atan(e2 / a2) + PI;
+  */
 }
 
 void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration& period)
@@ -153,8 +155,6 @@ void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration
   }
 
   KDL::Frame cart_pose;
-  // Copy desired twist and update time to local var to reduce lock contention
-
   KDL::Twist twist;
   twist(0) = crane_tip_velocity_command_[0];
   twist(1) = crane_tip_velocity_command_[1];
@@ -201,8 +201,13 @@ void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration
     if (!std::isfinite(joint_velocity_command(i)))
     {
       ROS_ERROR_THROTTLE(1.0, "Target joint velocity (%d) is not finite : %f", i, joint_velocity_command(i));
-      joint_velocity_command(i) = 1.0;
+      joint_velocity_command(i) = 0.0;
     }
+  }
+  for (std::size_t i = 0; i < n_dof_; ++i)
+  {
+    joint_velocity_[i] = joint_velocity_command(i);
+    joint_position_[i] += joint_velocity_command(i) * period.toSec();
   }
 
   actuator_velocity_[0] = joint_velocity_command(0);
