@@ -3,6 +3,7 @@
 
 // Author: Lars Tingelstad (NTNU) <lars.tingelstad@ntnu.no>
 
+#include <Eigen/LU>
 #include <crane_hw_interface/crane_hw_interface_sim.h>
 
 namespace crane_hw_interface
@@ -136,78 +137,35 @@ void CraneHardwareInterfaceSim::read(const ros::Time& time, const ros::Duration&
   b2 = sqrt(a2 * a2 + e2 * e2);
   u = (l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2);
   joint_position_[2] = acos(u) + atan(e1 / a1) + atan(e2 / a2) - PI;
-  
 }
 
 void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration& period)
 {
   KDL::JntArray joint_position(n_dof_);
-  KDL::JntArray joint_velocity(n_dof_);
-  KDL::JntArray joint_velocity_command(n_dof_);
-
   for (std::size_t i = 0; i < n_dof_; ++i)
   {
-    joint_velocity(i) = joint_velocity_[i];
     joint_position(i) = joint_position_[i];
   }
 
-  KDL::Frame cart_pose;
-  KDL::Twist twist;
-  twist(0) = crane_tip_velocity_command_[0];
-  twist(1) = crane_tip_velocity_command_[1];
-  twist(2) = 0.01;
-  twist(3) = 0.0;
-  twist(4) = 0.0;
-  twist(5) = 0.0;
+  // Compute Jacobian
+  jnt_to_jac_solver_->JntToJac(joint_position, J_);
+  Eigen::Matrix<double, 3, 3> J = J_.data.topRows(3);
 
-  for (int i = 0; i < 6; ++i)
-  {
-    if (!std::isfinite(twist(i)))
-    {
-      ROS_ERROR_THROTTLE(1.0, "Twist command value (%d) is not finite : %f", i, twist(i));
-      twist(i) = 0.0;
-    }
-  }
+  // Initialize desired cartesian crane tip velocity
+  Eigen::Matrix<double, 3, 1> xd;
+  xd << crane_tip_velocity_command_[0], crane_tip_velocity_command_[1], 0.0;
 
-  if (fksolver_->JntToCart(joint_position, cart_pose) < 0)
-  {
-    twist.Zero();
-    ROS_ERROR_THROTTLE(1.0, "FKsolver solver failed");
-  }
-  else
-  {
-    if (twist_command_frame_ == "end_effector_frame")
-    {
-      twist = cart_pose.M * twist;
-    }
-  }
+  // Solve for joint velocities
+  Eigen::Matrix<double, 3, 1> qd = J.inverse() * xd;
 
-  // twist = cart_pose.M * twist;
-
-  // change the twist here
-  if (solver_->CartToJnt(joint_position, twist, joint_velocity_command) < 0)
-  {
-    for (unsigned i = 0; i < n_dof_; ++i)
-    {
-      joint_velocity_command(i) = 0.0;
-    }
-  }
-
-  // Make sure solver didn't generate any NaNs.
+  KDL::JntArray joint_velocity_command(n_dof_);
   for (unsigned i = 0; i < n_dof_; ++i)
   {
-    if (!std::isfinite(joint_velocity_command(i)))
-    {
-      ROS_ERROR_THROTTLE(1.0, "Target joint velocity (%d) is not finite : %f", i, joint_velocity_command(i));
-      joint_velocity_command(i) = 0.0;
-    }
+    joint_velocity_command(i) = qd(i);
   }
 
   actuator_velocity_[0] = joint_velocity_command(0);
   actuator_position_[0] += actuator_velocity_[0] * period.toSec();
-
-  // joint_velocity_[0] = joint_velocity_command(0);
-  // joint_position_[0] = actuator_position_[0];
 
   double e1 = 0.154236;
   double a1 = 0.550;
@@ -230,8 +188,6 @@ void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration
   u = (l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2);
   actuator_velocity_[2] = -(1.0 / ((1.0 / sqrt(1.0 - u * u)) * (l / (-b1 * b2)))) * joint_velocity_command(2);
   actuator_position_[2] += actuator_velocity_[2] * period.toSec();
-
-  // ROS_INFO_STREAM("Joints: " << joint_velocity_[0] << " " << joint_velocity_[1] << " " << joint_velocity_[2]);
 }
 
 }  // namespace crane_hw_interface

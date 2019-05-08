@@ -26,7 +26,7 @@ bool CraneTipVelocityForwardController::init(hardware_interface::RobotHW* robot_
 
 void CraneTipVelocityForwardController::starting(const ros::Time&)
 {
-  crane_tip_velocity_handle_.setCommand({ 0.0, 0.0 });
+  crane_tip_velocity_handle_.setCommand({ -0.1, 0.0 });
 }
 
 void CraneTipVelocityForwardController::update(const ros::Time& now, const ros::Duration& period)
