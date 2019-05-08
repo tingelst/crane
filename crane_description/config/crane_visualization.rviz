@@ -8,7 +8,6 @@ Panels:
         - /Status1
         - /RobotModel1
         - /RobotModel1/Links1
-        - /RobotModel1/Links1/tip_link1
         - /TF1
         - /TF1/Frames1
         - /TF1/Tree1
@@ -69,50 +68,28 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        cylinder1:
+        frame1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        frame2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        payload:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        cylinder2:
+        wire:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        link1:
+        world:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
-        link2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link4:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        piston1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        piston2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        tip_link:
-          Alpha: 1
-          Show Axes: true
-          Show Trail: true
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
@@ -126,23 +103,15 @@ Visualization Manager:
         All Enabled: false
         base_link:
           Value: true
-        cylinder1:
+        frame1:
           Value: true
-        cylinder2:
+        frame2:
           Value: true
-        link1:
+        payload:
           Value: true
-        link2:
+        wire:
           Value: true
-        link3:
-          Value: true
-        link4:
-          Value: true
-        piston1:
-          Value: true
-        piston2:
-          Value: true
-        tip_link:
+        world:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -150,18 +119,12 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        base_link:
-          link1:
-            link2:
-              cylinder1:
-                piston1:
-                  {}
-              link3:
-                cylinder2:
-                  piston2:
-                    {}
-                link4:
-                  tip_link:
+        world:
+          base_link:
+            frame1:
+              frame2:
+                wire:
+                  payload:
                     {}
       Update Interval: 0
       Value: true
@@ -169,7 +132,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: base_link
+    Fixed Frame: world
     Frame Rate: 30
   Name: root
   Tools:
@@ -201,10 +164,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.400398344
+      Pitch: 0.325398415
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.50539947
+      Yaw: 3.22040057
     Saved: ~
 Window Geometry:
   Displays:
