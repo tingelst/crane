@@ -17,7 +17,7 @@ CraneHardwareInterfaceSim::CraneHardwareInterfaceSim()
   , joint_velocity_command_(n_dof_, 0.0)
   , joint_names_(n_dof_)
   , actuator_names_(n_dof_)
-  , crane_tip_velocity_command_({0.0, 0.0})
+  , crane_tip_velocity_command_({ 0.0, 0.0 })
   , nh_("~")
 {
 }
@@ -72,6 +72,9 @@ void CraneHardwareInterfaceSim::init()
   }
   solver_.reset(new KDL::ChainIkSolverVel_wdls(kdl_chain_));
   fksolver_.reset(new KDL::ChainFkSolverPos_recursive(kdl_chain_));
+  jnt_to_jac_solver_.reset(new KDL::ChainJntToJacSolver(kdl_chain_));
+
+  J_.resize(n_dof_);
 
   // Create ros_control interfaces (joint state and position joint for all dof's)
   for (std::size_t i = 0; i < n_dof_; ++i)
@@ -91,11 +94,9 @@ void CraneHardwareInterfaceSim::init()
 
   crane_tip_state_interface_.registerHandle(
       CraneTipStateHandle("crane_tip", &crane_tip_position_, &crane_tip_velocity_));
-      
+
   crane_tip_velocity_command_interface_.registerHandle(
       CraneTipVelocityHandle(crane_tip_state_interface_.getHandle("crane_tip"), &crane_tip_velocity_command_));
-
-  
 
   // Register interfaces
   registerInterface(&joint_state_interface_);
@@ -103,7 +104,6 @@ void CraneHardwareInterfaceSim::init()
   registerInterface(&velocity_joint_interface_);
   registerInterface(&crane_tip_state_interface_);
   registerInterface(&crane_tip_velocity_command_interface_);
-
 
   ROS_INFO_STREAM_NAMED("crane_hw_interface", "Loaded simulated crane hardware interface");
 }
@@ -115,9 +115,6 @@ void CraneHardwareInterfaceSim::start()
 
 void CraneHardwareInterfaceSim::read(const ros::Time& time, const ros::Duration& period)
 {
-  // No need to read actuator_states since our write() command populates our state for us
-
-  /*
   joint_position_[0] = actuator_position_[0];
 
   double e1 = 0.154236;
@@ -138,8 +135,8 @@ void CraneHardwareInterfaceSim::read(const ros::Time& time, const ros::Duration&
   b1 = sqrt(a1 * a1 + e1 * e1);
   b2 = sqrt(a2 * a2 + e2 * e2);
   u = (l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2);
-  joint_position_[2] = acos(u) + atan(e1 / a1) + atan(e2 / a2) + PI;
-  */
+  joint_position_[2] = acos(u) + atan(e1 / a1) + atan(e2 / a2) - PI;
+  
 }
 
 void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration& period)
@@ -147,7 +144,7 @@ void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration
   KDL::JntArray joint_position(n_dof_);
   KDL::JntArray joint_velocity(n_dof_);
   KDL::JntArray joint_velocity_command(n_dof_);
- 
+
   for (std::size_t i = 0; i < n_dof_; ++i)
   {
     joint_velocity(i) = joint_velocity_[i];
@@ -158,7 +155,7 @@ void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration
   KDL::Twist twist;
   twist(0) = crane_tip_velocity_command_[0];
   twist(1) = crane_tip_velocity_command_[1];
-  twist(2) = 0.0;
+  twist(2) = 0.01;
   twist(3) = 0.0;
   twist(4) = 0.0;
   twist(5) = 0.0;
@@ -172,7 +169,6 @@ void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration
     }
   }
 
-  // FK is used to transform the twist command seen from end-effector frame to the one seen from body frame.
   if (fksolver_->JntToCart(joint_position, cart_pose) < 0)
   {
     twist.Zero();
@@ -185,6 +181,8 @@ void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration
       twist = cart_pose.M * twist;
     }
   }
+
+  // twist = cart_pose.M * twist;
 
   // change the twist here
   if (solver_->CartToJnt(joint_position, twist, joint_velocity_command) < 0)
@@ -204,14 +202,12 @@ void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration
       joint_velocity_command(i) = 0.0;
     }
   }
-  for (std::size_t i = 0; i < n_dof_; ++i)
-  {
-    joint_velocity_[i] = joint_velocity_command(i);
-    joint_position_[i] += joint_velocity_command(i) * period.toSec();
-  }
 
   actuator_velocity_[0] = joint_velocity_command(0);
   actuator_position_[0] += actuator_velocity_[0] * period.toSec();
+
+  // joint_velocity_[0] = joint_velocity_command(0);
+  // joint_position_[0] = actuator_position_[0];
 
   double e1 = 0.154236;
   double a1 = 0.550;
@@ -221,9 +217,8 @@ void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration
   double b1 = sqrt(a1 * a1 + e1 * e1);
   double b2 = sqrt(a2 * a2 + e2 * e2);
   double u = (l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2);
-  actuator_velocity_[1] = (1.0 / sqrt(1.0 - u * u)) * (l / (-b1 * b2)) * joint_velocity_command(1);
+  actuator_velocity_[1] = -(1.0 / ((1.0 / sqrt(1.0 - u * u)) * (l / (-b1 * b2)))) * joint_velocity_command(1);
   actuator_position_[1] += actuator_velocity_[1] * period.toSec();
-
 
   e1 = 0.160;
   a1 = 0.750;
@@ -233,10 +228,10 @@ void CraneHardwareInterfaceSim::write(const ros::Time& time, const ros::Duration
   b1 = sqrt(a1 * a1 + e1 * e1);
   b2 = sqrt(a2 * a2 + e2 * e2);
   u = (l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2);
-  actuator_velocity_[2] = (1.0 / sqrt(1.0 - u * u)) * (l / (-b1 * b2)) * joint_velocity_command(2);
+  actuator_velocity_[2] = -(1.0 / ((1.0 / sqrt(1.0 - u * u)) * (l / (-b1 * b2)))) * joint_velocity_command(2);
   actuator_position_[2] += actuator_velocity_[2] * period.toSec();
 
-
+  // ROS_INFO_STREAM("Joints: " << joint_velocity_[0] << " " << joint_velocity_[1] << " " << joint_velocity_[2]);
 }
 
 }  // namespace crane_hw_interface

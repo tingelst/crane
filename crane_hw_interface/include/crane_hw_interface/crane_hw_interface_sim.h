@@ -60,7 +60,10 @@ private:
   KDL::Chain kdl_chain_;
   boost::shared_ptr<KDL::ChainIkSolverVel_wdls> solver_;
   boost::shared_ptr<KDL::ChainFkSolverPos_recursive> fksolver_;
-  std::string twist_command_frame_{"base_frame"};
+  boost::shared_ptr<KDL::ChainJntToJacSolver> jnt_to_jac_solver_;
+  std::string twist_command_frame_{ "base_frame" };
+
+  KDL::Jacobian  J_;            // Jacobian  
 
   // Timing
   ros::Duration control_period_;

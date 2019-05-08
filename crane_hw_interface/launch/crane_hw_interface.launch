@@ -15,7 +15,7 @@
     <rosparam>
       joint_names: ["joint1", "joint2", "joint3"]
       actuator_names: ["actuator1", "actuator2", "actuator3"]
-      initial_actuator_position: [0.1, 0.7, 0.9]
+      initial_actuator_position: [0.0, 0.8, 0.8]
     </rosparam>
   </node>
 
@@ -27,6 +27,8 @@
   </node>>
 
   <!-- Load controllers -->
-  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" 
-  args="crane_state_controller crane_tip_velocity_forward_controller"/>
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="crane_state_controller crane_tip_velocity_forward_controller"/>
+  <!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller crane_tip_velocity_forward_controller"/> -->
+
+  <!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller crane_tip_velocity_controller"/> -->
 </launch>
