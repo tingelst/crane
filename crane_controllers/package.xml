@@ -25,6 +25,7 @@
   <depend>kdl_parser</depend>
   <depend>hardware_interface</depend>
   <depend>crane_hw_interface</depend>
+  <depend>crane_msgs</depend>
   <depend>pluginlib</depend>
   <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>

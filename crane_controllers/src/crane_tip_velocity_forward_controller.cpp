@@ -20,17 +20,16 @@ bool CraneTipVelocityForwardController::init(hardware_interface::RobotHW* robot_
   }
 
   crane_tip_velocity_handle_ = crane_tip_velocity_command_interface_->getHandle("crane_tip");
+  command_sub_ = node_handle.subscribe<crane_msgs::CraneControl>("command", 1,
+                                                                 &CraneTipVelocityForwardController::commandCB, this);
 
   return true;
 }
 
-void CraneTipVelocityForwardController::starting(const ros::Time&)
-{
-  crane_tip_velocity_handle_.setCommand({ -0.1, 0.0 });
-}
-
 void CraneTipVelocityForwardController::update(const ros::Time& now, const ros::Duration& period)
 {
+  crane_msgs::CraneControl command = *command_buffer_.readFromRT();
+  crane_tip_velocity_handle_.setCommand({ command.gx, command.gy });
 }
 
 }  // namespace crane_controllers

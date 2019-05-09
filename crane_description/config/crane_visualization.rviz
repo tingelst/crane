@@ -68,25 +68,47 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        frame1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        frame2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        payload:
+        cylinder1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        wire:
+        cylinder2:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        world:
+        link1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        link2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        link3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        link4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        piston1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        piston2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        tip_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -103,15 +125,23 @@ Visualization Manager:
         All Enabled: false
         base_link:
           Value: true
-        frame1:
+        cylinder1:
           Value: true
-        frame2:
+        cylinder2:
           Value: true
-        payload:
+        link1:
           Value: true
-        wire:
+        link2:
           Value: true
-        world:
+        link3:
+          Value: true
+        link4:
+          Value: true
+        piston1:
+          Value: true
+        piston2:
+          Value: true
+        tip_link:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -119,12 +149,18 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        world:
-          base_link:
-            frame1:
-              frame2:
-                wire:
-                  payload:
+        base_link:
+          link1:
+            link2:
+              cylinder1:
+                piston1:
+                  {}
+              link3:
+                cylinder2:
+                  piston2:
+                    {}
+                link4:
+                  tip_link:
                     {}
       Update Interval: 0
       Value: true
@@ -132,7 +168,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: world
+    Fixed Frame: base_link
     Frame Rate: 30
   Name: root
   Tools:

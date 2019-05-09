@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   hardware_interface
   crane_hw_interface
+  crane_msgs
   sensor_msgs
   message_generation
   pluginlib
@@ -34,6 +35,7 @@ catkin_package(
     geometry_msgs
     hardware_interface
     crane_hw_interface
+    crane_msgs
     sensor_msgs
     message_runtime
     pluginlib
