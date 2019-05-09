@@ -105,6 +105,7 @@
     </link> 
 
     <link name="tip_link"/>
+    <link name="suspension_frame"/>
 
     <joint name="joint1" type="revolute">
       <origin xyz="0 0 0.628" rpy="0 0 0"/>
@@ -167,6 +168,14 @@
       <parent link="link4"/>
       <child link="tip_link"/>
     </joint>
+
+    <joint name="suspension_joint" type="continuous">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="tip_link"/>
+      <child link="suspension_frame"/>
+      <axis xyz="0 -1 0"/>
+    </joint>
+
 
 
 

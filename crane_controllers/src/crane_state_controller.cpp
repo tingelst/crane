@@ -41,7 +41,7 @@ bool CraneStateController::init(hardware_interface::RobotHW* robot_hw, ros::Node
   }
 
   // realtime publisher
-  realtime_pub_.reset(new realtime_tools::RealtimePublisher<sensor_msgs::JointState>(root_nh, "/joint_states", 4));
+  realtime_pub_.reset(new realtime_tools::RealtimePublisher<sensor_msgs::JointState>(root_nh, "joint_states", 4));
 
   // get joints and allocate message
   for (unsigned i = 0; i < num_hw_joints_; i++)
@@ -71,6 +71,10 @@ bool CraneStateController::init(hardware_interface::RobotHW* robot_hw, ros::Node
   realtime_pub_->msg_.velocity.push_back(0.0);
   realtime_pub_->msg_.effort.push_back(0.0);
   realtime_pub_->msg_.name.push_back("actuator3");
+  realtime_pub_->msg_.position.push_back(0.0);
+  realtime_pub_->msg_.velocity.push_back(0.0);
+  realtime_pub_->msg_.effort.push_back(0.0);
+  realtime_pub_->msg_.name.push_back("suspension_joint");
   realtime_pub_->msg_.position.push_back(0.0);
   realtime_pub_->msg_.velocity.push_back(0.0);
   realtime_pub_->msg_.effort.push_back(0.0);
@@ -138,6 +142,9 @@ void CraneStateController::update(const ros::Time& time, const ros::Duration& /*
       realtime_pub_->msg_.position[6] = actuator_state_[2].getPosition();
       realtime_pub_->msg_.velocity[6] = actuator_state_[2].getVelocity();
       realtime_pub_->msg_.effort[6] = actuator_state_[2].getEffort();
+
+      // suspension_joint
+      realtime_pub_->msg_.position[7] = -joint_state_[1].getPosition() - joint_state_[2].getPosition();
 
       realtime_pub_->unlockAndPublish();
     }

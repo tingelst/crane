@@ -68,25 +68,73 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        frame1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        frame2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        payload:
+        cylinder1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        wire:
+        cylinder2:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        world:
+        link1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        link2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        link3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        link4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        pendulum_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        pendulum_frame1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        pendulum_frame2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        pendulum_payload:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        pendulum_wire:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        piston1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        piston2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        suspension_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        tip_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -102,37 +150,69 @@ Visualization Manager:
       Frames:
         All Enabled: false
         base_link:
+          Value: false
+        cylinder1:
+          Value: false
+        cylinder2:
+          Value: false
+        link1:
+          Value: false
+        link2:
+          Value: false
+        link3:
+          Value: false
+        link4:
+          Value: false
+        pendulum_base_link:
+          Value: false
+        pendulum_frame1:
+          Value: false
+        pendulum_frame2:
+          Value: false
+        pendulum_payload:
+          Value: false
+        pendulum_wire:
+          Value: false
+        piston1:
+          Value: false
+        piston2:
+          Value: false
+        suspension_frame:
           Value: true
-        frame1:
-          Value: true
-        frame2:
-          Value: true
-        payload:
-          Value: true
-        wire:
-          Value: true
-        world:
-          Value: true
+        tip_link:
+          Value: false
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
-      Show Names: true
+      Show Names: false
       Tree:
-        world:
-          base_link:
-            frame1:
-              frame2:
-                wire:
-                  payload:
+        base_link:
+          link1:
+            link2:
+              cylinder1:
+                piston1:
+                  {}
+              link3:
+                cylinder2:
+                  piston2:
                     {}
+                link4:
+                  tip_link:
+                    suspension_frame:
+                      pendulum_base_link:
+                        pendulum_frame1:
+                          pendulum_frame2:
+                            pendulum_wire:
+                              pendulum_payload:
+                                {}
       Update Interval: 0
       Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: world
+    Fixed Frame: base_link
     Frame Rate: 30
   Name: root
   Tools:
@@ -149,7 +229,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.42064714
+      Distance: 6.19389009
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -164,10 +244,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.480398774
+      Pitch: 0.210398749
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.2554009
+      Yaw: 1.51539958
     Saved: ~
 Window Geometry:
   Displays:

@@ -2,16 +2,16 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:macro name="pendulum" params="prefix length">
 
-    <material name="white">
+    <material name="${prefix}white">
       <color rgba="1 1 1 1"/>
     </material>
-    <material name="gray">
+    <material name="${prefix}gray">
       <color rgba="0.5 0.5 0.5 1"/>
     </material>
-    <material name="lessgray">
+    <material name="${prefix}lessgray">
       <color rgba="0.75 0.75 0.75 1"/>
     </material>
-    <material name="red">
+    <material name="${prefix}red">
       <color rgba="1 0 0 1"/>
     </material>
 
@@ -42,7 +42,7 @@
         <geometry>
           <cylinder radius="0.005" length="${length}"/>
         </geometry>
-        <material name="lessgray"/>
+        <material name="${prefix}lessgray"/>
       </visual>
     </link>
 
@@ -57,7 +57,7 @@
         <geometry>
           <sphere radius="0.1"/>
         </geometry>
-        <material name="red"/>
+        <material name="${prefix}red"/>
       </visual>
     </link>
 
