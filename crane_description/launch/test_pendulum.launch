@@ -2,6 +2,9 @@
 <launch>
   <include file="$(find crane_description)/launch/load_pendulum.launch" />
 
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find crane_description)/config/crane_visualization.rviz" required="true" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+    <remap from="joint_states" to="pendulum_joint_states"/>
+  </node>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find crane_description)/config/pendulum_visualization.rviz" required="true" />
 </launch>

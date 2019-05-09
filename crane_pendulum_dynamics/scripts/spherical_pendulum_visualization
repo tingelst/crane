@@ -1,27 +1,42 @@
 #!/usr/bin/env python
 
-import time 
-import numpy as np 
+import time
+import numpy as np
 
-import rospy 
+from threading import Lock
+
+import rospy
 from sensor_msgs.msg import JointState
 
+from crane_msgs.msg import CraneControl
 from crane_pendulum_dynamics.rk4 import rk4
-from crane_pendulum_dynamics.spherical_pendulum import spherical_pendulum_dyn
+from crane_pendulum_dynamics.spherical_pendulum import spherical_pendulum_dyn, lyapunov_controller
+
 
 class SphericalPendulumVisualization(object):
     def __init__(self):
-        self._joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=5)
+        self._joint_state_pub = rospy.Publisher(
+            'pendulum_joint_states', JointState, queue_size=5)
+        self._command_sub = rospy.Subscriber(
+            '/lyapunov_pendulum_damping_controller/command', CraneControl, callback=self._command_cb)
+
+        self._command = np.array([0.0, 0.0])
+        self._command_lock = Lock()
+
+    def _command_cb(self, msg):
+        self._command_lock.acquire()
+        self._command = np.array([msg.gx, msg.gy])
+        self._command_lock.release()
 
     def run(self):
 
-        q = np.array([np.pi/12, 0.0, np.pi/6, 0.0])
+        q = np.array([np.pi/6, 0.0, np.pi/6, 0.0])
 
         start_time = time.time()
         current_time = start_time
         previous_time = current_time
 
-        rate = rospy.Rate(50)
+        rate = rospy.Rate(100)
         while not rospy.is_shutdown():
 
             current_time = time.time()
@@ -29,7 +44,10 @@ class SphericalPendulumVisualization(object):
             previous_time = current_time
 
             # update the time and state
-            (t, q) = rk4(current_time, q, dt, spherical_pendulum_dyn)
+
+            self._command_lock.acquire()
+            (t, q) = rk4(current_time, q, dt, spherical_pendulum_dyn, self._command)
+            self._command_lock.release()
 
             msg = JointState()
             msg.header.stamp = rospy.Time.now()
@@ -52,4 +70,3 @@ if __name__ == '__main__':
 
     except rospy.ROSInterruptException:
         pass
-

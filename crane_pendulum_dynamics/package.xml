@@ -16,6 +16,7 @@
   <depend>rospy</depend>
   <depend>geometry_msgs</depend>
   <depend>sensor_msgs</depend>
+  <depend>crane_msgs</depend>
 
   <exec_depend>python-numpy</exec_depend>
   <exec_depend>python-scipy</exec_depend>

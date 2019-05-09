@@ -15,6 +15,7 @@
 #include <realtime_tools/realtime_buffer.h>
 
 #include <std_msgs/Float64.h>
+#include <sensor_msgs/JointState.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 
@@ -38,6 +39,17 @@ private:
 
   ros::Subscriber command_sub_;
   realtime_tools::RealtimeBuffer<crane_msgs::CraneControl> command_buffer_;
+  ros::Subscriber pendulum_joint_state_sub_;
+
+  realtime_tools::RealtimeBuffer<std::array<double, 4>> pendulum_joint_state_buffer_;
+
+  std::unique_ptr<realtime_tools::RealtimePublisher<crane_msgs::CraneControl>> command_pub_;
+
+  void pendulumJointStateCB(const sensor_msgs::JointState::ConstPtr& msg)
+  {
+    pendulum_joint_state_buffer_.writeFromNonRT(
+        { msg->position[0], msg->velocity[0], msg->position[1], msg->velocity[1] });
+  }
   void commandCB(const crane_msgs::CraneControl::ConstPtr& msg)
   {
     command_buffer_.writeFromNonRT(*msg);

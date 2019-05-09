@@ -21,7 +21,7 @@ def lyapunov_controller(t, q):
     return np.array([ux, uy])
 
 
-def spherical_pendulum_dyn(t, q):
+def spherical_pendulum_dyn(t, q, u=[0.0, 0.0]):
     phix, dphix, phiy, dphiy = q
 
     g = 9.81
@@ -32,7 +32,8 @@ def spherical_pendulum_dyn(t, q):
     cy = np.cos(phiy)
     sy = np.sin(phiy)
 
-    ddx0, ddy0 = lyapunov_controller(t, q)
+    # ddx0, ddy0 = lyapunov_controller(t, q)
+    ddx0, ddy0 = u
 
     ddphix = (-g*sx/L + 2.0*dphix*dphiy*sy)/cy + ddy0*cx/(L*cy)
     ddphiy = -g*cx*sy/L - (ddx0*cy + ddy0*sx*sy)/L

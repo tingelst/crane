@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
-  <include file="$(find crane_description)/launch/test_pendulum.launch" />
+  <!-- <include file="$(find crane_description)/launch/test_pendulum.launch" /> -->
   <node name="crane_pendulum_dynamics_node" pkg="crane_pendulum_dynamics" type="spherical_pendulum_visualization" />
 </launch>
