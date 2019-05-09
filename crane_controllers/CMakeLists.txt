@@ -45,6 +45,7 @@ catkin_package(
 )
 
 add_library(crane_controllers
+  src/lyapunov_pendulum_damping_controller.cpp
   src/crane_tip_velocity_controller.cpp
   src/crane_tip_velocity_forward_controller.cpp
   src/crane_state_controller.cpp

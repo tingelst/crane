@@ -27,7 +27,7 @@
   </node>>
 
   <!-- Load controllers -->
-  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="crane_state_controller crane_tip_velocity_forward_controller"/>
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="crane_state_controller lyapunov_pendulum_damping_controller"/>
   <!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller crane_tip_velocity_forward_controller"/> -->
 
   <!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller crane_tip_velocity_controller"/> -->

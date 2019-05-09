@@ -1,4 +1,9 @@
 <library path="lib/libcrane_controllers">
+  <class name="crane_controllers/LyapunovPendulumDampingController" type="crane_controllers::LyapunovPendulumDampingController" base_class_type="controller_interface::ControllerBase">
+    <description>
+      A Lyapunov-based pendulum damping controller controller
+    </description>
+  </class>
   <class name="crane_controllers/CraneTipVelocityForwardController" type="crane_controllers::CraneTipVelocityForwardController" base_class_type="controller_interface::ControllerBase">
     <description>
       A crane tip cartesian velocity forward controller
