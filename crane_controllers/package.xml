@@ -13,6 +13,7 @@
   <author>Geir O. Tysse</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>python-catkin-pkg</buildtool_depend>
 
   <build_depend>message_generation</build_depend>
   <build_depend>eigen</build_depend>
@@ -34,6 +35,8 @@
   <depend>urdf</depend>
 
   <exec_depend>message_runtime</exec_depend>
+  <exec_depend>python-numpy</exec_depend>
+  <exec_depend>python-scipy</exec_depend>
 
   <export>
     <controller_interface plugin="${prefix}/crane_controllers_plugin.xml"/>

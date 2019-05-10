@@ -21,5 +21,4 @@
   <exec_depend>python-numpy</exec_depend>
   <exec_depend>python-scipy</exec_depend>
   <exec_depend>python-opencv</exec_depend>
-  <exec_depend>python-scipy</exec_depend>
 </package>
