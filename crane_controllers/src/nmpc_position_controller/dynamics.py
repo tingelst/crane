@@ -31,16 +31,16 @@ def continuous_dynamics(z, g, k, L):
     dzdt[6] = z[7]  # dphiy
     dzdt[7] = (-kd*dphiy) - (kp*phiy) - (9.81 / L * cx*sy) - \
         ((gx*cy + gy*sx*sy)/L)  # ddphiy
-    return dzdt, z
+    return dzdt
 
 
 def discrete_dynamics(zk, gk, Ts, k, L):
     '''Repeated Euler's method (Algorithm 1 in ECC)'''
     M = 10
     delta = Ts/M
-    zk1 = zk
+    zk1 = zk.ravel()
     cds = []
-    for ct in range(M):
-        cd = continuous_dynamics(zk1, gk, k, L)[0].copy()
+    for ct in range(M+1):
+        cd = continuous_dynamics(zk1, gk.ravel(), k.ravel(), L)
         zk1 += delta * cd
-    return zk1
+    return zk1.reshape(-1,1)

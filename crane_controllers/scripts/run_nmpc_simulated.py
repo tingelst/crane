@@ -5,7 +5,7 @@ import pickle
 import matplotlib.pyplot as plt
 
 from nmpc_position_controller.dynamics import discrete_dynamics, continuous_dynamics
-from nmpc_position_controller.control import control
+from nmpc_position_controller.control import control, cost
 
 
 def load_data():
@@ -52,15 +52,23 @@ if __name__ == "__main__":
         gx = gxs[i]
         gy = gys[i]
 
-        if i == 99 :
+        Q = np.diag([1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0])
+
+        if i == 999 :
             # print(z)
             # print(last_g)
             # print(k)
             # print(L)
-            dd = discrete_dynamics(z, last_g, 0.2, k, L)
+            
+            c = cost(last_gopt, z, 0.2, 4, zref, Q, k, last_g, L)
+            print(c)
+
+            # 
+            # 
+            # dd = discrete_dynamics(z.reshape(-1,1), last_g, 0.2, k, L)
             # cd = continuous_dynamics(z, last_g, k, L)
             # print(dd)
-            print(dd)
+            # print(dd)
 
 
 
