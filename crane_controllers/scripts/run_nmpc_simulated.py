@@ -4,6 +4,7 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 
+from nmpc_position_controller.dynamics import discrete_dynamics, continuous_dynamics
 from nmpc_position_controller.control import control
 
 
@@ -51,11 +52,17 @@ if __name__ == "__main__":
         gx = gxs[i]
         gy = gys[i]
 
-        control(z, zref, t, gamma, k, L, last_g, last_gopt)
+        if i == 99 :
+            # print(z)
+            # print(last_g)
+            # print(k)
+            # print(L)
+            dd = discrete_dynamics(z, last_g, 0.2, k, L)
+            # cd = continuous_dynamics(z, last_g, k, L)
+            # print(dd)
+            print(dd)
 
 
-    plt.plot(zs)
-    plt.show()
 
 
 

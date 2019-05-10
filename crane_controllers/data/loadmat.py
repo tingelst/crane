@@ -60,7 +60,7 @@ def main():
     dict_ = {}
     for filename in filenames:
         mat = loadmat(filename + '.mat')
-        data = np.array(mat[filename + "_in"]['Data'])
+        data = np.array(mat[filename + "_in"]['Data'], dtype=np.float64)
         dict_[filename] = data
     f = open("datain.pickle", "wb")
     pickle.dump(dict_, f)
@@ -70,7 +70,7 @@ def main():
     dict_ = {}
     for filename in filenames:
         mat = loadmat(filename + '.mat')
-        data = np.array(mat[filename]['Data'])
+        data = np.array(mat[filename]['Data'], dtype=np.float64)
         dict_[filename] = data
     f = open("dataout.pickle", "wb")
     pickle.dump(dict_, f)
