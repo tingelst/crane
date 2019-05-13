@@ -24,6 +24,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(Eigen3 REQUIRED)
+find_package(CASADI REQUIRED)
 
 catkin_python_setup()
 
@@ -46,6 +47,10 @@ catkin_package(
     urdf
 )
 
+add_executable(testcasadi src/casaditest.cpp)
+target_include_directories(testcasadi PRIVATE ${CASADI_INCLUDE_DIR})
+target_link_libraries(testcasadi ${CASADI_LIBRARIES})
+
 add_library(crane_controllers
   src/lyapunov_pendulum_damping_controller.cpp
   src/crane_tip_velocity_controller.cpp
@@ -55,9 +60,11 @@ add_library(crane_controllers
 
 target_link_libraries(crane_controllers PUBLIC
   ${catkin_LIBRARIES}
+  ${CASADI_LIBRARIES}
 )
 
 target_include_directories(crane_controllers SYSTEM PUBLIC
+  ${CASADI_INCLUDE_DIR}
   ${EIGEN3_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )

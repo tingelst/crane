@@ -23,6 +23,9 @@
 #include <crane_msgs/CraneControl.h>
 #include <crane_hw_interface/crane_tip_velocity_command_interface.h>
 
+#include "casadi/casadi.hpp"
+
+
 namespace crane_controllers
 {
 class LyapunovPendulumDampingController
@@ -54,6 +57,11 @@ private:
   {
     command_buffer_.writeFromNonRT(*msg);
   }
+
+  casadi::Function continuousDynamics(void);
+  casadi::Function discreteDynamics(void);
+
+  
 };
 }  // namespace crane_controllers
 
