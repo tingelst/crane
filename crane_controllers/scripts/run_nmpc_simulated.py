@@ -19,7 +19,6 @@ def load_data():
     f.close()
     return datain, dataout
 
-
 if __name__ == "__main__":
     datain, dataout = load_data()
 
