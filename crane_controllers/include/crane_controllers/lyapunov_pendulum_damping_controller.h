@@ -60,7 +60,8 @@ private:
   casadi::Function continuousDynamics(void);
   casadi::Function discreteDynamics(void);
 
-  casadi::Function solver(void);
+  casadi::Function solver(const std::vector<double>& z, const std::vector<double>& zref,
+                          const std::vector<double>& last_g);
   casadi::Function solver_;
 };
 }  // namespace crane_controllers
