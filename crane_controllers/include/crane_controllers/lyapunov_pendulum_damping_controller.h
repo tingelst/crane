@@ -25,7 +25,6 @@
 
 #include "casadi/casadi.hpp"
 
-
 namespace crane_controllers
 {
 class LyapunovPendulumDampingController
@@ -61,7 +60,8 @@ private:
   casadi::Function continuousDynamics(void);
   casadi::Function discreteDynamics(void);
 
-  
+  casadi::Function solver(void);
+  casadi::Function solver_;
 };
 }  // namespace crane_controllers
 

@@ -47,10 +47,6 @@ catkin_package(
     urdf
 )
 
-add_executable(testcasadi src/casaditest.cpp)
-target_include_directories(testcasadi PRIVATE ${CASADI_INCLUDE_DIR})
-target_link_libraries(testcasadi ${CASADI_LIBRARIES})
-
 add_library(crane_controllers
   src/lyapunov_pendulum_damping_controller.cpp
   src/crane_tip_velocity_controller.cpp
