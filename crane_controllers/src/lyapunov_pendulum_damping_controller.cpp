@@ -184,7 +184,6 @@ casadi::Function LyapunovPendulumDampingController::solver(const std::vector<dou
                                                            const std::vector<double>& zref_in,
                                                            const std::vector<double>& last_g_in)
 {
-  // 'g', 'z', 'Ts', 'N', 'zref', 'k', 'last_g', 'L'
   using namespace casadi;
   using namespace std;
 
@@ -213,26 +212,26 @@ casadi::Function LyapunovPendulumDampingController::solver(const std::vector<dou
 
   gk = g(Slice(0, 2));
   zk1 = dynamics(vector<SX>{ zk, gk, Ts, k, L }).at(0);
-  J = J + SX::mtimes(SX::mtimes((zk1 - zref).T(), Q), (zk1 - zref)) +
-      SX::mtimes(SX::mtimes((gk - last_g).T(), R), (gk - last_g));
+  J = J + SX::mtimes(vector<SX>{ (zk1 - zref).T(), Q, (zk1 - zref) }) +
+      SX::mtimes(vector<SX>{ (gk - last_g).T(), R, (gk - last_g) });
   zk = zk1;
 
   gk = g(Slice(2, 4));
   zk1 = dynamics(vector<SX>{ zk, gk, Ts, k, L }).at(0);
-  J = J + SX::mtimes(SX::mtimes((zk1 - zref).T(), Q), (zk1 - zref)) +
-      SX::mtimes(SX::mtimes((gk - g(Slice(0, 2))).T(), R), (gk - g(Slice(0, 2))));
+  J = J + SX::mtimes(vector<SX>{ (zk1 - zref).T(), Q, (zk1 - zref) }) +
+      SX::mtimes(vector<SX>{ (gk - g(Slice(0, 2))).T(), R, (gk - g(Slice(0, 2))) });
   zk = zk1;
 
   gk = g(Slice(4, 6));
   zk1 = dynamics(vector<SX>{ zk, gk, Ts, k, L }).at(0);
-  J = J + SX::mtimes(SX::mtimes((zk1 - zref).T(), Q), (zk1 - zref)) +
-      SX::mtimes(SX::mtimes((gk - g(Slice(2, 4))).T(), R), (gk - g(Slice(2, 4))));
+  J = J + SX::mtimes(vector<SX>{ (zk1 - zref).T(), Q, (zk1 - zref) }) +
+      SX::mtimes(vector<SX>{ (gk - g(Slice(2, 4))).T(), R, (gk - g(Slice(2, 4))) });
   zk = zk1;
 
   gk = g(Slice(6, 8));
   zk1 = dynamics(vector<SX>{ zk, gk, Ts, k, L }).at(0);
-  J = J + SX::mtimes(SX::mtimes((zk1 - zref).T(), Q), (zk1 - zref)) +
-      SX::mtimes(SX::mtimes((gk - g(Slice(4, 6))).T(), R), (gk - g(Slice(4, 6))));
+  J = J + SX::mtimes(vector<SX>{ (zk1 - zref).T(), Q, (zk1 - zref) }) +
+      SX::mtimes(vector<SX>{ (gk - g(Slice(4, 6))).T(), R, (gk - g(Slice(4, 6))) });
 
   // Create the NLP
   SXDict nlp = { { "x", g }, { "f", J } };
@@ -240,9 +239,12 @@ casadi::Function LyapunovPendulumDampingController::solver(const std::vector<dou
   // NLP solver options
   Dict solver_opts;
   std::string solver_name = "ipopt";
+  // std::string solver_name = "sqpmethod";
   solver_opts["verbose"] = false;
   solver_opts["print_time"] = false;
-  solver_opts["ipopt.print_level"] = 0;
+  if (solver_name == "ipopt") {
+    solver_opts["ipopt.print_level"] = 0;
+  }
 
   // Allocate an NLP solver and buffers
   Function solver = nlpsol("solver", solver_name, nlp, solver_opts);
