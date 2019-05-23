@@ -63,7 +63,29 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
     command_pub_->unlockAndPublish();
   }
 
-  // solver_ = solver({ 1.0, 2.0, 3.0, 4, 5, 6, 7, 8 }, { 1, 2, 3, 4, 5, 6, 7, 8 }, { 1, 2 });
+  {
+    std::vector<double> z{ 1.23934024e+00,  1.25449097e-02, -7.56690389e-02, 1.94915197e-02,
+                           -2.48908109e-04, 1.97056315e-02, -1.45635425e-03, 1.03694469e-03 };
+    std::vector<double> zref{ 1.29644275, 0., 0., 0., 0., 0., 0., 0. };
+    std::vector<double> last_g{ -0.01027713, 0.01856886 };
+
+    std::vector<double> x0{ 0.01818353,  0.02595379, 0.00907866,  0.03259367,
+                            -0.01027713, 0.01856886, -0.02268865, 0.00656219 };
+
+    std::vector<double> gmin{ -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1 };
+    std::vector<double> gmax{ 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 };
+
+    solver_ = solver(z, zref, last_g);
+    // Solve the problem
+    casadi::DMDict arg = {
+      { "lbx", gmin },
+      { "ubx", gmax },
+      { "x0", x0 },
+    };
+
+    casadi::DMDict res = solver_(arg);
+    ROS_INFO_STREAM(res["x"]);
+  }
 
   std::vector<double> x0{
     0.0040685, -0.02000171, 0.0101947, 0.00103702, 0.00799181, 0.01778638, 0.00498826, 0.0260024
@@ -79,23 +101,12 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
 
     casadi::Function cd = continuousDynamics();
     casadi::DM res = cd(std::vector<casadi::DM>{ z, g, k, L }).at(0);
-    ROS_INFO_STREAM(res);
+    // ROS_INFO_STREAM(res);
 
     casadi::Function dd = discreteDynamics();
     res = dd(std::vector<casadi::DM>{ z, g, Ts, k, L }).at(0);
-    ROS_INFO_STREAM(res);
+    // ROS_INFO_STREAM(res);
   }
-
-  std::vector<double> gmin{ -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1 };
-  std::vector<double> gmax{ 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 };
-
-  // Solve the problem
-  casadi::DMDict arg = {
-    { "lbx", gmin },
-    { "ubx", gmax },
-    { "x0", x0 },
-  };
-  // casadi::DMDict res = solver_(arg);
 
   crane_tip_velocity_handle_.setCommand({ ux * period.toSec(), uy * period.toSec() });
 }
@@ -169,23 +180,23 @@ casadi::Function LyapunovPendulumDampingController::discreteDynamics(void)
   return dd;
 }
 
-/*
-casadi::Function LyapunovPendulumDampingController::solver(const std::vector<double>& z,
-                                                           const std::vector<double>& zref,
-                                                           const std::vector<double>& last_g)
+casadi::Function LyapunovPendulumDampingController::solver(const std::vector<double>& z_in,
+                                                           const std::vector<double>& zref_in,
+                                                           const std::vector<double>& last_g_in)
 {
   // 'g', 'z', 'Ts', 'N', 'zref', 'k', 'last_g', 'L'
   using namespace casadi;
+  using namespace std;
 
-  SX zk = SX(z);
-  SX zk1 = zk;
-  SX zrefk = SX(zref);
-  SX last_gk = SX(last_g);
+  SX zk = SX(z_in);
+  SX zref = SX(zref_in);
+  SX last_g = SX(last_g_in);
+
+  SX zk1;
 
   SX Ts = 0.2;
   SX N = 4;
   SX L = 1.05;
-
 
   SX g = SX::sym("g", 8);
   SX gk = SX::sym("gk", 2);
@@ -199,17 +210,29 @@ casadi::Function LyapunovPendulumDampingController::solver(const std::vector<dou
 
   // Discrete dynamics
   Function dynamics = discreteDynamics();
-  std::vector<SX> input;
-  std::vector<SX> output;
 
   gk = g(Slice(0, 2));
-  input = { { zk, gk, Ts, k, L } };
-  output = dynamics(input);
-  zk1 = output[0];
-
-  J = J + SX::mtimes(SX::mtimes((zk1 - zrefk).T(), Q), (zk1 - zrefk)) +
-      SX::mtimes(SX::mtimes((gk - last_gk).T(), R), (gk - last_gk));
+  zk1 = dynamics(vector<SX>{ zk, gk, Ts, k, L }).at(0);
+  J = J + SX::mtimes(SX::mtimes((zk1 - zref).T(), Q), (zk1 - zref)) +
+      SX::mtimes(SX::mtimes((gk - last_g).T(), R), (gk - last_g));
   zk = zk1;
+
+  gk = g(Slice(2, 4));
+  zk1 = dynamics(vector<SX>{ zk, gk, Ts, k, L }).at(0);
+  J = J + SX::mtimes(SX::mtimes((zk1 - zref).T(), Q), (zk1 - zref)) +
+      SX::mtimes(SX::mtimes((gk - g(Slice(0, 2))).T(), R), (gk - g(Slice(0, 2))));
+  zk = zk1;
+
+  gk = g(Slice(4, 6));
+  zk1 = dynamics(vector<SX>{ zk, gk, Ts, k, L }).at(0);
+  J = J + SX::mtimes(SX::mtimes((zk1 - zref).T(), Q), (zk1 - zref)) +
+      SX::mtimes(SX::mtimes((gk - g(Slice(2, 4))).T(), R), (gk - g(Slice(2, 4))));
+  zk = zk1;
+
+  gk = g(Slice(6, 8));
+  zk1 = dynamics(vector<SX>{ zk, gk, Ts, k, L }).at(0);
+  J = J + SX::mtimes(SX::mtimes((zk1 - zref).T(), Q), (zk1 - zref)) +
+      SX::mtimes(SX::mtimes((gk - g(Slice(4, 6))).T(), R), (gk - g(Slice(4, 6))));
 
   // Create the NLP
   SXDict nlp = { { "x", g }, { "f", J } };
@@ -226,6 +249,5 @@ casadi::Function LyapunovPendulumDampingController::solver(const std::vector<dou
 
   return solver;
 }
-*/
 
 }  // namespace crane_controllers
