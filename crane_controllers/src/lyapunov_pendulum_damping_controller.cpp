@@ -63,11 +63,28 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
     command_pub_->unlockAndPublish();
   }
 
-  solver_ = solver({ 1.0, 2.0, 3.0, 4, 5, 6, 7, 8 }, { 1, 2, 3, 4, 5, 6, 7, 8 }, { 1, 2 });
+  // solver_ = solver({ 1.0, 2.0, 3.0, 4, 5, 6, 7, 8 }, { 1, 2, 3, 4, 5, 6, 7, 8 }, { 1, 2 });
 
   std::vector<double> x0{
     0.0040685, -0.02000171, 0.0101947, 0.00103702, 0.00799181, 0.01778638, 0.00498826, 0.0260024
   };
+
+  {
+    casadi::DM z(std::vector<double>{ 1.20927357, -0.24379647, -0.12293626, -0.27332213, 0.05360948, 0.002603,
+                                      -0.06313162, 0.04556808 });
+    casadi::DM g(std::vector<double>{ 0.1, 0.1 });
+    casadi::DM k(std::vector<double>{ 1.0, 2.0 });
+    casadi::DM L = 1.05;
+    casadi::DM Ts = 0.2;
+
+    casadi::Function cd = continuousDynamics();
+    casadi::DM res = cd(std::vector<casadi::DM>{ z, g, k, L }).at(0);
+    ROS_INFO_STREAM(res);
+
+    casadi::Function dd = discreteDynamics();
+    res = dd(std::vector<casadi::DM>{ z, g, Ts, k, L }).at(0);
+    ROS_INFO_STREAM(res);
+  }
 
   std::vector<double> gmin{ -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1 };
   std::vector<double> gmax{ 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 };
@@ -78,7 +95,7 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
     { "ubx", gmax },
     { "x0", x0 },
   };
-  casadi::DMDict res = solver_(arg);
+  // casadi::DMDict res = solver_(arg);
 
   crane_tip_velocity_handle_.setCommand({ ux * period.toSec(), uy * period.toSec() });
 }
@@ -134,30 +151,25 @@ casadi::Function LyapunovPendulumDampingController::discreteDynamics(void)
   using namespace casadi;
 
   SX zk = SX::sym("zk", 8);
-  SX zk1 = SX::sym("zk1", 8);
   SX gk = SX::sym("gk", 2);
   SX Ts = SX::sym("Ts");
   SX k = SX::sym("k", 2);
   SX L = SX::sym("L");
 
-  SX cd_out = SX::zeros(8);
-
   Function cd = continuousDynamics();
-  std::vector<SX> input{ { zk1, gk, k, L } };
-  std::vector<SX> output;
-
   SX delta = Ts / 10.0;
-  zk1 = zk;
+
+  SX zk1 = zk;
   for (int i = 0; i < 10; ++i)
   {
-    output = cd(input);
-    zk1 = zk1 + delta * output[0];
+    zk1 += delta * cd(std::vector<SX>{ zk1, gk, k, L }).at(0);
   }
 
   Function dd("discreteDynamics", { zk, gk, Ts, k, L }, { zk1 }, { "zk", "gk", "Ts", "k", "L" }, { "zk1" });
   return dd;
 }
 
+/*
 casadi::Function LyapunovPendulumDampingController::solver(const std::vector<double>& z,
                                                            const std::vector<double>& zref,
                                                            const std::vector<double>& last_g)
@@ -214,5 +226,6 @@ casadi::Function LyapunovPendulumDampingController::solver(const std::vector<dou
 
   return solver;
 }
+*/
 
 }  // namespace crane_controllers
