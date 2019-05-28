@@ -4,13 +4,26 @@ import rospy
 # Brings in the SimpleActionClient
 import actionlib
 
-from crane_msgs.msg import FollowCraneTrajectoryActionGoal, FollowCraneTrajectoryAction
+from crane_msgs.msg import CraneTrajectoryPoint, CraneTrajectory
+from crane_msgs.msg import FollowCraneTrajectoryGoal, FollowCraneTrajectoryAction
 
 def action_client():
-    client = actionlib.SimpleActionClient('follow_crane_trajectory', FollowCraneTrajectoryAction)
+    client = actionlib.SimpleActionClient('/crane_tip_velocity_rml_controller/follow_crane_trajectory', FollowCraneTrajectoryAction)
     client.wait_for_server()
     rospy.loginfo("Server online")
-    goal = FollowCraneTrajectoryActionGoal()
+    goal = FollowCraneTrajectoryGoal()
+    
+    p1 = CraneTrajectoryPoint()
+    p1.position = [2.0, 0.5]
+    p1.velocity = [0.0, 0.0]
+    p1.max_velocity = [0.25, 0.25]
+    p1.max_acceleration = [1.0, 1.0]
+
+    trajectory = CraneTrajectory()
+    trajectory.points = [p1]
+
+    goal.trajectory = trajectory
+
     client.send_goal(goal)
     client.wait_for_result()
     return client.get_result()

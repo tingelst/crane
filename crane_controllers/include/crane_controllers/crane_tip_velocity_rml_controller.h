@@ -79,6 +79,11 @@ private:
   virtual void goalCB(GoalHandle gh)
   {
     ROS_INFO_STREAM("Received goal!");
+    gh.setAccepted();
+
+
+    gh.setSucceeded();
+
   }
 
   virtual void cancelCB(GoalHandle gh)
