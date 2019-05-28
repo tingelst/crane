@@ -47,9 +47,11 @@ catkin_package(
     urdf
 )
 
+add_subdirectory(external/ReflexxesTypeII)
+
 add_library(crane_controllers
   src/lyapunov_pendulum_damping_controller.cpp
-  src/crane_tip_velocity_controller.cpp
+  src/crane_tip_velocity_rml_controller.cpp
   src/crane_tip_velocity_forward_controller.cpp
   src/crane_state_controller.cpp
 )
@@ -57,12 +59,14 @@ add_library(crane_controllers
 target_link_libraries(crane_controllers PUBLIC
   ${catkin_LIBRARIES}
   ${CASADI_LIBRARIES}
+  RMLTypeII
 )
 
 target_include_directories(crane_controllers SYSTEM PUBLIC
   ${CASADI_INCLUDE_DIR}
   ${EIGEN3_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
+  external/ReflexxesTypeII/include
 )
 
 target_include_directories(crane_controllers PUBLIC

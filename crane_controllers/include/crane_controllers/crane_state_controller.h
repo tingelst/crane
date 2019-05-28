@@ -42,6 +42,9 @@
 #include <realtime_tools/realtime_publisher.h>
 #include <sensor_msgs/JointState.h>
 
+#include <crane_hw_interface/crane_tip_state_interface.h>
+#include <crane_msgs/CraneState.h>
+
 namespace crane_controllers
 {
 constexpr double PI = 3.14159265358979323846;
@@ -50,7 +53,8 @@ constexpr double DEG2RAD = 0.017453292519943295;
 
 class CraneStateController
   : public controller_interface::MultiInterfaceController<hardware_interface::JointStateInterface,
-                                                          hardware_interface::ActuatorStateInterface>
+                                                          hardware_interface::ActuatorStateInterface,
+                                                          crane_hw_interface::CraneTipStateInterface>
 {
 public:
   CraneStateController() : publish_rate_(50.0)
@@ -65,7 +69,9 @@ public:
 private:
   std::vector<hardware_interface::ActuatorStateHandle> actuator_state_;
   std::vector<hardware_interface::JointStateHandle> joint_state_;
-  std::shared_ptr<realtime_tools::RealtimePublisher<sensor_msgs::JointState> > realtime_pub_;
+  crane_hw_interface::CraneTipStateHandle crane_tip_state_;
+  std::shared_ptr<realtime_tools::RealtimePublisher<sensor_msgs::JointState> > joint_realtime_pub_;
+  std::shared_ptr<realtime_tools::RealtimePublisher<crane_msgs::CraneState> > crane_realtime_pub_;
   ros::Time last_publish_time_;
   double publish_rate_;
   unsigned int num_hw_joints_;

@@ -23,6 +23,7 @@ bool CraneTipVelocityForwardController::init(hardware_interface::RobotHW* robot_
   command_sub_ = node_handle.subscribe<crane_msgs::CraneControl>("command", 1,
                                                                  &CraneTipVelocityForwardController::commandCB, this);
 
+
   return true;
 }
 

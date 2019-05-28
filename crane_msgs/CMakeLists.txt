@@ -13,6 +13,7 @@ add_message_files(
   FILES
   CraneControl.msg
   CraneState.msg
+  CraneTrajectoryPoint.msg
 )
 
 generate_messages(

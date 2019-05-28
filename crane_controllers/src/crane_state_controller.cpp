@@ -32,6 +32,13 @@ bool CraneStateController::init(hardware_interface::RobotHW* robot_hw, ros::Node
     return false;
   }
 
+  crane_hw_interface::CraneTipStateInterface* cs = robot_hw->get<crane_hw_interface::CraneTipStateInterface>();
+  if (!cs)
+  {
+    return false;
+  }
+  crane_tip_state_ = cs->getHandle("crane_tip");
+
   // get all actuator names from the hardware interface
   const std::vector<std::string>& actuator_names = as->getNames();
   num_hw_actuators_ = actuator_names.size();
@@ -41,16 +48,23 @@ bool CraneStateController::init(hardware_interface::RobotHW* robot_hw, ros::Node
   }
 
   // realtime publisher
-  realtime_pub_.reset(new realtime_tools::RealtimePublisher<sensor_msgs::JointState>(root_nh, "joint_states", 4));
+  joint_realtime_pub_.reset(new realtime_tools::RealtimePublisher<sensor_msgs::JointState>(root_nh, "joint_states", 4));
+  crane_realtime_pub_.reset(new realtime_tools::RealtimePublisher<crane_msgs::CraneState>(root_nh, "crane_states", 4));
+
+  for (unsigned i = 0; i < 2; i++)
+  {
+    crane_realtime_pub_->msg_.position.push_back(0.0);
+    crane_realtime_pub_->msg_.velocity.push_back(0.0);
+  }
 
   // get joints and allocate message
   for (unsigned i = 0; i < num_hw_joints_; i++)
   {
     joint_state_.push_back(js->getHandle(joint_names[i]));
-    realtime_pub_->msg_.name.push_back(joint_names[i]);
-    realtime_pub_->msg_.position.push_back(0.0);
-    realtime_pub_->msg_.velocity.push_back(0.0);
-    realtime_pub_->msg_.effort.push_back(0.0);
+    joint_realtime_pub_->msg_.name.push_back(joint_names[i]);
+    joint_realtime_pub_->msg_.position.push_back(0.0);
+    joint_realtime_pub_->msg_.velocity.push_back(0.0);
+    joint_realtime_pub_->msg_.effort.push_back(0.0);
   }
 
   for (unsigned i = 0; i < num_hw_actuators_; i++)
@@ -58,26 +72,26 @@ bool CraneStateController::init(hardware_interface::RobotHW* robot_hw, ros::Node
     actuator_state_.push_back(as->getHandle(actuator_names[i]));
   }
 
-  realtime_pub_->msg_.name.push_back("link2_cylinder1_joint");
-  realtime_pub_->msg_.position.push_back(0.0);
-  realtime_pub_->msg_.velocity.push_back(0.0);
-  realtime_pub_->msg_.effort.push_back(0.0);
-  realtime_pub_->msg_.name.push_back("actuator2");
-  realtime_pub_->msg_.position.push_back(0.0);
-  realtime_pub_->msg_.velocity.push_back(0.0);
-  realtime_pub_->msg_.effort.push_back(0.0);
-  realtime_pub_->msg_.name.push_back("link3_cylinder2_joint");
-  realtime_pub_->msg_.position.push_back(0.0);
-  realtime_pub_->msg_.velocity.push_back(0.0);
-  realtime_pub_->msg_.effort.push_back(0.0);
-  realtime_pub_->msg_.name.push_back("actuator3");
-  realtime_pub_->msg_.position.push_back(0.0);
-  realtime_pub_->msg_.velocity.push_back(0.0);
-  realtime_pub_->msg_.effort.push_back(0.0);
-  realtime_pub_->msg_.name.push_back("suspension_joint");
-  realtime_pub_->msg_.position.push_back(0.0);
-  realtime_pub_->msg_.velocity.push_back(0.0);
-  realtime_pub_->msg_.effort.push_back(0.0);
+  joint_realtime_pub_->msg_.name.push_back("link2_cylinder1_joint");
+  joint_realtime_pub_->msg_.position.push_back(0.0);
+  joint_realtime_pub_->msg_.velocity.push_back(0.0);
+  joint_realtime_pub_->msg_.effort.push_back(0.0);
+  joint_realtime_pub_->msg_.name.push_back("actuator2");
+  joint_realtime_pub_->msg_.position.push_back(0.0);
+  joint_realtime_pub_->msg_.velocity.push_back(0.0);
+  joint_realtime_pub_->msg_.effort.push_back(0.0);
+  joint_realtime_pub_->msg_.name.push_back("link3_cylinder2_joint");
+  joint_realtime_pub_->msg_.position.push_back(0.0);
+  joint_realtime_pub_->msg_.velocity.push_back(0.0);
+  joint_realtime_pub_->msg_.effort.push_back(0.0);
+  joint_realtime_pub_->msg_.name.push_back("actuator3");
+  joint_realtime_pub_->msg_.position.push_back(0.0);
+  joint_realtime_pub_->msg_.velocity.push_back(0.0);
+  joint_realtime_pub_->msg_.effort.push_back(0.0);
+  joint_realtime_pub_->msg_.name.push_back("suspension_joint");
+  joint_realtime_pub_->msg_.position.push_back(0.0);
+  joint_realtime_pub_->msg_.velocity.push_back(0.0);
+  joint_realtime_pub_->msg_.effort.push_back(0.0);
 
   return true;
 }
@@ -93,19 +107,33 @@ void CraneStateController::update(const ros::Time& time, const ros::Duration& /*
   // limit rate of publishing
   if (publish_rate_ > 0.0 && last_publish_time_ + ros::Duration(1.0 / publish_rate_) < time)
   {
+    if (crane_realtime_pub_->trylock())
+    {
+      // populate crane state message:
+      std::array<double, 2> position = crane_tip_state_.getPosition();
+      std::array<double, 2> velocity = crane_tip_state_.getVelocity();
+      crane_realtime_pub_->msg_.header.stamp = time;
+      for (unsigned i = 0; i < 2; ++i)
+      {
+        crane_realtime_pub_->msg_.position[i] = position[i];
+        crane_realtime_pub_->msg_.velocity[i] = velocity[i];
+      }
+      crane_realtime_pub_->unlockAndPublish();
+    }
+
     // try to publish
-    if (realtime_pub_->trylock())
+    if (joint_realtime_pub_->trylock())
     {
       // we're actually publishing, so increment time
       last_publish_time_ = last_publish_time_ + ros::Duration(1.0 / publish_rate_);
 
       // populate joint state message:
-      realtime_pub_->msg_.header.stamp = time;
+      joint_realtime_pub_->msg_.header.stamp = time;
       for (unsigned i = 0; i < num_hw_joints_; i++)
       {
-        realtime_pub_->msg_.position[i] = joint_state_[i].getPosition();
-        realtime_pub_->msg_.velocity[i] = joint_state_[i].getVelocity();
-        realtime_pub_->msg_.effort[i] = joint_state_[i].getEffort();
+        joint_realtime_pub_->msg_.position[i] = joint_state_[i].getPosition();
+        joint_realtime_pub_->msg_.velocity[i] = joint_state_[i].getVelocity();
+        joint_realtime_pub_->msg_.effort[i] = joint_state_[i].getEffort();
       }
 
       // link2_cylinder1_joint
@@ -117,14 +145,14 @@ void CraneStateController::update(const ros::Time& time, const ros::Duration& /*
       double b1 = sqrt(a1 * a1 + e1 * e1);
       double b2 = sqrt(a2 * a2 + e2 * e2);
       double u = (l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2);
-      realtime_pub_->msg_.position[3] = -acos((b2 * b2 - b1 * b1 - l * l) / (-2.0 * b1 * l)) - atan(a1 / e1) + PI;
-      realtime_pub_->msg_.velocity[3] = 0.0;
-      realtime_pub_->msg_.effort[3] = 0.0;
+      joint_realtime_pub_->msg_.position[3] = -acos((b2 * b2 - b1 * b1 - l * l) / (-2.0 * b1 * l)) - atan(a1 / e1) + PI;
+      joint_realtime_pub_->msg_.velocity[3] = 0.0;
+      joint_realtime_pub_->msg_.effort[3] = 0.0;
 
       // actuator2
-      realtime_pub_->msg_.position[4] = actuator_state_[1].getPosition();
-      realtime_pub_->msg_.velocity[4] = actuator_state_[1].getVelocity();
-      realtime_pub_->msg_.effort[4] = actuator_state_[1].getEffort();
+      joint_realtime_pub_->msg_.position[4] = actuator_state_[1].getPosition();
+      joint_realtime_pub_->msg_.velocity[4] = actuator_state_[1].getVelocity();
+      joint_realtime_pub_->msg_.effort[4] = actuator_state_[1].getEffort();
 
       // link3_cylinder2_joint
       e1 = 0.160;
@@ -134,19 +162,20 @@ void CraneStateController::update(const ros::Time& time, const ros::Duration& /*
       l = actuator_state_[2].getPosition();
       b1 = sqrt(a1 * a1 + e1 * e1);
       b2 = sqrt(a2 * a2 + e2 * e2);
-      realtime_pub_->msg_.position[5] = -acos((b2 * b2 - b1 * b1 - l * l) / (-2.0 * b1 * l)) - atan(a1 / e1) + PI_2;
-      realtime_pub_->msg_.velocity[5] = 0.0;
-      realtime_pub_->msg_.effort[5] = 0.0;
+      joint_realtime_pub_->msg_.position[5] =
+          -acos((b2 * b2 - b1 * b1 - l * l) / (-2.0 * b1 * l)) - atan(a1 / e1) + PI_2;
+      joint_realtime_pub_->msg_.velocity[5] = 0.0;
+      joint_realtime_pub_->msg_.effort[5] = 0.0;
 
       // actuator3
-      realtime_pub_->msg_.position[6] = actuator_state_[2].getPosition();
-      realtime_pub_->msg_.velocity[6] = actuator_state_[2].getVelocity();
-      realtime_pub_->msg_.effort[6] = actuator_state_[2].getEffort();
+      joint_realtime_pub_->msg_.position[6] = actuator_state_[2].getPosition();
+      joint_realtime_pub_->msg_.velocity[6] = actuator_state_[2].getVelocity();
+      joint_realtime_pub_->msg_.effort[6] = actuator_state_[2].getEffort();
 
       // suspension_joint
-      realtime_pub_->msg_.position[7] = -joint_state_[1].getPosition() - joint_state_[2].getPosition();
+      joint_realtime_pub_->msg_.position[7] = -joint_state_[1].getPosition() - joint_state_[2].getPosition();
 
-      realtime_pub_->unlockAndPublish();
+      joint_realtime_pub_->unlockAndPublish();
     }
   }
 }

@@ -8,6 +8,9 @@ crane_tip_velocity_controller:
 crane_tip_velocity_forward_controller:
   type: crane_controllers/CraneTipVelocityForwardController
 
+crane_tip_velocity_rml_controller:
+  type: crane_controllers/CraneTipVelocityRMLController
+
 lyapunov_pendulum_damping_controller:
   type: crane_controllers/LyapunovPendulumDampingController 
 
