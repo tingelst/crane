@@ -20,6 +20,7 @@
 
   <build_export_depend>message_runtime</build_export_depend>
 
+  <depend>actionlib</depend>
   <depend>controller_interface</depend>
   <depend>dynamic_reconfigure</depend>
   <depend>kdl_conversions</depend>

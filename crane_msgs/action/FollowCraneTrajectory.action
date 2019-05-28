@@ -1,0 +1,20 @@
+# The joint trajectory to follow
+crane_msgs/CraneTrajectory trajectory
+
+---
+int32 error_code
+int32 SUCCESSFUL = 0
+int32 INVALID_GOAL = -1
+int32 OLD_HEADER_TIMESTAMP = -3
+
+# Human readable description of the error code. Contains complementary
+# information that is especially useful when execution fails, for instance:
+# - INVALID_GOAL: The reason for the invalid goal (e.g., the requested
+#   trajectory is in the past).
+string error_string
+
+---
+Header header
+crane_msgs/CraneTrajectoryPoint desired
+crane_msgs/CraneTrajectoryPoint actual
+crane_msgs/CraneTrajectoryPoint error

@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(catkin REQUIRED COMPONENTS
+  actionlib
   controller_interface
   dynamic_reconfigure
   kdl_conversions
@@ -31,6 +32,7 @@ catkin_python_setup()
 catkin_package(
   LIBRARIES crane_controllers
   CATKIN_DEPENDS
+    actionlib
     controller_interface
     dynamic_reconfigure
     kdl_conversions

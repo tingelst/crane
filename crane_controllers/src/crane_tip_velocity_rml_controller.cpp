@@ -29,6 +29,12 @@ bool CraneTipVelocityRMLController::init(hardware_interface::RobotHW* robot_hard
   command_sub_ = node_handle.subscribe<crane_msgs::CraneTrajectoryPoint>(
       "command", 1, &CraneTipVelocityRMLController::commandCB, this);
 
+  // ROS API: Action interface
+  action_server_.reset(new ActionServer(node_handle, "follow_crane_trajectory",
+                                        boost::bind(&CraneTipVelocityRMLController::goalCB, this, _1),
+                                        boost::bind(&CraneTipVelocityRMLController::cancelCB, this, _1), false));
+  action_server_->start();
+
   return true;
 }
 
@@ -79,7 +85,6 @@ void CraneTipVelocityRMLController::update(const ros::Time& now, const ros::Dura
 
   crane_tip_velocity_handle_.setCommand(
       { rml_output_->NewVelocityVector->VecData[0], rml_output_->NewVelocityVector->VecData[1] });
-
 }
 
 }  // namespace crane_controllers

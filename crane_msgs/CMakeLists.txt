@@ -2,10 +2,17 @@ cmake_minimum_required(VERSION 2.8.3)
 project(crane_msgs)
 
 find_package(catkin REQUIRED COMPONENTS
+  actionlib_msgs
   std_msgs
   sensor_msgs
   geometry_msgs
   message_generation
+)
+
+add_action_files(
+  DIRECTORY action
+  FILES 
+  FollowCraneTrajectory.action
 )
 
 add_message_files(
@@ -14,6 +21,7 @@ add_message_files(
   CraneControl.msg
   CraneState.msg
   CraneTrajectoryPoint.msg
+  CraneTrajectory.msg
 )
 
 generate_messages(
@@ -21,10 +29,10 @@ generate_messages(
   std_msgs
   sensor_msgs
   geometry_msgs
+  actionlib_msgs
 )
 
-catkin_package()
-
+catkin_package(CATKIN_DEPENDS actionlib_msgs geometry_msgs message_runtime std_msgs)
 
 #############
 ## Install ##
