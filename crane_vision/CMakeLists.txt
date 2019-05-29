@@ -6,11 +6,30 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   sensor_msgs
   geometry_msgs
+  roscpp
+  cv_bridge
+  image_transport
 )
+
+find_package( OpenCV REQUIRED )
 
 catkin_python_setup()
 
-catkin_package()
+catkin_package(
+   CATKIN_DEPENDS roscpp std_msgs cv_bridge sensor_msgs
+)
+
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+)
+
+add_executable(example_node src/opencv_example_node.cpp)
+
+target_link_libraries(example_node 
+  ${catkin_LIBRARIES} 
+  ${OpenCV_LIBRARIES})
+
 
 catkin_install_python(PROGRAMS
    nodes/crane_vision_node
