@@ -5,6 +5,8 @@ import cv2
 import numpy as np
 import time
 
+from sensor_msgs.msg import JointState
+
 from crane_vision.transformations import trf
 from crane_vision.camera import CameraArray
 from crane_vision.vision import find_sphere_centers, find_line
@@ -35,11 +37,14 @@ P0 = np.dot(np.dot(K0, PII), trf(np.eye(3), t_11))
 P1 = np.dot(np.dot(K1, PII), trf(np.eye(3), t_21))
 P2 = np.dot(np.dot(K2, PII), trf(np.eye(3), t_31))
 
+debug = False
 
 def main():
     rospy.init_node('crane_vision_node')
 
-    cams = CameraArray([0, 1, 2])
+    cams = CameraArray([0, 2, 1])
+
+    pendulum_pub = rospy.Publisher('pendulum_states', JointState, queue_size=3)
 
     center01 = (0, 0)
     center02 = (0, 0)
@@ -49,13 +54,12 @@ def main():
     center22 = (0, 0)
 
     hat_Pkm1 = np.diag([0, 0, 0, 0, 0, 0])
-    hat_thetakm1 = np.array([0, 0, 0, 0, 2.5*np.pi/180, -1.7*np.pi/180])
+    hat_thetakm1 = np.array([0, 0, 0, 0, np.deg2rad(2.5), np.deg2rad(-1.7)])
 
-    q1 = 0.2  # Debug
-    ddx = 0.1  # Debug
-    ddy = 0.1  # Debug
-    Lhat = 0.5  # Debug
-    dt = 0.1  # Debug
+    q1 = np.deg2rad(37.4)  # Debug
+    ddx = 0.0  # Debug
+    ddy = 0.0  # Debug
+    Lhat = 1.05  # Debug
 
     start_time = time.time()
     current_time = start_time
@@ -66,13 +70,33 @@ def main():
             frames = cams.read()
             if frames is not None:
                 frame1, frame2, frame3 = frames
+
+                # if debug:
+                #     cv2.imshow('frame1', frame1)
+                #     cv2.waitKey(30)
+
+
                 # Find pixels that corresponds to the spheres
-                center01, center02 = find_sphere_centers(
+                center01, center02, mask1 = find_sphere_centers(
                     frame1, center01, center02)
-                center11, center12 = find_sphere_centers(
+                center11, center12, _ = find_sphere_centers(
                     frame2, center11, center12)
-                center21, center22 = find_sphere_centers(
+                center21, center22, _  = find_sphere_centers(
                     frame3, center21, center22)
+
+                if debug:
+                    frame1 = cv2.circle(frame1, (int(center01[0]), int(center01[1])), 5, (255,0,0), -1)
+                    frame1 = cv2.circle(frame1, (int(center02[0]), int(center02[1])), 5, (0,0,255), -1)
+                    frame2 = cv2.circle(frame2, (int(center11[0]), int(center11[1])), 5, (255,0,0), -1)
+                    frame2 = cv2.circle(frame2, (int(center12[0]), int(center12[1])), 5, (00,0,255), -1)
+                    frame3 = cv2.circle(frame3, (int(center21[0]), int(center21[1])), 5, (255,0,0), -1)
+                    frame3 = cv2.circle(frame3, (int(center22[0]), int(center22[1])), 5, (0,0,255), -1)
+                    cv2.imshow('frame1', frame1)
+                    cv2.imshow('frame2', frame2)
+                    cv2.imshow('frame3', frame3)
+                    cv2.waitKey(30)
+
+                
 
                 # Find direction vector of a line through the spheres,
                 # given in camera coordinates
@@ -95,6 +119,18 @@ def main():
 
                 hat_thetak, hat_Pk, zk = ekf(Lvec, np.array(
                     [ddx, ddy]), hat_Pkm1, hat_thetakm1, q1, Lhat, dt)
+
+
+                th, phi, dth, dphi, _, _ = hat_thetak
+                msg = JointState()
+                msg.header.stamp = rospy.Time.now()
+                msg.position = np.rad2deg([th, phi, zk[0], zk[1]])
+                msg.velocity = np.rad2deg([dth, dphi])
+
+                pendulum_pub.publish(msg)
+
+                # rospy.loginfo('th: {}'.format(np.rad2deg(th)))
+                
 
                 rospy.loginfo(1.0 / dt)
 
