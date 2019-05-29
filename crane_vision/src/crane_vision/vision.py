@@ -13,7 +13,8 @@ def find_sphere_centers(img, c1, c2):
     blur_param = 5
 
     # Gaussian blurred image
-    blur1 = cv2.GaussianBlur(img, (3+(2*blur_param-2), 3+(2*blur_param-2)), 0)
+    # blur1 = cv2.GaussianBlur(img, (3+(2*blur_param-2), 3+(2*blur_param-2)), 0)
+    blur1 = img
     # # Convert from RGB to HSV
     hsv1 = cv2.cvtColor(blur1, cv2.COLOR_BGR2HSV)
     # # Binary image based on colours
@@ -52,7 +53,7 @@ def find_sphere_centers(img, c1, c2):
         center01 = center02
         center02 = tmp
 
-    return center01, center02
+    return center01, center02, mask1
 
 
 def dlt(c0, c1, c2, P0, P1, P2):
