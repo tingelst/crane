@@ -43,7 +43,7 @@ private:
   ros::NodeHandle nh_;
 
   const unsigned int n_dof_ = 3;
-  
+
   std::vector<std::string> joint_names_;
   std::vector<double> joint_position_;
   std::vector<double> joint_velocity_;
@@ -60,6 +60,11 @@ private:
   std::array<double, 2> crane_tip_velocity_;
   std::array<double, 2> crane_tip_velocity_command_;
 
+  KDL::Chain kdl_chain_;
+  boost::shared_ptr<KDL::ChainIkSolverVel_wdls> solver_;
+  boost::shared_ptr<KDL::ChainFkSolverPos_recursive> fksolver_;
+  boost::shared_ptr<KDL::ChainJntToJacSolver> jnt_to_jac_solver_;
+ 
   // Timing
   ros::Duration control_period_;
   ros::Duration elapsed_time_;

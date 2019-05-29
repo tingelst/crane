@@ -45,6 +45,36 @@ void CraneHardwareInterface::init()
     ROS_ERROR("Cannot find required parameter 'actuator_names' on the parameter server.");
     throw std::runtime_error("Cannot find required parameter 'actuator_names' on the parameter server.");
   }
+
+  // Initialize KDL structures
+  std::string tip_link, root_link;
+  nh_.param<std::string>("root_name", root_link, "base_link");
+  nh_.param<std::string>("tip_name", tip_link, "tip_link");
+
+  // Load URDF
+  urdf::Model model;
+  if (!model.initParam("robot_description"))
+  {
+    ROS_ERROR_STREAM_NAMED("CraneTipVelocityController", "Failed to parse URDF");
+    throw std::runtime_error("CraneTipVelocityController: Failed to parse URDF");
+  }
+  // Load the tree
+  KDL::Tree kdl_tree;
+  if (!kdl_parser::treeFromUrdfModel(model, kdl_tree))
+  {
+    ROS_ERROR("Could not construct tree from URDF");
+    throw std::runtime_error("Could not construct tree from URDF");
+  }
+  // Populate the Chain
+  if (!kdl_tree.getChain(root_link, tip_link, kdl_chain_))
+  {
+    ROS_ERROR("Could not construct chain from URDF");
+    throw std::runtime_error("Could not construct chain from URDF");
+  }
+  solver_.reset(new KDL::ChainIkSolverVel_wdls(kdl_chain_));
+  fksolver_.reset(new KDL::ChainFkSolverPos_recursive(kdl_chain_));
+  jnt_to_jac_solver_.reset(new KDL::ChainJntToJacSolver(kdl_chain_));
+
   MLPIRESULT result = MLPI_S_OK;
 
   MlpiVersion versionInfo;
@@ -88,7 +118,7 @@ void CraneHardwareInterface::init()
 
   crane_tip_state_interface_.registerHandle(
       CraneTipStateHandle("crane_tip", &crane_tip_position_, &crane_tip_velocity_));
-      
+
   crane_tip_velocity_command_interface_.registerHandle(
       CraneTipVelocityHandle(crane_tip_state_interface_.getHandle("crane_tip"), &crane_tip_velocity_command_));
 
@@ -124,7 +154,7 @@ void CraneHardwareInterface::read(const ros::Time& time, const ros::Duration& pe
   actuator_velocity_[1] = vars_cont[4];
   actuator_velocity_[2] = vars_cont[5];
 
-  joint_position_[0] = actuator_position_[0] * DEG2RAD;
+  joint_position_[0] = actuator_position_[0] * DEG2RAD; 
 
   double e1 = 0.154236;
   double a1 = 0.550;
@@ -144,12 +174,43 @@ void CraneHardwareInterface::read(const ros::Time& time, const ros::Duration& pe
   b1 = sqrt(a1 * a1 + e1 * e1);
   b2 = sqrt(a2 * a2 + e2 * e2);
   joint_position_[2] = acos((l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2)) + atan(e1 / a1) + atan(e2 / a2) + PI;
+
+  KDL::JntArray q(n_dof_);
+  KDL::JntArray qd(n_dof_);
+  for (std::size_t i = 0; i < n_dof_; ++i)
+  {
+    q(i) = joint_position_[i];
+    qd(i) = joint_velocity_[i];
+  }
+
+  KDL::Frame X;
+  fksolver_->JntToCart(q, X);
+
+  KDL::Jacobian J(3);
+  jnt_to_jac_solver_->JntToJac(q, J);
+  Eigen::Matrix<double, 3, 1> xd = J.data.topRows(3) * qd.data;
+
+  for (std::size_t i = 0; i < 2; ++i)
+  {
+    crane_tip_position_[i] = X.p(i);
+    crane_tip_velocity_[i] = xd(i);
+  }
 }
 
 void CraneHardwareInterface::write(const ros::Time& time, const ros::Duration& period)
 {
-  // MLPIRESULT result =
-  //     mlpiLogicWriteVariableBySymbolArrayDouble(mlpi_connection_, L"velocity_cmd", &joint_velocity_[0], n_dof_);
+  double x = crane_tip_position_[0];
+  double y = crane_tip_position_[1];
+  double r = sqrt(x * x + y * y);
+  double theta = joint_position_[0];
+
+  std::array<double, 2> command{
+    (cos(theta) * crane_tip_velocity_command_[0] + sin(theta) * crane_tip_velocity_command_[1]) * -1.0,
+    (-sin(theta) * crane_tip_velocity_command_[0] / r + cos(theta) * crane_tip_velocity_command_[1] / r) * 9.549
+  };
+
+  MLPIRESULT result =
+      mlpiLogicWriteVariableBySymbolArrayDouble(mlpi_connection_, u"Application.PlcProg.cont", &command[0], 2);
 }
 
 }  // namespace crane_hw_interface
