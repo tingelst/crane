@@ -1,7 +1,7 @@
 <launch>
-  <node pkg="nodelet" type="nodelet" name="camera_vision_nodelet_manager" args="manager" output="screen"/>
+  <node pkg="nodelet" type="nodelet" name="crane_vision_nodelet_manager" args="manager" output="screen"/>
 
-  <node pkg="nodelet" type="nodelet" name="camera0" args="load cv_camera/CvCameraNodelet camera_vision_nodelet_manager" output="screen">
+  <node pkg="nodelet" type="nodelet" name="camera0" args="load cv_camera/CvCameraNodelet crane_vision_nodelet_manager" output="screen">
     <param name="frame_id" value="camera0" />
     <param name="device_id" value="0" />
     <param name="image_width" value="1280"/>
@@ -9,7 +9,7 @@
     <param name="rate" value="30.0" />
   </node>
 
-  <node pkg="nodelet" type="nodelet" name="camera1" args="load cv_camera/CvCameraNodelet camera_vision_nodelet_manager" output="screen">
+  <node pkg="nodelet" type="nodelet" name="camera1" args="load cv_camera/CvCameraNodelet crane_vision_nodelet_manager" output="screen">
     <param name="frame_id" value="camera1" />
     <param name="device_id" value="1" />
     <param name="image_width" value="1280"/>

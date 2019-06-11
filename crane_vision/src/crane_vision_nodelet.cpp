@@ -24,7 +24,7 @@ void CraneVisionNodelet::onInit()
   ros::NodeHandle& private_nh = getPrivateNodeHandle();
   it_.reset(new image_transport::ImageTransport(nh));
 
-  camera_sub_ = it_->subscribeCamera("camera0/image_raw", 3, &CraneVisionNodelet::imageCb, this);
+  camera_sub_ = it_->subscribeCamera("/camera0/image_raw", 3, &CraneVisionNodelet::imageCb, this);
 }
 
 void CraneVisionNodelet::imageCb(const sensor_msgs::ImageConstPtr& image_msg,
