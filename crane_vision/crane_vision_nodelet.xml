@@ -1,0 +1,7 @@
+<library path="lib/libcrane_vision_nodelet">
+  <class name="crane_vision/CraneVisionNodelet" type="crane_vision::CraneVisionNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+      crane_vision_nodelet
+    </description>
+  </class>
+</library>

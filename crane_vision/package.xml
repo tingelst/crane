@@ -14,6 +14,7 @@
   <buildtool_depend>catkin</buildtool_depend>
   <buildtool_depend>python-catkin-pkg</buildtool_depend>
 
+  <depend>nodelet</depend>
   <depend>rospy</depend>
   <depend>roscpp</depend>
   <depend>std_msgs</depend>
@@ -26,4 +27,8 @@
   <exec_depend>python-scipy</exec_depend>
   <exec_depend>python-opencv</exec_depend>
   <exec_depend>python-scipy</exec_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/crane_vision_nodelet.xml"/>
+  </export>
 </package>
