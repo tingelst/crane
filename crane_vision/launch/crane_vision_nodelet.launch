@@ -18,6 +18,17 @@
   </node>
 
   <node pkg="nodelet" type="nodelet" name="crane_vision_nodelet" args="load crane_vision/CraneVisionNodelet crane_vision_nodelet_manager" output="screen">
+    <rosparam param="roi0">[320, 180, 640, 360]</rosparam>
+    <rosparam param="roi1">[320, 180, 640, 360]</rosparam>
+    <rosparam param="roi2">[320, 180, 640, 360]</rosparam>
+    <rosparam param="hmin">70</rosparam>
+    <rosparam param="hmax">87</rosparam>
+    <rosparam param="smin">65</rosparam>
+    <rosparam param="smax">153</rosparam>
+    <rosparam param="vmin">165</rosparam>
+    <rosparam param="vmax">219</rosparam>
+    <rosparam param="queue_size">10</rosparam>
+    <rosparam param="approximate_sync">true</rosparam>
   </node>
 
   <!-- <node pkg="nodelet" type="nodelet" name="Plus2" args="load nodelet_tutorial_math/Plus standalone_nodelet" output="screen">
