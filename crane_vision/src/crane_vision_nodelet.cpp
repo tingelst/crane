@@ -34,19 +34,21 @@ class CraneVisionNodelet : public nodelet::Nodelet
 {
   virtual void onInit();
 
-  std::vector<double> imageCb(const sensor_msgs::ImageConstPtr& image_msg,
-                              const sensor_msgs::CameraInfoConstPtr& info_msg);
+  bool extractSphereCenters(const sensor_msgs::ImageConstPtr& image_msg,
+                            const sensor_msgs::CameraInfoConstPtr& info_msg, const cv::Rect& roi,
+                            std::vector<double>& points, bool debug, const std::string& winname);
 
-  void imageCb2(const sensor_msgs::ImageConstPtr& image0_msg, const sensor_msgs::CameraInfoConstPtr& info0_msg,
-                const sensor_msgs::ImageConstPtr& image1_msg, const sensor_msgs::CameraInfoConstPtr& info1_msg);
+  void imageCb(const sensor_msgs::ImageConstPtr& image0_msg, const sensor_msgs::CameraInfoConstPtr& info0_msg,
+               const sensor_msgs::ImageConstPtr& image1_msg, const sensor_msgs::CameraInfoConstPtr& info1_msg,
+               const sensor_msgs::ImageConstPtr& image2_msg, const sensor_msgs::CameraInfoConstPtr& info2_msg);
 
   boost::shared_ptr<image_transport::ImageTransport> it_;
 
   /// Subscriptions
   image_transport::SubscriberFilter image0_sub_, image1_sub_, image2_sub_;
   message_filters::Subscriber<CameraInfo> image0_info_sub_, image1_info_sub_, image2_info_sub_;
-  typedef ExactTime<Image, CameraInfo, Image, CameraInfo> ExactPolicy;
-  typedef ApproximateTime<Image, CameraInfo, Image, CameraInfo> ApproximatePolicy;
+  typedef ExactTime<Image, CameraInfo, Image, CameraInfo, Image, CameraInfo> ExactPolicy;
+  typedef ApproximateTime<Image, CameraInfo, Image, CameraInfo, Image, CameraInfo> ApproximatePolicy;
   typedef message_filters::Synchronizer<ExactPolicy> ExactSync;
   typedef message_filters::Synchronizer<ApproximatePolicy> ApproximateSync;
   boost::shared_ptr<ExactSync> exact_sync_;
@@ -56,7 +58,9 @@ class CraneVisionNodelet : public nodelet::Nodelet
   ros::Publisher pub_;
 
   int hmin_, hmax_, smin_, smax_, vmin_, vmax_;
-  cv::Rect roi_;
+  cv::Rect roi0_, roi1_, roi2_;
+
+  bool debug_;
 };
 
 void CraneVisionNodelet::onInit()
@@ -74,25 +78,43 @@ void CraneVisionNodelet::onInit()
   if (approx)
   {
     approximate_sync_.reset(new ApproximateSync(ApproximatePolicy(queue_size), image0_sub_, image0_info_sub_,
-                                                image1_sub_, image1_info_sub_));
-    approximate_sync_->registerCallback(boost::bind(&CraneVisionNodelet::imageCb2, this, _1, _2, _3, _4));
+                                                image1_sub_, image1_info_sub_, image2_sub_, image2_info_sub_));
+    approximate_sync_->registerCallback(boost::bind(&CraneVisionNodelet::imageCb, this, _1, _2, _3, _4, _5, _6));
   }
   else
   {
-    exact_sync_.reset(
-        new ExactSync(ExactPolicy(queue_size), image0_sub_, image0_info_sub_, image1_sub_, image1_info_sub_));
-    exact_sync_->registerCallback(boost::bind(&CraneVisionNodelet::imageCb2, this, _1, _2, _3, _4));
+    exact_sync_.reset(new ExactSync(ExactPolicy(queue_size), image0_sub_, image0_info_sub_, image1_sub_,
+                                    image1_info_sub_, image2_sub_, image2_info_sub_));
+    exact_sync_->registerCallback(boost::bind(&CraneVisionNodelet::imageCb, this, _1, _2, _3, _4, _5, _6));
   }
 
   std::vector<int> roi;
   if (private_nh.getParam("roi0", roi))
   {
-    roi_ = cv::Rect(roi[0], roi[1], roi[2], roi[3]);
+    roi0_ = cv::Rect(roi[0], roi[1], roi[2], roi[3]);
   }
   else
   {
-    NODELET_ERROR_STREAM("Did not find any roi parameters!");
+    NODELET_ERROR_STREAM("Did not find any roi0 parameters!");
   }
+  if (private_nh.getParam("roi1", roi))
+  {
+    roi1_ = cv::Rect(roi[0], roi[1], roi[2], roi[3]);
+  }
+  else
+  {
+    NODELET_ERROR_STREAM("Did not find any roi1 parameters!");
+  }
+  if (private_nh.getParam("roi2", roi))
+  {
+    roi2_ = cv::Rect(roi[0], roi[1], roi[2], roi[3]);
+  }
+  else
+  {
+    NODELET_ERROR_STREAM("Did not find any roi2 parameters!");
+  }
+
+  private_nh.param("debug", debug_, false);
 
   private_nh.param("hmin", hmin_, 43);
   private_nh.param("hmax", hmax_, 73);
@@ -107,19 +129,22 @@ void CraneVisionNodelet::onInit()
   image0_info_sub_.subscribe(nh, "/camera0/camera_info", 1);
   image1_sub_.subscribe(*it_, "/camera1/image_raw", 1);
   image1_info_sub_.subscribe(nh, "/camera1/camera_info", 1);
+  image2_sub_.subscribe(*it_, "/camera2/image_raw", 1);
+  image2_info_sub_.subscribe(nh, "/camera2/camera_info", 1);
 
   pub_ = private_nh.advertise<std_msgs::Float64MultiArray>("points", 1);
 }
 
-std::vector<double> CraneVisionNodelet::imageCb(const sensor_msgs::ImageConstPtr& image_msg,
-                                                const sensor_msgs::CameraInfoConstPtr& info_msg)
+bool CraneVisionNodelet::extractSphereCenters(const sensor_msgs::ImageConstPtr& image_msg,
+                                              const sensor_msgs::CameraInfoConstPtr& info_msg, const cv::Rect& roi,
+                                              std::vector<double>& points, bool debug, const std::string& winname)
 {
   using namespace std;
   using namespace cv;
 
   Mat bgr8_image = cv_bridge::toCvShare(image_msg, "bgr8")->image;
 
-  Mat roi_image = bgr8_image(roi_);
+  Mat roi_image = bgr8_image(roi);
 
   Mat hsv_image;
   cvtColor(roi_image, hsv_image, CV_BGR2HSV);
@@ -163,26 +188,52 @@ std::vector<double> CraneVisionNodelet::imageCb(const sensor_msgs::ImageConstPtr
     /// Swap to get right order
     if (mc[sort_idx[1]].y > mc[sort_idx[0]].y)
     {
-      return std::vector<double>{ mc[sort_idx[1]].x, mc[sort_idx[1]].y, mc[sort_idx[0]].x, mc[sort_idx[0]].y };
+      points[0] = mc[sort_idx[1]].x;
+      points[1] = mc[sort_idx[1]].y;
+      points[2] = mc[sort_idx[0]].x;
+      points[3] = mc[sort_idx[0]].y;
     }
     else
     {
-      return std::vector<double>{ mc[sort_idx[0]].x, mc[sort_idx[0]].y, mc[sort_idx[1]].x, mc[sort_idx[1]].y };
+      points[0] = mc[sort_idx[0]].x;
+      points[1] = mc[sort_idx[0]].y;
+      points[2] = mc[sort_idx[1]].x;
+      points[3] = mc[sort_idx[1]].y;
+    }
+
+    if (debug)
+    {
+      circle(roi_image, Point2d(points[0], points[1]), 5, Scalar(0, 0, 255), -1, 8, 0);
+      circle(roi_image, Point2d(points[2], points[3]), 5, Scalar(255, 0, 0), -1, 8, 0);
+      imshow(winname, roi_image);
+      waitKey(30);
     }
   }
 }
 
-void CraneVisionNodelet::imageCb2(const sensor_msgs::ImageConstPtr& image0_msg,
-                                  const sensor_msgs::CameraInfoConstPtr& info0_msg,
-                                  const sensor_msgs::ImageConstPtr& image1_msg,
-                                  const sensor_msgs::CameraInfoConstPtr& info1_msg)
+void CraneVisionNodelet::imageCb(const sensor_msgs::ImageConstPtr& image0_msg,
+                                 const sensor_msgs::CameraInfoConstPtr& info0_msg,
+                                 const sensor_msgs::ImageConstPtr& image1_msg,
+                                 const sensor_msgs::CameraInfoConstPtr& info1_msg,
+                                 const sensor_msgs::ImageConstPtr& image2_msg,
+                                 const sensor_msgs::CameraInfoConstPtr& info2_msg)
 {
-  std::vector<double> points0 = imageCb(image0_msg, info0_msg);
-  std::vector<double> points1 = imageCb(image0_msg, info0_msg);
-  std::vector<double> points2 = imageCb(image0_msg, info0_msg);
+  using namespace std;
+
+  vector<double> points0{ 0.0, 0.0, 0.0, 0.0 };
+  vector<double> points1{ 0.0, 0.0, 0.0, 0.0 };
+  vector<double> points2{ 0.0, 0.0, 0.0, 0.0 };
+
+  extractSphereCenters(image0_msg, info0_msg, roi0_, points0, debug_, "camera0");
+  extractSphereCenters(image1_msg, info1_msg, roi1_, points1, debug_, "camera1");
+  extractSphereCenters(image2_msg, info2_msg, roi2_, points2, debug_, "camera2");
 
   std_msgs::Float64MultiArray msg;
-  msg.data = std::vector<double>{ 1.0, 2.0, 3.0, 4.0 };
+  std::vector<double> data(12);
+  msg.data =
+      std::vector<double>{ points0[0] + roi0_.x, points0[1] + roi0_.y, points0[2] + roi0_.x, points0[3] + roi0_.y,
+                           points1[0] + roi1_.y, points1[1] + roi1_.y, points1[2] + roi1_.y, points1[3] + roi1_.y,
+                           points2[0] + roi2_.y, points2[1] + roi2_.y, points2[2] + roi2_.y, points2[3] + roi2_.y };
   pub_.publish(msg);
 }
 
