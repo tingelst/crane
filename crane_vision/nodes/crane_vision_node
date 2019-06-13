@@ -52,38 +52,46 @@ Lhat = 1.05  # Debug
 
 dt = 1.0/30.0
 
+previous_time = time.time()
+
 def callback(msg):
 
     global previous_time
 
     points = np.array(msg.data).reshape(-1, 2)
-    center01, center02, center11, center12, center21, center22 = points
+    if not np.isnan(points).any():
+        center01, center02, center11, center12, center21, center22 = points
 
-    # Find direction vector of a line through the spheres,
-    # given in camera coordinates
-    Lc0 = find_line(center01, center02,
-                    center11, center12,
-                    center21, center22,
-                    P0, P1, P2)
+        # Find direction vector of a line through the spheres,
+        # given in camera coordinates
 
-    # Find direction vector of a line through the spheres,
-    # given in inertial coordinates
-    Lvec = np.dot(np.array([[-np.cos(q1), 0, np.sin(q1)],
-                            [np.sin(q1), 0, np.cos(q1)],
-                            [0, 1.0, 0]]), Lc0)
-    if np.linalg.norm(Lvec) > 0.00001:
-        Lvec = Lvec / np.linalg.norm(Lvec)
+        Lc0 = find_line(center01, center02,
+                        center11, center12,
+                        center21, center22,
+                        P0, P1, P2)
 
-    hat_thetak, hat_Pk, zk = ekf(Lvec, np.array(
-        [ddx, ddy]), hat_Pkm1, hat_thetakm1, q1, Lhat, dt)
+        # Find direction vector of a line through the spheres,
+        # given in inertial coordinates
+        Lvec = np.dot(np.array([[-np.cos(q1), 0, np.sin(q1)],
+                                [np.sin(q1), 0, np.cos(q1)],
+                                [0, 1.0, 0]]), Lc0)
+        if np.linalg.norm(Lvec) > 0.00001:
+            Lvec = Lvec / np.linalg.norm(Lvec)
 
-    th, phi, dth, dphi, _, _ = hat_thetak
-    msg = JointState()
-    msg.header.stamp = rospy.Time.now()
-    msg.position = np.rad2deg([th, phi, zk[0], zk[1]])
-    msg.velocity = np.rad2deg([dth, dphi])
+        current_time = time.time()
+        dt = current_time - previous_time
+        previous_time = current_time
 
-    pendulum_pub.publish(msg)
+        hat_thetak, hat_Pk, zk = ekf(Lvec, np.array(
+            [ddx, ddy]), hat_Pkm1, hat_thetakm1, q1, Lhat, dt)
+
+        th, phi, dth, dphi, _, _ = hat_thetak
+        msg = JointState()
+        msg.header.stamp = rospy.Time.now()
+        msg.position = np.rad2deg([th, phi, zk[0], zk[1]])
+        msg.velocity = np.rad2deg([dth, dphi])
+
+        pendulum_pub.publish(msg)
 
     
 def main():
@@ -92,91 +100,6 @@ def main():
     points_sub = rospy.Subscriber('/crane_vision_nodelet/points', Float64MultiArray, callback)
 
     rospy.spin()
-
-    # center01 = (0, 0)
-    # center02 = (0, 0)
-    # center11 = (0, 0)
-    # center12 = (0, 0)
-    # center21 = (0, 0)
-    # center22 = (0, 0)
-
-
-    # start_time = time.time()
-    # current_time = start_time
-    # previous_time = current_time
-
-    # try:
-    #     while not rospy.is_shutdown():
-    #         frames = cams.read()
-    #         if frames is not None:
-    #             frame1, frame2, frame3 = frames
-
-    #             # if debug:
-    #             #     cv2.imshow('frame1', frame1)
-    #             #     cv2.waitKey(30)
-
-
-    #             # Find pixels that corresponds to the spheres
-    #             center01, center02, mask1 = find_sphere_centers(
-    #                 frame1, center01, center02)
-    #             center11, center12, _ = find_sphere_centers(
-    #                 frame2, center11, center12)
-    #             center21, center22, _  = find_sphere_centers(
-    #                 frame3, center21, center22)
-
-    #             if debug:
-    #                 frame1 = cv2.circle(frame1, (int(center01[0]), int(center01[1])), 5, (255,0,0), -1)
-    #                 frame1 = cv2.circle(frame1, (int(center02[0]), int(center02[1])), 5, (0,0,255), -1)
-    #                 frame2 = cv2.circle(frame2, (int(center11[0]), int(center11[1])), 5, (255,0,0), -1)
-    #                 frame2 = cv2.circle(frame2, (int(center12[0]), int(center12[1])), 5, (00,0,255), -1)
-    #                 frame3 = cv2.circle(frame3, (int(center21[0]), int(center21[1])), 5, (255,0,0), -1)
-    #                 frame3 = cv2.circle(frame3, (int(center22[0]), int(center22[1])), 5, (0,0,255), -1)
-    #                 cv2.imshow('frame1', frame1)
-    #                 cv2.imshow('frame2', frame2)
-    #                 cv2.imshow('frame3', frame3)
-    #                 cv2.waitKey(30)
-
-                
-
-    #             # Find direction vector of a line through the spheres,
-    #             # given in camera coordinates
-    #             Lc0 = find_line(center01, center02,
-    #                             center11, center12,
-    #                             center21, center22,
-    #                             P0, P1, P2)
-
-    #             # Find direction vector of a line through the spheres,
-    #             # given in inertial coordinates
-    #             Lvec = np.dot(np.array([[-np.cos(q1), 0, np.sin(q1)],
-    #                                     [np.sin(q1), 0, np.cos(q1)],
-    #                                     [0, 1.0, 0]]), Lc0)
-    #             if np.linalg.norm(Lvec) > 0.00001:
-    #                 Lvec = Lvec / np.linalg.norm(Lvec)
-
-    #             current_time = time.time()
-    #             dt = current_time - previous_time
-    #             previous_time = current_time
-
-    #             hat_thetak, hat_Pk, zk = ekf(Lvec, np.array(
-    #                 [ddx, ddy]), hat_Pkm1, hat_thetakm1, q1, Lhat, dt)
-
-
-    #             th, phi, dth, dphi, _, _ = hat_thetak
-    #             msg = JointState()
-    #             msg.header.stamp = rospy.Time.now()
-    #             msg.position = np.rad2deg([th, phi, zk[0], zk[1]])
-    #             msg.velocity = np.rad2deg([dth, dphi])
-
-    #             pendulum_pub.publish(msg)
-
-    #             # rospy.loginfo('th: {}'.format(np.rad2deg(th)))
-                
-
-    #             rospy.loginfo(1.0 / dt)
-
-    # except rospy.ROSInterruptException:
-    #     pass
-
 
 if __name__ == "__main__":
     main()

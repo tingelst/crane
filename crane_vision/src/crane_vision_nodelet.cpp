@@ -123,8 +123,6 @@ void CraneVisionNodelet::onInit()
   private_nh.param("vmin", vmin_, 86);
   private_nh.param("vmax", vmax_, 255);
 
-  // camera_sub_ = it_->subscribeCamera("image_raw", 3, &CraneVisionNodelet::imageCb, this);
-
   image0_sub_.subscribe(*it_, "/camera0/image_raw", 1);
   image0_info_sub_.subscribe(nh, "/camera0/camera_info", 1);
   image1_sub_.subscribe(*it_, "/camera1/image_raw", 1);
