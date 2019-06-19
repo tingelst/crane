@@ -96,14 +96,10 @@ bool ekf(Vector3d Lvec, AccelerationVector uk, MatrixXd hat_Pkm1, VectorXd hat_t
   Eigen::Matrix2d R;
   R << 0.00377597, -0.00210312, -0.00210312, 0.00125147;
 
-  cout << R << endl;
-
   CovarianceMatrix Q = CovarianceMatrix::Zero();
   Q.diagonal() << 0.00003, 0.00003, 0.0005, 0.0005, 0.0001, 0.0001;
   Eigen::Matrix<double, 2, 6> H;
   H << 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0;
-
-  cout << H << endl;
 
   TransitionMatrix Fi = Fk(x, u, g / r, L, dt);
 
@@ -116,12 +112,13 @@ bool ekf(Vector3d Lvec, AccelerationVector uk, MatrixXd hat_Pkm1, VectorXd hat_t
   }
 
   Eigen::MatrixXd barP_kp1 = (Fi * hat_Pkm1 * Fi.transpose()) + Q;
-
-  cout << barP_kp1 << endl;
-
   Eigen::MatrixXd K_kp1 = barP_kp1 * H.transpose() * (R + H * barP_kp1 * H.transpose()).inverse();
 
-  cout << K_kp1 << endl;
+  Eigen::VectorXd hat_thetak = x + K_kp1 * (zkp1 - H * x);
+  Eigen::MatrixXd hat_Pk = (Eigen::Matrix<double, 6, 6>::Identity() - K_kp1 * H) * barP_kp1;
+
+  cout << hat_thetak << endl;
+
 }
 
 int main()
