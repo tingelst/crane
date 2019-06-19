@@ -98,7 +98,7 @@ bool ekf(Vector3d Lvec, AccelerationVector uk, MatrixXd hat_Pkm1, VectorXd hat_t
 
   cout << R << endl;
 
-  CovarianceMatrix Q;
+  CovarianceMatrix Q = CovarianceMatrix::Zero();
   Q.diagonal() << 0.00003, 0.00003, 0.0005, 0.0005, 0.0001, 0.0001;
   Eigen::Matrix<double, 2, 6> H;
   H << 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0;
