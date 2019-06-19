@@ -1,15 +1,19 @@
+// Eigen
+#include <Eigen/Dense>
+#include <Eigen/SVD>
+
+// OpenCV
 #include <opencv2/opencv.hpp>
 
+// ROS
 #include <ros/ros.h>
 #include <nodelet/nodelet.h>
-
 #include <image_transport/image_transport.h>
 #include <image_transport/subscriber_filter.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/exact_time.h>
 #include <message_filters/sync_policies/approximate_time.h>
-
 #include <cv_bridge/cv_bridge.h>
 #include <std_msgs/Float64MultiArray.h>
 
@@ -17,6 +21,117 @@ namespace crane_vision
 {
 using namespace sensor_msgs;
 using namespace message_filters::sync_policies;
+
+using ProjectionMatrix = Eigen::Matrix<double, 3, 4>;
+using Vector3d = Eigen::Matrix<double, 3, 1>;
+using StateVector = Eigen::Matrix<double, 6, 1>;
+using TransitionMatrix = Eigen::Matrix<double, 6, 6>;
+using CovarianceMatrix = Eigen::Matrix<double, 6, 6>;
+using AccelerationVector = Eigen::Vector2d;
+
+Vector3d dlt(const Eigen::Vector2d& c0, const Eigen::Vector2d& c1, const Eigen::Vector2d& c2,
+             const ProjectionMatrix& P0, const ProjectionMatrix& P1, const ProjectionMatrix P2)
+{
+  Eigen::Matrix<double, 6, 4> X;
+  X.row(0) = c0(0) * P0.row(2) - P0.row(0);
+  X.row(1) = c0(1) * P0.row(2) - P0.row(1);
+  X.row(2) = c1(0) * P1.row(2) - P1.row(0);
+  X.row(3) = c1(1) * P1.row(2) - P1.row(1);
+  X.row(4) = c2(0) * P2.row(2) - P2.row(0);
+  X.row(5) = c2(1) * P2.row(2) - P2.row(1);
+
+  Eigen::JacobiSVD<Eigen::MatrixXd> svd(X, Eigen::ComputeThinU | Eigen::ComputeThinV);
+  Eigen::MatrixXd V = svd.matrixV();
+
+  Eigen::Vector3d L = Eigen::Vector3d::Zero();
+  double scale = V(3, 3);
+  if (scale > 1e-8)
+  {
+    L = V.col(3).topRows(3) / scale;
+  }
+  return L;
+}
+
+Vector3d findLine(const Eigen::Vector2d& c01, const Eigen::Vector2d& c02, const Eigen::Vector2d& c11,
+                  const Eigen::Vector2d& c12, const Eigen::Vector2d& c21, const Eigen::Vector2d& c22,
+                  const ProjectionMatrix& P0, const ProjectionMatrix& P1, const ProjectionMatrix P2)
+{
+  Vector3d X1 = dlt(c01, c11, c21, P0, P1, P2);
+  Vector3d X2 = dlt(c02, c12, c22, P0, P1, P2);
+  Vector3d L = X2 - X1;
+  L.normalize();
+  return L;
+}
+
+StateVector fk(StateVector x, AccelerationVector u, double w, double L)
+{
+  double c0 = cos(x(0));
+  double c1 = cos(x(1));
+  double s0 = sin(x(0));
+  double s1 = sin(x(1));
+
+  StateVector x1 = StateVector::Zero();
+  x1(0) = x(2);
+  x1(1) = x(3);
+  x1(2) = (2.0 * x(2) * x(3) * s1 - w * s0 + (u(1) * c0 / L)) / c1;
+  x1(3) = -c1 * s1 * x(2) * x(2) - (u(0) * c1 + u(1) * s0 * s1) / L - w * c0 * s1;
+  return x1;
+}
+
+TransitionMatrix Fk(StateVector x, AccelerationVector u, double w, double L, double dt)
+{
+  double c0 = cos(x(0));
+  double c1 = cos(x(1));
+  double s0 = sin(x(0));
+  double s1 = sin(x(1));
+
+  TransitionMatrix X = TransitionMatrix::Identity();
+  X(0, 2) = dt;
+  X(1, 3) = dt;
+  X(2, 0) = -(dt * (w * c0 + (u(1) * s0) / L)) / c1;
+  X(2, 1) = 2.0 * dt * x(2) * x(3) + (dt * s1 * (2.0 * x(2) * x(3) * s1 - w * s0 + (u(1) * c0) / L)) / (c1 * c1);
+  X(2, 2) = (2.0 * dt * x(3) * s1) / c1 + 1.0;
+  X(2, 3) = (2.0 * dt * x(2) * s1) / c1;
+  X(3, 0) = dt * (w * s0 * s1 - (u[1] * c0 * s1) / L);
+  X(3, 1) = -dt * (x(2) * x(2) * c1 * c1 - x(2) * x(2) * s1 * s1 - (u(0) * s1 - u(1) * c1 * s0 / L) + w * c0 * c1);
+  X(3, 2) = -2.0 * dt * x(2) * c1 * s1;
+  return X;
+}
+
+auto ekf(Vector3d Lvec, AccelerationVector uk, Eigen::MatrixXd hat_Pkm1, Eigen::VectorXd hat_thetakm1, double r,
+         double dt)
+{
+  int D = 10;
+  double g = 9.81;
+  double L = r;
+  AccelerationVector u = uk;
+  Eigen::VectorXd x = hat_thetakm1;
+  Eigen::Matrix2d R;
+  R << 0.00377597, -0.00210312, -0.00210312, 0.00125147;
+
+  CovarianceMatrix Q = CovarianceMatrix::Zero();
+  Q.diagonal() << 0.00003, 0.00003, 0.0005, 0.0005, 0.0001, 0.0001;
+  Eigen::Matrix<double, 2, 6> H;
+  H << 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0;
+
+  TransitionMatrix Fi = Fk(x, u, g / r, L, dt);
+
+  Eigen::Vector2d zkp1;
+  zkp1 << atan2(-Lvec(1), Lvec(2)), atan2(Lvec(0), sqrt(Lvec(1) * Lvec(1) + Lvec(2) * Lvec(2)));
+
+  for (int i = 0; i < D; ++i)
+  {
+    x = x + fk(x, u, g / r, L) * dt / D;
+  }
+
+  Eigen::MatrixXd barP_kp1 = (Fi * hat_Pkm1 * Fi.transpose()) + Q;
+  Eigen::MatrixXd K_kp1 = barP_kp1 * H.transpose() * (R + H * barP_kp1 * H.transpose()).inverse();
+
+  Eigen::VectorXd hat_thetak = x + K_kp1 * (zkp1 - H * x);
+  Eigen::MatrixXd hat_Pk = (Eigen::Matrix<double, 6, 6>::Identity() - K_kp1 * H) * barP_kp1;
+
+  return std::make_tuple(hat_thetak, hat_Pk);
+}
 
 struct CompareArea
 {
@@ -59,6 +174,10 @@ class CraneVisionNodelet : public nodelet::Nodelet
 
   int hmin_, hmax_, smin_, smax_, vmin_, vmax_;
   cv::Rect roi0_, roi1_, roi2_;
+
+  Eigen::Matrix<double, 6, 6> hat_Pkm1_;
+  StateVector hat_thetakm1_;
+  ProjectionMatrix P0_, P1_, P2_;
 
   bool debug_;
 };
@@ -131,6 +250,13 @@ void CraneVisionNodelet::onInit()
   image2_info_sub_.subscribe(nh, "/camera2/camera_info", 1);
 
   pub_ = private_nh.advertise<std_msgs::Float64MultiArray>("points", 1);
+
+  P0_ << 942.0, 0.0, 623.66, 0.0, 0.0, 942.0, 345.69, 0.0, 0.0, 0.0, 1.0, 0.0;
+  P1_ << 941.0, 0.0, 637.21, 220005.80000000002, 0.0, 941.0, 349.9, 0.0, 0.0, 0.0, 1.0, 0.0;
+  P2_ << 937.0, 0.0, 637.21, 437579.0, 0.0, 937.0, 381.54, 0.0, 0.0, 0.0, 1.0, 0.0;
+
+  hat_thetakm1_.setZero();
+  hat_Pkm1_ << 0.0, 0.0, 0.0, 0.0, 0.04, -0.03;
 }
 
 bool CraneVisionNodelet::extractSphereCenters(const sensor_msgs::ImageConstPtr& image_msg,
@@ -217,6 +343,7 @@ void CraneVisionNodelet::imageCb(const sensor_msgs::ImageConstPtr& image0_msg,
                                  const sensor_msgs::CameraInfoConstPtr& info2_msg)
 {
   using namespace std;
+  using namespace Eigen;
 
   vector<double> points0{ 0.0, 0.0, 0.0, 0.0 };
   vector<double> points1{ 0.0, 0.0, 0.0, 0.0 };
@@ -225,6 +352,20 @@ void CraneVisionNodelet::imageCb(const sensor_msgs::ImageConstPtr& image0_msg,
   extractSphereCenters(image0_msg, info0_msg, roi0_, points0, debug_, "camera0");
   extractSphereCenters(image1_msg, info1_msg, roi1_, points1, debug_, "camera1");
   extractSphereCenters(image2_msg, info2_msg, roi2_, points2, debug_, "camera2");
+
+  Vector2d center01 = Vector2d(points0[0] + roi0_.x, points0[1] + roi0_.y);
+  Vector2d center02 = Vector2d(points0[2] + roi0_.x, points0[3] + roi0_.y);
+  Vector2d center11 = Vector2d(points1[0] + roi1_.x, points1[1] + roi1_.y);
+  Vector2d center12 = Vector2d(points1[2] + roi1_.x, points1[3] + roi1_.x);
+  Vector2d center21 = Vector2d(points2[0] + roi2_.x, points2[1] + roi2_.y);
+  Vector2d center22 = Vector2d(points2[2] + roi2_.x, points2[3] + roi2_.y);
+
+  Vector3d Lc0 = findLine(center01, center02, center11, center12, center21, center22, P0_, P1_, P2_);
+
+  // todo(Lars): Transform to inertial coordinatesA
+  Vector3d Lvec = Lc0;
+
+  // std::tie(hat_thetakm1_, hat_Pkm1_) = ekf(Lvec, AccelerationVector(0.0,0.0), hat_thetakm1_, hat_Pkm1_, 1.05, 0.01);
 
   std_msgs::Float64MultiArray msg;
   std::vector<double> data(12);
