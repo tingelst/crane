@@ -12,7 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   nodelet
 )
 
-find_package( OpenCV REQUIRED )
+find_package(OpenCV REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 # catkin_python_setup()
 
@@ -23,8 +24,15 @@ catkin_package(
 
 include_directories(
   include
+  ${EIGEN3_INCLUDE_DIR}
   ${catkin_INCLUDE_DIRS}
 )
+
+add_executable(ekf src/crane_vision_ekf.cpp)
+target_link_libraries(ekf
+  ${catkin_LIBRARIES} 
+  ${OpenCV_LIBRARIES})
+
 
 add_executable(example_node src/opencv_example_node.cpp)
 target_link_libraries(example_node 

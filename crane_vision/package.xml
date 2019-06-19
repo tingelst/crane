@@ -14,6 +14,8 @@
   <buildtool_depend>catkin</buildtool_depend>
   <buildtool_depend>python-catkin-pkg</buildtool_depend>
 
+  <build_depend>eigen</build_depend>
+
   <depend>nodelet</depend>
   <depend>rospy</depend>
   <depend>roscpp</depend>
