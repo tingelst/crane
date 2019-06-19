@@ -4,4 +4,9 @@
       crane_vision_nodelet
     </description>
   </class>
+  <class name="crane_vision/CraneVisionEKF" type="crane_vision::CraneVisionEKD" base_class_type="nodelet::Nodelet">
+    <description>
+      crane_vision_ekf
+    </description>
+  </class>
 </library>
