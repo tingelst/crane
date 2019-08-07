@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
 
-# catkin_python_setup()
+catkin_python_setup()
 
 catkin_package(
    CATKIN_DEPENDS roscpp std_msgs cv_bridge sensor_msgs nodelet
