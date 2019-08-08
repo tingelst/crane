@@ -40,7 +40,7 @@ P2 = np.dot(np.dot(K2, PII), trf(np.eye(3), t_31))
 
 debug = False
 
-pendulum_pub = rospy.Publisher('pendulum_states', JointState, queue_size=3)
+pendulum_pub = rospy.Publisher('pendulum_joint_states', JointState, queue_size=3)
 
 hat_Pk = np.diag([0, 0, 0, 0, 0, 0])
 hat_thetak = np.array([0, 0, 0, 0, np.deg2rad(2.5), np.deg2rad(-1.7)])
@@ -96,8 +96,10 @@ def callback(msg):
         th, phi, dth, dphi, _, _ = hat_thetak
         msg = JointState()
         msg.header.stamp = rospy.Time.now()
-        msg.position = np.rad2deg([th, phi, zk[0], zk[1]])
-        msg.velocity = np.rad2deg([dth, dphi])
+        msg.name = ['phix_joint', 'phiy_joint']
+        msg.position = [th, phi, zk[0], zk[1]]
+        msg.velocity = [dth, dphi, 0.0, 0.0]
+        msg.effort = [zk[0], zk[1]]
 
         pendulum_pub.publish(msg)
 

@@ -19,23 +19,74 @@ bool LyapunovPendulumDampingController::init(hardware_interface::RobotHW* robot_
     return false;
   }
 
+  // RML
+  rml_.reset(new ReflexxesAPI(2, 0.01));
+  rml_input_.reset(new RMLPositionInputParameters(2));
+  rml_output_.reset(new RMLPositionOutputParameters(2));
+
   crane_tip_velocity_handle_ = crane_tip_velocity_command_interface_->getHandle("crane_tip");
-  command_sub_ = node_handle.subscribe<crane_msgs::CraneControl>("command", 1,
-                                                                 &LyapunovPendulumDampingController::commandCB, this);
+
+  command_sub_ = node_handle.subscribe<crane_msgs::CraneTrajectoryPoint>(
+      "command", 1, &LyapunovPendulumDampingController::commandCB, this);
+
   pendulum_joint_state_sub_ = node_handle.subscribe<sensor_msgs::JointState>(
       "/pendulum_joint_states", 1, &LyapunovPendulumDampingController::pendulumJointStateCB, this);
-
   pendulum_joint_state_buffer_.writeFromNonRT({ 0.0, 0.0, 0.0, 0.0 });
 
-  command_pub_.reset(new realtime_tools::RealtimePublisher<crane_msgs::CraneControl>(node_handle, "command", 3));
-
-  ROS_INFO_STREAM(this->discreteDynamics());
+  command_pub_.reset(new realtime_tools::RealtimePublisher<crane_msgs::CraneControl>(node_handle, "commanded", 1));
 
   return true;
 }
 
+void LyapunovPendulumDampingController::starting(const ros::Time& now)
+{
+  ROS_INFO("LyapunovPendulumDampingController: Starting!");
+
+  std::array<double, 2> position = crane_tip_velocity_handle_.getPosition();
+  std::array<double, 2> velocity = crane_tip_velocity_handle_.getVelocity();
+
+  crane_msgs::CraneTrajectoryPoint command;
+  for (std::size_t i = 0; i < 2; ++i)
+  {
+    command.position.push_back(position[i]);
+    command.velocity.push_back(0.0);
+    command.max_velocity.push_back(0.1);
+    command.max_acceleration.push_back(0.1);
+  }
+  command_buffer_.initRT(command);
+
+  for (std::size_t i = 0; i < 2; ++i)
+  {
+    rml_input_->SelectionVector->VecData[i] = true;
+  }
+}
+
 void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::Duration& period)
 {
+  // Trajectory
+  crane_msgs::CraneTrajectoryPoint trajectory_point = *command_buffer_.readFromRT();
+
+  std::array<double, 2> position = crane_tip_velocity_handle_.getPosition();
+  std::array<double, 2> velocity = crane_tip_velocity_handle_.getVelocity();
+
+  for (std::size_t i = 0; i < 2; ++i)
+  {
+    rml_input_->CurrentPositionVector->VecData[i] = position[i];
+    rml_input_->CurrentVelocityVector->VecData[i] = velocity[i];
+
+    rml_input_->TargetPositionVector->VecData[i] = trajectory_point.position[i];
+    rml_input_->TargetVelocityVector->VecData[i] = trajectory_point.velocity[i];
+    rml_input_->MaxVelocityVector->VecData[i] = trajectory_point.max_velocity[i];
+    rml_input_->MaxAccelerationVector->VecData[i] = trajectory_point.max_acceleration[i];
+  }
+
+  int result = rml_->RMLPosition(*rml_input_.get(), rml_output_.get(), rml_flags_);
+  if (result < 0)
+  {
+    ROS_ERROR_STREAM("RML error: " << result);
+  }
+
+  // Damping
   std::array<double, 4> q = *pendulum_joint_state_buffer_.readFromRT();
 
   double kp = 1.0;
@@ -46,7 +97,7 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
   double dphiy = q[3];
 
   double g = 9.81;
-  double L = 1.0;
+  double L = 1.05;
 
   double cx = cos(phix);
   double sx = sin(phix);
@@ -56,12 +107,21 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
   double uy = -L * cy / cx * (kd * dphix + kp * phix) - 2.0 * L * sy / cx + g * sx * sy * sy / cx;
   double ux = L / cy * (kd * dphiy + kp * phiy) - L * sy * dphix * dphix - uy * sx * sy / cy;
 
+  std::array<double, 2> command;
+  command[0] = rml_output_->NewVelocityVector->VecData[0] + ux * period.toSec();
+  command[1] = rml_output_->NewVelocityVector->VecData[1] + ux * period.toSec();
+
   if (command_pub_->trylock())
   {
-    command_pub_->msg_.gx = ux;
-    command_pub_->msg_.gy = uy;
+    command_pub_->msg_.gx = command[0];
+    command_pub_->msg_.gy = command[1];
     command_pub_->unlockAndPublish();
   }
+
+  ROS_INFO("%f, %f", command[0], command[1]);
+  crane_tip_velocity_handle_.setCommand({ command[0], command[1] });
+
+  /*
 
   {
     std::vector<double> z{ 1.23934024e+00,  1.25449097e-02, -7.56690389e-02, 1.94915197e-02,
@@ -84,7 +144,6 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
     };
 
     casadi::DMDict res = solver_(arg);
-    ROS_INFO_STREAM(res["x"]);
   }
 
   std::vector<double> x0{
@@ -108,7 +167,7 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
     // ROS_INFO_STREAM(res);
   }
 
-  crane_tip_velocity_handle_.setCommand({ ux * period.toSec(), uy * period.toSec() });
+  */
 }
 
 casadi::Function LyapunovPendulumDampingController::continuousDynamics(void)
@@ -242,7 +301,8 @@ casadi::Function LyapunovPendulumDampingController::solver(const std::vector<dou
   // std::string solver_name = "sqpmethod";
   solver_opts["verbose"] = false;
   solver_opts["print_time"] = false;
-  if (solver_name == "ipopt") {
+  if (solver_name == "ipopt")
+  {
     solver_opts["ipopt.print_level"] = 0;
   }
 

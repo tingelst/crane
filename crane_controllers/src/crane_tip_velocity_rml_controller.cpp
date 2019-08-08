@@ -85,6 +85,8 @@ void CraneTipVelocityRMLController::update(const ros::Time& now, const ros::Dura
 
   crane_tip_velocity_handle_.setCommand(
       { rml_output_->NewVelocityVector->VecData[0], rml_output_->NewVelocityVector->VecData[1] });
+
+  ROS_INFO("%f, %f", rml_output_->NewVelocityVector->VecData[0], rml_output_->NewVelocityVector->VecData[1]);
 }
 
 }  // namespace crane_controllers

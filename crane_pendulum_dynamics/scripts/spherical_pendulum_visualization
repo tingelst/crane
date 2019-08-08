@@ -10,7 +10,7 @@ from sensor_msgs.msg import JointState
 
 from crane_msgs.msg import CraneControl
 from crane_pendulum_dynamics.rk4 import rk4
-from crane_pendulum_dynamics.spherical_pendulum import spherical_pendulum_dyn, lyapunov_controller
+from crane_pendulum_dynamics.spherical_pendulum import spherical_pendulum_dyn
 
 
 class SphericalPendulumVisualization(object):
@@ -18,7 +18,7 @@ class SphericalPendulumVisualization(object):
         self._joint_state_pub = rospy.Publisher(
             'pendulum_joint_states', JointState, queue_size=5)
         self._command_sub = rospy.Subscriber(
-            '/lyapunov_pendulum_damping_controller/command', CraneControl, callback=self._command_cb)
+            '/lyapunov_pendulum_damping_controller/commanded', CraneControl, callback=self._command_cb)
 
         self._command = np.array([0.0, 0.0])
         self._command_lock = Lock()

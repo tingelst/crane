@@ -40,6 +40,6 @@
     <rosparam param="debug">false</rosparam>
   </node>
 
-  <!-- <node pkg="crane_vision" type="crane_vision_node" name="crane_vision_ekf" output="screen"/> -->
+  <node pkg="crane_vision" type="crane_vision_node" name="crane_vision_ekf" output="screen"/>
 
 </launch>
