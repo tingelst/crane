@@ -68,6 +68,7 @@ private:
   realtime_tools::RealtimeBuffer<std::array<double, 4>> pendulum_joint_state_buffer_;
 
   std::unique_ptr<realtime_tools::RealtimePublisher<crane_msgs::CraneControl>> command_pub_;
+  std::unique_ptr<realtime_tools::RealtimePublisher<sensor_msgs::JointState>> trajectory_pub_;
 
   void pendulumJointStateCB(const sensor_msgs::JointState::ConstPtr& msg)
   {
@@ -88,7 +89,11 @@ private:
   casadi::Function solver_;
 
   std::vector<double> last_g_;
+  std::vector<double> last_gopt_;
+  double dx0_{ 0.0 };
+  double dy0_{ 0.0 };
 };
+
 }  // namespace crane_controllers
 
 PLUGINLIB_EXPORT_CLASS(crane_controllers::LyapunovPendulumDampingController, controller_interface::ControllerBase)

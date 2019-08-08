@@ -31,7 +31,7 @@ class SphericalPendulumVisualization(object):
 
     def run(self):
 
-        q = np.deg2rad([10, 0.0, 10, 0.0])
+        q = np.deg2rad([0, 0.0, 0, 0.0])
 
         start_time = time.time()
         current_time = start_time
