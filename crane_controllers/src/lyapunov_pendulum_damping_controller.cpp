@@ -123,14 +123,24 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
   uy = 0.0;
 
   std::vector<double> z{ position[0], velocity[0], position[1], velocity[1], phix, dphix, phiy, dphiy };
-  std::vector<double> zref{ rml_output_->NewPositionVector->VecData[0],
-                            rml_output_->NewVelocityVector->VecData[0],
-                            rml_output_->NewPositionVector->VecData[1],
-                            rml_output_->NewVelocityVector->VecData[1],
+
+  std::vector<double> zref{ 1.5,
+                            0.0,
+                            1.5,
+                            0.0,
                             0.,
                             0.,
                             0.,
                             0. };
+
+  // std::vector<double> zref{ rml_output_->NewPositionVector->VecData[0],
+  //                           rml_output_->NewVelocityVector->VecData[0],
+  //                           rml_output_->NewPositionVector->VecData[1],
+  //                           rml_output_->NewVelocityVector->VecData[1],
+  //                           0.,
+  //                           0.,
+  //                           0.,
+  //                           0. };
 
   if (trajectory_pub_->trylock())
   {
@@ -272,7 +282,7 @@ casadi::Function LyapunovPendulumDampingController::solver(const std::vector<dou
   SX k = SX::vertcat({ 1.0, 2.0 });
 
   SX R = SX::diagcat({ 0.1, 0.1 });
-  SX Q = SX::diagcat({ 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0 });
+  SX Q = SX::diagcat({ 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
 
   SX J = 0.0;
 
