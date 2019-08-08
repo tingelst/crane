@@ -177,9 +177,8 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
   dy0_ = ddy0 * period.toSec();
 
   crane_tip_velocity_handle_.setCommand({ dx0_, dy0_ });
-  // crane_tip_velocity_handle_.setCommand({ zref[1], zref[3] });
-
-}  // namespace crane_controllers
+  // crane_tip_velocity_handle_.setCommand({ dwx * period.toSec(), dwy * period.toSec() });
+}
 
 casadi::Function LyapunovPendulumDampingController::continuousDynamics(void)
 {
