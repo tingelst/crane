@@ -26,11 +26,12 @@ class SphericalPendulumVisualization(object):
     def _command_cb(self, msg):
         self._command_lock.acquire()
         self._command = np.array([msg.gx, msg.gy])
+        # print(self._command)
         self._command_lock.release()
 
     def run(self):
 
-        q = np.array([np.pi/6, 0.0, np.pi/6, 0.0])
+        q = np.deg2rad([10, 0.0, 10, 0.0])
 
         start_time = time.time()
         current_time = start_time

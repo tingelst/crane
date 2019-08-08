@@ -86,6 +86,8 @@ private:
   casadi::Function solver(const std::vector<double>& z, const std::vector<double>& zref,
                           const std::vector<double>& last_g);
   casadi::Function solver_;
+
+  std::vector<double> last_g_;
 };
 }  // namespace crane_controllers
 

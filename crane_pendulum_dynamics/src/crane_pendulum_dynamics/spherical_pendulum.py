@@ -8,7 +8,7 @@ def spherical_pendulum_dyn(t, q, u=[0.0, 0.0]):
     phix, dphix, phiy, dphiy = q
 
     g = 9.81
-    L = 1.0
+    L = 1.05
 
     cx = np.cos(phix)
     sx = np.sin(phix)
