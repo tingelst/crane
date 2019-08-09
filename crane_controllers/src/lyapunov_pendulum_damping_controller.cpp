@@ -19,34 +19,96 @@ bool LyapunovPendulumDampingController::init(hardware_interface::RobotHW* robot_
     return false;
   }
 
+  // RML
+  rml_.reset(new ReflexxesAPI(2, 0.1));
+  rml_input_.reset(new RMLPositionInputParameters(2));
+  rml_output_.reset(new RMLPositionOutputParameters(2));
+
   crane_tip_velocity_handle_ = crane_tip_velocity_command_interface_->getHandle("crane_tip");
-  command_sub_ = node_handle.subscribe<crane_msgs::CraneControl>("command", 1,
-                                                                 &LyapunovPendulumDampingController::commandCB, this);
+
+  command_sub_ = node_handle.subscribe<crane_msgs::CraneTrajectoryPoint>(
+      "command", 1, &LyapunovPendulumDampingController::commandCB, this);
+
   pendulum_joint_state_sub_ = node_handle.subscribe<sensor_msgs::JointState>(
       "/pendulum_joint_states", 1, &LyapunovPendulumDampingController::pendulumJointStateCB, this);
-
   pendulum_joint_state_buffer_.writeFromNonRT({ 0.0, 0.0, 0.0, 0.0 });
 
-  command_pub_.reset(new realtime_tools::RealtimePublisher<crane_msgs::CraneControl>(node_handle, "command", 3));
+  command_pub_.reset(new realtime_tools::RealtimePublisher<crane_msgs::CraneControl>(node_handle, "commanded", 3));
+  trajectory_pub_.reset(new realtime_tools::RealtimePublisher<sensor_msgs::JointState>(node_handle, "zref", 3));
+  trajectory_pub_->msg_.name.push_back("x");
+  trajectory_pub_->msg_.name.push_back("y");
+  for (size_t i = 0; i < 2; ++i)
+  {
+    trajectory_pub_->msg_.position.push_back(0.0);
+    trajectory_pub_->msg_.velocity.push_back(0.0);
+  }
 
-  ROS_INFO_STREAM(this->discreteDynamics());
+  last_g_ = std::vector<double>{ { 0.0, 0.0 } };
+  last_gopt_ = std::vector<double>{ { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } };
 
   return true;
 }
 
+void LyapunovPendulumDampingController::starting(const ros::Time& now)
+{
+  ROS_INFO("LyapunovPendulumDampingController: Starting!");
+
+  std::array<double, 2> position = crane_tip_velocity_handle_.getPosition();
+  std::array<double, 2> velocity = crane_tip_velocity_handle_.getVelocity();
+
+  crane_msgs::CraneTrajectoryPoint command;
+  for (std::size_t i = 0; i < 2; ++i)
+  {
+    command.position.push_back(position[i]);
+    command.velocity.push_back(0.0);
+    command.max_velocity.push_back(0.1);
+    command.max_acceleration.push_back(0.1);
+  }
+  command_buffer_.initRT(command);
+
+  for (std::size_t i = 0; i < 2; ++i)
+  {
+    rml_input_->SelectionVector->VecData[i] = true;
+  }
+}
+
 void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::Duration& period)
 {
+  // Trajectory
+  crane_msgs::CraneTrajectoryPoint trajectory_point = *command_buffer_.readFromRT();
+
+  std::array<double, 2> position = crane_tip_velocity_handle_.getPosition();
+  std::array<double, 2> velocity = crane_tip_velocity_handle_.getVelocity();
+
+  for (std::size_t i = 0; i < 2; ++i)
+  {
+    rml_input_->CurrentPositionVector->VecData[i] = position[i];
+    rml_input_->CurrentVelocityVector->VecData[i] = velocity[i];
+
+    rml_input_->TargetPositionVector->VecData[i] = trajectory_point.position[i];
+    rml_input_->TargetVelocityVector->VecData[i] = trajectory_point.velocity[i];
+    rml_input_->MaxVelocityVector->VecData[i] = trajectory_point.max_velocity[i];
+    rml_input_->MaxAccelerationVector->VecData[i] = trajectory_point.max_acceleration[i];
+  }
+
+  int result = rml_->RMLPosition(*rml_input_.get(), rml_output_.get(), rml_flags_);
+  if (result < 0)
+  {
+    ROS_ERROR_STREAM("RML error: " << result);
+  }
+
+  // Damping
   std::array<double, 4> q = *pendulum_joint_state_buffer_.readFromRT();
 
-  double kp = 1.0;
-  double kd = 2.0;
+  double kp = 1.0 / 2.0;
+  double kd = 2.0 / 2.0;
   double phix = q[0];
   double dphix = q[1];
   double phiy = q[2];
   double dphiy = q[3];
 
   double g = 9.81;
-  double L = 1.0;
+  double L = 1.05;
 
   double cx = cos(phix);
   double sx = sin(phix);
@@ -56,59 +118,76 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
   double uy = -L * cy / cx * (kd * dphix + kp * phix) - 2.0 * L * sy / cx + g * sx * sy * sy / cx;
   double ux = L / cy * (kd * dphiy + kp * phiy) - L * sy * dphix * dphix - uy * sx * sy / cy;
 
+  // DEBUG
+  ux = 0.0;
+  uy = 0.0;
+
+  std::vector<double> z{ position[0], velocity[0], position[1], velocity[1], phix, dphix, phiy, dphiy };
+
+  std::vector<double> zref{ 1.5,
+                            0.0,
+                            1.5,
+                            0.0,
+                            0.,
+                            0.,
+                            0.,
+                            0. };
+
+  // std::vector<double> zref{ rml_output_->NewPositionVector->VecData[0],
+  //                           rml_output_->NewVelocityVector->VecData[0],
+  //                           rml_output_->NewPositionVector->VecData[1],
+  //                           rml_output_->NewVelocityVector->VecData[1],
+  //                           0.,
+  //                           0.,
+  //                           0.,
+  //                           0. };
+
+  if (trajectory_pub_->trylock())
+  {
+    trajectory_pub_->msg_.header.stamp = now;
+    trajectory_pub_->msg_.position[0] = zref[0];
+    trajectory_pub_->msg_.position[1] = zref[2];
+    trajectory_pub_->msg_.velocity[0] = zref[1];
+    trajectory_pub_->msg_.velocity[1] = zref[3];
+    trajectory_pub_->unlockAndPublish();
+  }
+
+  // ROS_INFO("%f, %f, %f. %f",   zref[0], zref[1], zref[2], zref[3]);
+
+  // Solve the problem
+  std::vector<double> gmin{ -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1 };
+  std::vector<double> gmax{ 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 };
+
+  solver_ = solver(z, zref, last_g_);
+  std::vector<double> sol;
+  solver_({ { "lbx", gmin }, { "ubx", gmax }, { "x0", last_gopt_ } }, { { "x", &sol } });
+
+  double gx = sol[0];
+  double gy = sol[1];
+
+  // Store the results for next cycle
+  last_gopt_ = sol;
+  last_g_ = std::vector<double>{ { gx, gy } };
+
+  double dwx = ux + gx;
+  double dwy = uy + gy;
+
+  double Tv = 0.2;
+  double ddx0 = (dwx * period.toSec() - dx0_) / Tv;
+  double ddy0 = (dwy * period.toSec() - dy0_) / Tv;
+
   if (command_pub_->trylock())
   {
-    command_pub_->msg_.gx = ux;
-    command_pub_->msg_.gy = uy;
+    command_pub_->msg_.gx = ddx0;
+    command_pub_->msg_.gy = ddy0;
     command_pub_->unlockAndPublish();
   }
 
-  {
-    std::vector<double> z{ 1.23934024e+00,  1.25449097e-02, -7.56690389e-02, 1.94915197e-02,
-                           -2.48908109e-04, 1.97056315e-02, -1.45635425e-03, 1.03694469e-03 };
-    std::vector<double> zref{ 1.29644275, 0., 0., 0., 0., 0., 0., 0. };
-    std::vector<double> last_g{ -0.01027713, 0.01856886 };
+  dx0_ = ddx0 * period.toSec();
+  dy0_ = ddy0 * period.toSec();
 
-    std::vector<double> x0{ 0.01818353,  0.02595379, 0.00907866,  0.03259367,
-                            -0.01027713, 0.01856886, -0.02268865, 0.00656219 };
-
-    std::vector<double> gmin{ -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1 };
-    std::vector<double> gmax{ 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 };
-
-    solver_ = solver(z, zref, last_g);
-    // Solve the problem
-    casadi::DMDict arg = {
-      { "lbx", gmin },
-      { "ubx", gmax },
-      { "x0", x0 },
-    };
-
-    casadi::DMDict res = solver_(arg);
-    ROS_INFO_STREAM(res["x"]);
-  }
-
-  std::vector<double> x0{
-    0.0040685, -0.02000171, 0.0101947, 0.00103702, 0.00799181, 0.01778638, 0.00498826, 0.0260024
-  };
-
-  {
-    casadi::DM z(std::vector<double>{ 1.20927357, -0.24379647, -0.12293626, -0.27332213, 0.05360948, 0.002603,
-                                      -0.06313162, 0.04556808 });
-    casadi::DM g(std::vector<double>{ 0.1, 0.1 });
-    casadi::DM k(std::vector<double>{ 1.0, 2.0 });
-    casadi::DM L = 1.05;
-    casadi::DM Ts = 0.2;
-
-    casadi::Function cd = continuousDynamics();
-    casadi::DM res = cd(std::vector<casadi::DM>{ z, g, k, L }).at(0);
-    // ROS_INFO_STREAM(res);
-
-    casadi::Function dd = discreteDynamics();
-    res = dd(std::vector<casadi::DM>{ z, g, Ts, k, L }).at(0);
-    // ROS_INFO_STREAM(res);
-  }
-
-  crane_tip_velocity_handle_.setCommand({ ux * period.toSec(), uy * period.toSec() });
+  crane_tip_velocity_handle_.setCommand({ dx0_, dy0_ });
+  // crane_tip_velocity_handle_.setCommand({ dwx * period.toSec(), dwy * period.toSec() });
 }
 
 casadi::Function LyapunovPendulumDampingController::continuousDynamics(void)
@@ -203,7 +282,7 @@ casadi::Function LyapunovPendulumDampingController::solver(const std::vector<dou
   SX k = SX::vertcat({ 1.0, 2.0 });
 
   SX R = SX::diagcat({ 0.1, 0.1 });
-  SX Q = SX::diagcat({ 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0 });
+  SX Q = SX::diagcat({ 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
 
   SX J = 0.0;
 
@@ -242,7 +321,8 @@ casadi::Function LyapunovPendulumDampingController::solver(const std::vector<dou
   // std::string solver_name = "sqpmethod";
   solver_opts["verbose"] = false;
   solver_opts["print_time"] = false;
-  if (solver_name == "ipopt") {
+  if (solver_name == "ipopt")
+  {
     solver_opts["ipopt.print_level"] = 0;
   }
 

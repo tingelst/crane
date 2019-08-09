@@ -262,7 +262,7 @@ void CraneVisionNodelet::onInit()
   P2_ << 937.0, 0.0, 637.21, 437579.0, 0.0, 937.0, 381.54, 0.0, 0.0, 0.0, 1.0, 0.0;
 
   hat_thetakm1_.setZero();
-  hat_Pkm1_ << 0.0, 0.0, 0.0, 0.0, 0.04, -0.03;
+  // hat_Pkm1_ << 0.0, 0.0, 0.0, 0.0, 0.04, -0.03;
 }
 
 bool CraneVisionNodelet::extractSphereCenters(const sensor_msgs::ImageConstPtr& image_msg,
@@ -366,10 +366,12 @@ void CraneVisionNodelet::imageCb(const sensor_msgs::ImageConstPtr& image0_msg,
   Vector2d center21 = Vector2d(points2[0] + roi2_.x, points2[1] + roi2_.y);
   Vector2d center22 = Vector2d(points2[2] + roi2_.x, points2[3] + roi2_.y);
 
-  Vector3d Lc0 = findLine(center01, center02, center11, center12, center21, center22, P0_, P1_, P2_);
+  // Vector3d Lc0 = findLine(center01, center02, center11, center12, center21, center22, P0_, P1_, P2_);
+
+
 
   // todo(Lars): Transform to inertial coordinatesA
-  Vector3d Lvec = Lc0;
+  // Vector3d Lvec = Lc0;
 
   // std::tie(hat_thetakm1_, hat_Pkm1_) = ekf(Lvec, AccelerationVector(0.0,0.0), hat_thetakm1_, hat_Pkm1_, 1.05, 0.01);
 

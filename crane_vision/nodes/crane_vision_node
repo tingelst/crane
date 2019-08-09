@@ -40,10 +40,10 @@ P2 = np.dot(np.dot(K2, PII), trf(np.eye(3), t_31))
 
 debug = False
 
-pendulum_pub = rospy.Publisher('pendulum_states', JointState, queue_size=3)
+pendulum_pub = rospy.Publisher('pendulum_joint_states', JointState, queue_size=3)
 
-hat_Pkm1 = np.diag([0, 0, 0, 0, 0, 0])
-hat_thetakm1 = np.array([0, 0, 0, 0, np.deg2rad(2.5), np.deg2rad(-1.7)])
+hat_Pk = np.diag([0, 0, 0, 0, 0, 0])
+hat_thetak = np.array([0, 0, 0, 0, np.deg2rad(2.5), np.deg2rad(-1.7)])
 
 q1 = np.deg2rad(37.4)  # Debug
 ddx = 0.0  # Debug
@@ -57,6 +57,8 @@ previous_time = time.time()
 def callback(msg):
 
     global previous_time
+    global hat_Pk
+    global hat_thetak
 
     points = np.array(msg.data).reshape(-1, 2)
     if not np.isnan(points).any():
@@ -70,26 +72,34 @@ def callback(msg):
                         center21, center22,
                         P0, P1, P2)
 
+        # print(Lc0)
+
         # Find direction vector of a line through the spheres,
         # given in inertial coordinates
         Lvec = np.dot(np.array([[-np.cos(q1), 0, np.sin(q1)],
                                 [np.sin(q1), 0, np.cos(q1)],
                                 [0, 1.0, 0]]), Lc0)
+
         if np.linalg.norm(Lvec) > 0.00001:
             Lvec = Lvec / np.linalg.norm(Lvec)
+
 
         current_time = time.time()
         dt = current_time - previous_time
         previous_time = current_time
 
+        # rospy.loginfo(1.0 / dt)
+
         hat_thetak, hat_Pk, zk = ekf(Lvec, np.array(
-            [ddx, ddy]), hat_Pkm1, hat_thetakm1, q1, Lhat, dt)
+            [ddx, ddy]), hat_Pk, hat_thetak, q1, Lhat, dt)
 
         th, phi, dth, dphi, _, _ = hat_thetak
         msg = JointState()
         msg.header.stamp = rospy.Time.now()
-        msg.position = np.rad2deg([th, phi, zk[0], zk[1]])
-        msg.velocity = np.rad2deg([dth, dphi])
+        msg.name = ['phix_joint', 'phiy_joint']
+        msg.position = [th, phi, zk[0], zk[1]]
+        msg.velocity = [dth, dphi, 0.0, 0.0]
+        msg.effort = [zk[0], zk[1]]
 
         pendulum_pub.publish(msg)
 
