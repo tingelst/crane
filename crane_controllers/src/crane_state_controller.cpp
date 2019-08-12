@@ -49,13 +49,14 @@ bool CraneStateController::init(hardware_interface::RobotHW* robot_hw, ros::Node
 
   // realtime publisher
   joint_realtime_pub_.reset(new realtime_tools::RealtimePublisher<sensor_msgs::JointState>(root_nh, "joint_states", 4));
-  crane_realtime_pub_.reset(new realtime_tools::RealtimePublisher<crane_msgs::CraneState>(root_nh, "crane_states", 4));
 
-  for (unsigned i = 0; i < 2; i++)
-  {
-    crane_realtime_pub_->msg_.position.push_back(0.0);
-    crane_realtime_pub_->msg_.velocity.push_back(0.0);
-  }
+  // crane_realtime_pub_.reset(new realtime_tools::RealtimePublisher<crane_msgs::CraneState>(root_nh, "crane_states", 4));
+  // for (unsigned i = 0; i < 2; i++)
+  // {
+  //   crane_realtime_pub_->msg_.x = 0.0;
+  //   crane_realtime_pub_->msg_.position.push_back(0.0);
+  //   crane_realtime_pub_->msg_.velocity.push_back(0.0);
+  // }
 
   // get joints and allocate message
   for (unsigned i = 0; i < num_hw_joints_; i++)
@@ -107,19 +108,19 @@ void CraneStateController::update(const ros::Time& time, const ros::Duration& /*
   // limit rate of publishing
   if (publish_rate_ > 0.0 && last_publish_time_ + ros::Duration(1.0 / publish_rate_) < time)
   {
-    if (crane_realtime_pub_->trylock())
-    {
-      // populate crane state message:
-      std::array<double, 2> position = crane_tip_state_.getPosition();
-      std::array<double, 2> velocity = crane_tip_state_.getVelocity();
-      crane_realtime_pub_->msg_.header.stamp = time;
-      for (unsigned i = 0; i < 2; ++i)
-      {
-        crane_realtime_pub_->msg_.position[i] = position[i];
-        crane_realtime_pub_->msg_.velocity[i] = velocity[i];
-      }
-      crane_realtime_pub_->unlockAndPublish();
-    }
+    // if (crane_realtime_pub_->trylock())
+    // {
+    //   // populate crane state message:
+    //   std::array<double, 2> position = crane_tip_state_.getPosition();
+    //   std::array<double, 2> velocity = crane_tip_state_.getVelocity();
+    //   crane_realtime_pub_->msg_.header.stamp = time;
+    //   for (unsigned i = 0; i < 2; ++i)
+    //   {
+    //     crane_realtime_pub_->msg_.position[i] = position[i];
+    //     crane_realtime_pub_->msg_.velocity[i] = velocity[i];
+    //   }
+    //   crane_realtime_pub_->unlockAndPublish();
+    // }
 
     // try to publish
     if (joint_realtime_pub_->trylock())

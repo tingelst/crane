@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(catkin REQUIRED COMPONENTS
+  nodelet
   actionlib
   controller_interface
   dynamic_reconfigure
@@ -32,6 +33,7 @@ catkin_python_setup()
 catkin_package(
   LIBRARIES crane_controllers
   CATKIN_DEPENDS
+    nodelet
     actionlib
     controller_interface
     dynamic_reconfigure
@@ -60,7 +62,6 @@ add_library(crane_controllers
 
 target_link_libraries(crane_controllers PUBLIC
   ${catkin_LIBRARIES}
-  ${CASADI_LIBRARIES}
   RMLTypeII
 )
 
@@ -75,8 +76,23 @@ target_include_directories(crane_controllers PUBLIC
   include
 )
 
+add_library(crane_nmpc_nodelet src/crane_nmpc_nodelet.cpp)
+target_link_libraries(crane_nmpc_nodelet 
+  ${catkin_LIBRARIES} 
+  ${CASADI_LIBRARIES}
+  )
+
+target_include_directories(crane_nmpc_nodelet SYSTEM PUBLIC
+  ${CASADI_INCLUDE_DIR}
+  ${catkin_INCLUDE_DIRS}
+)
+
+target_include_directories(crane_nmpc_nodelet PUBLIC
+  include
+)
+
 ## Installation
-install(TARGETS crane_controllers
+install(TARGETS crane_controllers crane_nmpc_nodelet
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -90,6 +106,6 @@ install(DIRECTORY config
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-install(FILES crane_controllers_plugin.xml
+install(FILES crane_controllers_plugin.xml crane_controllers_nodelet.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

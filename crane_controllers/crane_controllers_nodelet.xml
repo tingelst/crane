@@ -1,0 +1,7 @@
+<library path="lib/libcrane_nmpc_nodelet">
+  <class name="crane_controllers/CraneNMPCNodelet" type="crane_controllers::CraneNMPCNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+      crane_nmpc_nodelet
+    </description>
+  </class>
+</library>

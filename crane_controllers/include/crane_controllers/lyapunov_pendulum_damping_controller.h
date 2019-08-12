@@ -38,8 +38,6 @@
 #include <crane_msgs/CraneTrajectoryPoint.h>
 #include <crane_hw_interface/crane_tip_velocity_command_interface.h>
 
-// Casadi
-#include "casadi/casadi.hpp"
 
 namespace crane_controllers
 {
@@ -55,19 +53,14 @@ private:
   crane_hw_interface::CraneTipVelocityCommandInterface* crane_tip_velocity_command_interface_;
   crane_hw_interface::CraneTipVelocityHandle crane_tip_velocity_handle_;
 
-  // RML
-  std::unique_ptr<ReflexxesAPI> rml_;
-  std::unique_ptr<RMLPositionInputParameters> rml_input_;
-  std::unique_ptr<RMLPositionOutputParameters> rml_output_;
-  RMLPositionFlags rml_flags_;
-
   ros::Subscriber command_sub_;
-  realtime_tools::RealtimeBuffer<crane_msgs::CraneTrajectoryPoint> command_buffer_;
+  realtime_tools::RealtimeBuffer<crane_msgs::CraneControl> command_buffer_;
 
   ros::Subscriber pendulum_joint_state_sub_;
   realtime_tools::RealtimeBuffer<std::array<double, 4>> pendulum_joint_state_buffer_;
 
   std::unique_ptr<realtime_tools::RealtimePublisher<crane_msgs::CraneControl>> command_pub_;
+  std::unique_ptr<realtime_tools::RealtimePublisher<crane_msgs::CraneState>> state_pub_;
   std::unique_ptr<realtime_tools::RealtimePublisher<sensor_msgs::JointState>> trajectory_pub_;
 
   void pendulumJointStateCB(const sensor_msgs::JointState::ConstPtr& msg)
@@ -76,22 +69,17 @@ private:
         { msg->position[0], msg->velocity[0], msg->position[1], msg->velocity[1] });
   }
 
-  void commandCB(const crane_msgs::CraneTrajectoryPoint::ConstPtr& msg)
+  void commandCB(const crane_msgs::CraneControl::ConstPtr& msg)
   {
     command_buffer_.writeFromNonRT(*msg);
   }
 
-  casadi::Function continuousDynamics(void);
-  casadi::Function discreteDynamics(void);
-
-  casadi::Function solver(const std::vector<double>& z, const std::vector<double>& zref,
-                          const std::vector<double>& last_g);
-  casadi::Function solver_;
-
-  std::vector<double> last_g_;
-  std::vector<double> last_gopt_;
   double dx0_{ 0.0 };
   double dy0_{ 0.0 };
+  double last_wx_{0.0};
+  double last_wy_{0.0};
+  double last_dx0_{0.0};
+  double last_dy0_{0.0};
 };
 
 }  // namespace crane_controllers
