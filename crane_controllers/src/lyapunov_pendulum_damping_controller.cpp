@@ -34,6 +34,7 @@ bool LyapunovPendulumDampingController::init(hardware_interface::RobotHW* robot_
   pendulum_joint_state_buffer_.writeFromNonRT({ 0.0, 0.0, 0.0, 0.0 });
 
   command_pub_.reset(new realtime_tools::RealtimePublisher<crane_msgs::CraneControl>(node_handle, "commanded", 3));
+
   trajectory_pub_.reset(new realtime_tools::RealtimePublisher<sensor_msgs::JointState>(node_handle, "zref", 3));
   trajectory_pub_->msg_.name.push_back("x");
   trajectory_pub_->msg_.name.push_back("y");
@@ -80,6 +81,7 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
   std::array<double, 2> position = crane_tip_velocity_handle_.getPosition();
   std::array<double, 2> velocity = crane_tip_velocity_handle_.getVelocity();
 
+  /*
   for (std::size_t i = 0; i < 2; ++i)
   {
     rml_input_->CurrentPositionVector->VecData[i] = position[i];
@@ -97,11 +99,16 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
     ROS_ERROR_STREAM("RML error: " << result);
   }
 
+  */
+
   // Damping
   std::array<double, 4> q = *pendulum_joint_state_buffer_.readFromRT();
 
-  double kp = 1.0 / 2.0;
-  double kd = 2.0 / 2.0;
+  // Gains
+  double kp = 1.0;
+  double kd = 2.0;
+
+  // Pendulum states
   double phix = q[0];
   double dphix = q[1];
   double phiy = q[2];
@@ -119,19 +126,22 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
   double ux = L / cy * (kd * dphiy + kp * phiy) - L * sy * dphix * dphix - uy * sx * sy / cy;
 
   // DEBUG
-  ux = 0.0;
-  uy = 0.0;
+  /*
+  std::vector<double> z{ 0.05, 0.02, 1.3, 0.01, 0.01, 0.01, 0.01, 0.01 };
+  std::vector<double> zref{ 0.0, 0.0, 1.5, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  last_gopt_ = std::vector<double>{-0.0358, -0.0415, -0.0192, -0.0214, -0.0137, -0.0017, -0.0123, 0.0098};
+  last_g_ = std::vector<double>{-0.0192, -0.0214};
+  */
 
   std::vector<double> z{ position[0], velocity[0], position[1], velocity[1], phix, dphix, phiy, dphiy };
-
-  std::vector<double> zref{ 1.5,
+  std::vector<double> zref{ trajectory_point.position[0],
+                            trajectory_point.velocity[0],
+                            trajectory_point.position[1],
+                            trajectory_point.velocity[1],
                             0.0,
-                            1.5,
                             0.0,
-                            0.,
-                            0.,
-                            0.,
-                            0. };
+                            0.0,
+                            0.0 };
 
   // std::vector<double> zref{ rml_output_->NewPositionVector->VecData[0],
   //                           rml_output_->NewVelocityVector->VecData[0],
@@ -152,11 +162,10 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
     trajectory_pub_->unlockAndPublish();
   }
 
-  // ROS_INFO("%f, %f, %f. %f",   zref[0], zref[1], zref[2], zref[3]);
-
   // Solve the problem
-  std::vector<double> gmin{ -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1 };
-  std::vector<double> gmax{ 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 };
+  double max = 1.0;
+  std::vector<double> gmin{ -max, -max, -max, -max, -max, -max, -max, -max };
+  std::vector<double> gmax{ max, max, max, max, max, max, max, max };
 
   solver_ = solver(z, zref, last_g_);
   std::vector<double> sol;
@@ -165,16 +174,23 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
   double gx = sol[0];
   double gy = sol[1];
 
+  ROS_INFO("%f, %f, %f, %f, %f, %f, %f, %f", zref[0], zref[1], zref[2], zref[3], zref[4], zref[5], zref[6], zref[7]);
+  // ROS_INFO("%f, %f, %f, %f, %f, %f, %f, %f", sol[0], sol[1], sol[2], sol[3], sol[4], sol[5], sol[6], sol[7]);
+
   // Store the results for next cycle
   last_gopt_ = sol;
   last_g_ = std::vector<double>{ { gx, gy } };
 
+  // Velocity loop
+  double Tv = 0.2;
   double dwx = ux + gx;
   double dwy = uy + gy;
-
-  double Tv = 0.2;
-  double ddx0 = (dwx * period.toSec() - dx0_) / Tv;
-  double ddy0 = (dwy * period.toSec() - dy0_) / Tv;
+  double wx = dwx * period.toSec();
+  double wy = dwy * period.toSec();
+  double ddx0 = (wx - dx0_) / Tv;
+  double ddy0 = (wy - dy0_) / Tv;
+  dx0_ = ddx0 * period.toSec();
+  dy0_ = ddy0 * period.toSec();
 
   if (command_pub_->trylock())
   {
@@ -183,11 +199,7 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
     command_pub_->unlockAndPublish();
   }
 
-  dx0_ = ddx0 * period.toSec();
-  dy0_ = ddy0 * period.toSec();
-
   crane_tip_velocity_handle_.setCommand({ dx0_, dy0_ });
-  // crane_tip_velocity_handle_.setCommand({ dwx * period.toSec(), dwy * period.toSec() });
 }
 
 casadi::Function LyapunovPendulumDampingController::continuousDynamics(void)
@@ -282,7 +294,7 @@ casadi::Function LyapunovPendulumDampingController::solver(const std::vector<dou
   SX k = SX::vertcat({ 1.0, 2.0 });
 
   SX R = SX::diagcat({ 0.1, 0.1 });
-  SX Q = SX::diagcat({ 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
+  SX Q = SX::diagcat({ 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0 });
 
   SX J = 0.0;
 

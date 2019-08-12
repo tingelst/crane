@@ -17,21 +17,22 @@ class SphericalPendulumVisualization(object):
     def __init__(self):
         self._joint_state_pub = rospy.Publisher(
             'pendulum_joint_states', JointState, queue_size=5)
+
         self._command_sub = rospy.Subscriber(
             '/lyapunov_pendulum_damping_controller/commanded', CraneControl, callback=self._command_cb)
 
         self._command = np.array([0.0, 0.0])
+
         self._command_lock = Lock()
 
     def _command_cb(self, msg):
         self._command_lock.acquire()
         self._command = np.array([msg.gx, msg.gy])
-        # print(self._command)
         self._command_lock.release()
 
     def run(self):
 
-        q = np.deg2rad([0, 0.0, 0, 0.0])
+        q = np.deg2rad([7.0, 0.0, -7.0, 0.0])
 
         start_time = time.time()
         current_time = start_time

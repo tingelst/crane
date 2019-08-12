@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     // Send new setpoint to robot
     hardware_interface.write(timestamp, period);
 
-    rate.sleep();
+    // rate.sleep();
   }
 
   spinner.stop();
