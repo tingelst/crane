@@ -1,6 +1,6 @@
 <launch>
+    <!-- <node pkg="crane_pendulum_dynamics" type="spherical_pendulum_visualization" name="simulated_pendulum" output="screen"/> -->
     <node pkg="nodelet" type="nodelet" name="crane_nmpc_nodelet_manager" args="manager" output="screen"/>
-
     <node pkg="nodelet" type="nodelet" name="crane_nmpc_nodelet" args="load crane_controllers/CraneNMPCNodelet crane_nmpc_nodelet_manager" output="screen">
         <!-- <param name="frame_id" value="camera0" />
         <param name="device_id" value="2" />
@@ -8,5 +8,4 @@
         <param name="image_height" value="720"/>
         <param name="rate" value="30.0" /> -->
     </node>
-
 </launch>

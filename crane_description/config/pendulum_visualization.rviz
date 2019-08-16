@@ -8,6 +8,7 @@ Panels:
         - /Status1
         - /RobotModel1
         - /RobotModel1/Links1
+        - /RobotModel1/Links1/tip_link1
         - /TF1
         - /TF1/Frames1
         - /TF1/Tree1
@@ -136,10 +137,14 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        tip_link:
+        suspension_frame1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        tip_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: true
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
@@ -181,6 +186,8 @@ Visualization Manager:
           Value: false
         suspension_frame:
           Value: true
+        suspension_frame1:
+          Value: false
         tip_link:
           Value: false
       Marker Scale: 1
@@ -201,13 +208,14 @@ Visualization Manager:
                     {}
                 link4:
                   tip_link:
-                    suspension_frame:
-                      pendulum_base_link:
-                        pendulum_frame1:
-                          pendulum_frame2:
-                            pendulum_wire:
-                              pendulum_payload:
-                                {}
+                    suspension_frame1:
+                      suspension_frame:
+                        pendulum_base_link:
+                          pendulum_frame1:
+                            pendulum_frame2:
+                              pendulum_wire:
+                                pendulum_payload:
+                                  {}
       Update Interval: 0
       Value: true
   Enabled: true
@@ -249,10 +257,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.060399241745471954
+      Pitch: 0.6853991746902466
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.5654011964797974
+      Yaw: 1.375401258468628
     Saved: ~
 Window Geometry:
   Displays:
@@ -271,4 +279,4 @@ Window Geometry:
     collapsed: true
   Width: 1940
   X: 884
-  Y: 257
+  Y: 146

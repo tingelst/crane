@@ -3,7 +3,7 @@
 
   <node pkg="nodelet" type="nodelet" name="camera0" args="load cv_camera/CvCameraNodelet crane_vision_nodelet_manager" output="screen">
     <param name="frame_id" value="camera0" />
-    <param name="device_id" value="2" />
+    <param name="device_id" value="4" />
     <param name="image_width" value="1280"/>
     <param name="image_height" value="720"/>
     <param name="rate" value="30.0" />
@@ -11,7 +11,7 @@
 
   <node pkg="nodelet" type="nodelet" name="camera1" args="load cv_camera/CvCameraNodelet crane_vision_nodelet_manager" output="screen">
     <param name="frame_id" value="camera1" />
-    <param name="device_id" value="4" />
+    <param name="device_id" value="2" />
     <param name="image_width" value="1280"/>
     <param name="image_height" value="720"/>
     <param name="rate" value="30.0" />
@@ -40,9 +40,9 @@
     <rosparam param="debug">false</rosparam>
   </node>
 
-  <node pkg="nodelet" type="nodelet" name="crane_vision_ekf" args="load crane_vision/CraneVisionEKF crane_vision_nodelet_manager" output="screen">
-  </node>
+  <!-- <node pkg="nodelet" type="nodelet" name="crane_vision_ekf" args="load crane_vision/CraneVisionEKF crane_vision_nodelet_manager" output="screen"> -->
+  <!-- </node> -->
 
-  <!-- <node pkg="crane_vision" type="crane_vision_node" name="crane_vision_ekf" output="screen"/> -->
+  <node pkg="crane_vision" type="crane_vision_node" name="crane_vision_ekf" output="screen"/>
 
 </launch>

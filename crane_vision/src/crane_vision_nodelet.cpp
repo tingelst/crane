@@ -389,4 +389,3 @@ void CraneVisionNodelet::imageCb(const sensor_msgs::ImageConstPtr& image0_msg,
 // Register nodelet
 #include <pluginlib/class_list_macros.h>
 PLUGINLIB_EXPORT_CLASS(crane_vision::CraneVisionNodelet, nodelet::Nodelet)
-PLUGINLIB_EXPORT_CLASS(crane_vision::CraneVisionEKF, nodelet::Nodelet)

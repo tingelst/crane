@@ -154,7 +154,8 @@ void CraneHardwareInterface::read(const ros::Time& time, const ros::Duration& pe
   actuator_velocity_[1] = vars_cont[4];
   actuator_velocity_[2] = vars_cont[5];
 
-  joint_position_[0] = actuator_position_[0] * DEG2RAD; 
+  joint_position_[0] = actuator_position_[0] * DEG2RAD;
+  joint_velocity_[0] = actuator_velocity_[0] * 0.1047;
 
   double e1 = 0.154236;
   double a1 = 0.550;
@@ -165,6 +166,7 @@ void CraneHardwareInterface::read(const ros::Time& time, const ros::Duration& pe
   double b2 = sqrt(a2 * a2 + e2 * e2);
   double u = (l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2);
   joint_position_[1] = acos(u) + atan(e1 / a1) + atan(e2 / a2) - PI_2;
+  joint_velocity_[1] = -((1.0 / sqrt(1.0 - u * u)) * (l / (-b1 * b2))) * actuator_velocity_[1] * (-2.5 / 60000.0);
 
   e1 = 0.160;
   a1 = 0.750;
@@ -174,6 +176,7 @@ void CraneHardwareInterface::read(const ros::Time& time, const ros::Duration& pe
   b1 = sqrt(a1 * a1 + e1 * e1);
   b2 = sqrt(a2 * a2 + e2 * e2);
   joint_position_[2] = acos((l * l - b1 * b1 - b2 * b2) / (-2.0 * b1 * b2)) + atan(e1 / a1) + atan(e2 / a2) + PI;
+  joint_velocity_[2] = -((1.0 / sqrt(1.0 - u * u)) * (l / (-b1 * b2))) * actuator_velocity_[2] * (-2.5 / 60000.0);
 
   KDL::JntArray q(n_dof_);
   KDL::JntArray qd(n_dof_);

@@ -7,6 +7,7 @@ import time
 
 from std_msgs.msg import Float64MultiArray
 from sensor_msgs.msg import JointState
+from crane_msgs.msg import CraneControl
 
 from crane_vision.transformations import trf
 from crane_vision.camera import CameraArray
@@ -50,6 +51,8 @@ ddx = 0.0  # Debug
 ddy = 0.0  # Debug
 Lhat = 1.05  # Debug
 
+
+
 dt = 1.0/30.0
 
 previous_time = time.time()
@@ -59,6 +62,7 @@ def callback(msg):
     global previous_time
     global hat_Pk
     global hat_thetak
+    global q1
 
     points = np.array(msg.data).reshape(-1, 2)
     if not np.isnan(points).any():
@@ -72,13 +76,18 @@ def callback(msg):
                         center21, center22,
                         P0, P1, P2)
 
-        # print(Lc0)
 
         # Find direction vector of a line through the spheres,
         # given in inertial coordinates
-        Lvec = np.dot(np.array([[-np.cos(q1), 0, np.sin(q1)],
-                                [np.sin(q1), 0, np.cos(q1)],
-                                [0, 1.0, 0]]), Lc0)
+        q1 = -1.0 * q1
+        Lvec = np.dot(np.array([[-np.cos(q1), 0,  np.sin(q1)],
+                                [np.sin(q1),  0,   np.cos(q1)],
+                                [0,          1.0, 0]]), Lc0)
+
+
+        # Lvec = np.dot(np.array([[np.cos(q1), -np.sin(q1), 0], 
+        #                         [0.0, 0.0, -1.0], 
+        #                         [np.sin(q1), np.cos(q1), 0.0]]), Lc0)
 
         if np.linalg.norm(Lvec) > 0.00001:
             Lvec = Lvec / np.linalg.norm(Lvec)
@@ -103,11 +112,23 @@ def callback(msg):
 
         pendulum_pub.publish(msg)
 
+def joint_state_callback(msg):
+    global q1
+    q1 = msg.position[0]
+
+def command_callback(msg):
+    global ddx
+    global ddy
+    ddx = msg.gx
+    ddy = msg.gy
     
 def main():
     rospy.init_node('crane_vision_node')
 
     points_sub = rospy.Subscriber('/crane_vision_nodelet/points', Float64MultiArray, callback)
+    joint_state_sub = rospy.Subscriber('/crane_state_controller/joint_states', JointState, joint_state_callback)
+    commanded_sub = rospy.Subscriber(
+        '/lyapunov_pendulum_damping_controller/commanded', CraneControl, callback=command_callback)
 
     rospy.spin()
 

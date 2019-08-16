@@ -33,7 +33,7 @@ class CraneNMPCNodelet : public nodelet::Nodelet
   double gx_{ 0.0 };
   double gy_{ 0.0 };
 
-  double max_ = 0.3;
+  double max_ = 0.1;
   std::vector<double> gmin_;
   std::vector<double> gmax_;
 
@@ -78,7 +78,7 @@ void CraneNMPCNodelet::run()
       crane_msgs::CraneState state = *state_buffer_.readFromRT();
 
       std::vector<double> z{ state.x, state.dx, state.y, state.dy, state.phix, state.dphix, state.phiy, state.dphiy };
-      std::vector<double> zref{ 1.5, 0.0, -1.5, 0.0, 0.0, 0.0, 0.0, 0.0 };
+      std::vector<double> zref{ 1.5, 0.0, 1.5, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
       // Solve the problem
       solver_ = solver(z, zref, last_g_);

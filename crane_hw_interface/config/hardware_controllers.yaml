@@ -1,6 +1,6 @@
 crane_state_controller:
   type: crane_controllers/CraneStateController
-  publish_rate: 50
+  publish_rate: 60
 
 crane_tip_velocity_controller:
   type: crane_controllers/CraneTipVelocityController
