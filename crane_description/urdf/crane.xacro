@@ -14,6 +14,13 @@
 
     <link name="base_link"/>
 
+    <joint name="base_link_command_frame_fixed" type="fixed">
+      <parent link="base_link"/>
+      <child link="command_frame"/>
+      <origin xyz="0 0 0" rpy="0 ${radians(180)} ${radians(-90)}"/>
+    </joint>
+    <link name="command_frame"/>
+
     <joint name="fixed" type="fixed">
       <parent link="base_link"/>
       <child link="link1"/>

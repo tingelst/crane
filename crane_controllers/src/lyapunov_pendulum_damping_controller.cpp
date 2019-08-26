@@ -82,8 +82,6 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
   double gx = nmpc_command.gx;
   double gy = nmpc_command.gy;
 
-  // ROS_INFO("gx: %f, gy %f", gx, gy);
-
   // Gains
   double kp = 1.0;
   double kd = 2.0;
@@ -101,8 +99,12 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
 
   // Velocity loop
   double Tv = 0.2;
-  double dwx = ux + gx;
-  double dwy = uy + gy;
+  // double dwx = ux + gx;
+  // double dwy = uy + gy;
+
+  double dwx = gx;
+  double dwy = gy;
+
   double wx = dwx * period.toSec() + last_wx_; 
   double wy = dwy * period.toSec() + last_wy_;
   double ddx0 = (wx - dx0_) / Tv;
@@ -117,6 +119,7 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
 
   if (command_pub_->trylock())
   {
+    command_pub_->msg_.header.stamp = now;
     command_pub_->msg_.gx = ddx0;
     command_pub_->msg_.gy = ddy0;
     command_pub_->unlockAndPublish();

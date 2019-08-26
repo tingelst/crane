@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   image_transport
   nodelet
+  crane_msgs
 )
 
 find_package(OpenCV REQUIRED)

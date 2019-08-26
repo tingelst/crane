@@ -17,6 +17,8 @@
 #include <cv_bridge/cv_bridge.h>
 #include <std_msgs/Float64MultiArray.h>
 
+#include <crane_msgs/CranePendulumImagePoints.h>
+
 namespace crane_vision
 {
 using namespace sensor_msgs;
@@ -255,7 +257,7 @@ void CraneVisionNodelet::onInit()
   image2_sub_.subscribe(*it_, "/camera2/image_raw", 1);
   image2_info_sub_.subscribe(nh, "/camera2/camera_info", 1);
 
-  pub_ = private_nh.advertise<std_msgs::Float64MultiArray>("points", 1);
+  pub_ = private_nh.advertise<crane_msgs::CranePendulumImagePoints>("points", 1);
 
   P0_ << 942.0, 0.0, 623.66, 0.0, 0.0, 942.0, 345.69, 0.0, 0.0, 0.0, 1.0, 0.0;
   P1_ << 941.0, 0.0, 637.21, 220005.80000000002, 0.0, 941.0, 349.9, 0.0, 0.0, 0.0, 1.0, 0.0;
@@ -375,9 +377,11 @@ void CraneVisionNodelet::imageCb(const sensor_msgs::ImageConstPtr& image0_msg,
 
   // std::tie(hat_thetakm1_, hat_Pkm1_) = ekf(Lvec, AccelerationVector(0.0,0.0), hat_thetakm1_, hat_Pkm1_, 1.05, 0.01);
 
-  std_msgs::Float64MultiArray msg;
+  crane_msgs::CranePendulumImagePoints msg;
+  // Reuse the synchronized time stamp
+  msg.header.stamp = image0_msg->header.stamp;
   std::vector<double> data(12);
-  msg.data =
+  msg.points =
       std::vector<double>{ points0[0] + roi0_.x, points0[1] + roi0_.y, points0[2] + roi0_.x, points0[3] + roi0_.y,
                            points1[0] + roi1_.y, points1[1] + roi1_.y, points1[2] + roi1_.y, points1[3] + roi1_.y,
                            points2[0] + roi2_.y, points2[1] + roi2_.y, points2[2] + roi2_.y, points2[3] + roi2_.y };

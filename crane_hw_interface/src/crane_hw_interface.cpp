@@ -48,7 +48,7 @@ void CraneHardwareInterface::init()
 
   // Initialize KDL structures
   std::string tip_link, root_link;
-  nh_.param<std::string>("root_name", root_link, "base_link");
+  nh_.param<std::string>("root_name", root_link, "command_frame");
   nh_.param<std::string>("tip_name", tip_link, "tip_link");
 
   // Load URDF

@@ -22,6 +22,7 @@ add_message_files(
   CraneState.msg
   CraneTrajectoryPoint.msg
   CraneTrajectory.msg
+  CranePendulumImagePoints.msg
 )
 
 generate_messages(

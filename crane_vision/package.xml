@@ -24,6 +24,7 @@
   <depend>image_transport</depend>
   <depend>cv_bridge</depend>
   <depend>geometry_msgs</depend>
+  <depend>crane_msgs</depend>
 
   <exec_depend>python-numpy</exec_depend>
   <exec_depend>python-scipy</exec_depend>

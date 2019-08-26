@@ -16,7 +16,7 @@
     <rosparam>
       joint_names: ["joint1", "joint2", "joint3"]
       actuator_names: ["actuator1", "actuator2", "actuator3"]
-      initial_actuator_position: [0.3, 0.8, 0.8]
+      initial_actuator_position: [0.8357947147228622, 0.8, 0.8]
     </rosparam>
   </node>
 
