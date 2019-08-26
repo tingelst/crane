@@ -78,6 +78,7 @@ void CraneNMPCNodelet::run()
       crane_msgs::CraneState state = *state_buffer_.readFromRT();
 
       std::vector<double> z{ state.x, state.dx, state.y, state.dy, state.phix, state.dphix, state.phiy, state.dphiy };
+      
       std::vector<double> zref{ 0.5, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
       // Solve the problem

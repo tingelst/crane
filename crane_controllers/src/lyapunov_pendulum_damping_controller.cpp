@@ -99,12 +99,8 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
 
   // Velocity loop
   double Tv = 0.2;
-  // double dwx = ux + gx;
-  // double dwy = uy + gy;
-
-  double dwx = gx;
-  double dwy = gy;
-
+  double dwx = ux + gx;
+  double dwy = uy + gy;
   double wx = dwx * period.toSec() + last_wx_; 
   double wy = dwy * period.toSec() + last_wy_;
   double ddx0 = (wx - dx0_) / Tv;

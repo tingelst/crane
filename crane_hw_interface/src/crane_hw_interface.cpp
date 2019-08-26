@@ -208,8 +208,8 @@ void CraneHardwareInterface::write(const ros::Time& time, const ros::Duration& p
   double theta = joint_position_[0];
 
   std::array<double, 2> command{
-    (cos(theta) * crane_tip_velocity_command_[0] + sin(theta) * crane_tip_velocity_command_[1]) * -1.0,
-    (-sin(theta) * crane_tip_velocity_command_[0] / r + cos(theta) * crane_tip_velocity_command_[1] / r) * 9.549
+    (cos(theta) * crane_tip_velocity_command_[1] + sin(theta) * crane_tip_velocity_command_[0]) * -1.0,
+    (-sin(theta) * crane_tip_velocity_command_[1] / r + cos(theta) * crane_tip_velocity_command_[0] / r) * 9.549
   };
 
   MLPIRESULT result =

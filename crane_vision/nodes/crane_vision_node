@@ -88,7 +88,6 @@ def callback(points_msg, joint_state_msg, commanded_msg):
         previous_time = current_time
 
         ddx, ddy = commanded_msg.gx, commanded_msg.gy
-        ddx, ddy = 0.0, 0.0
 
         hat_thetak, hat_Pk, zk = ekf(Lvec, np.array(
             [ddx, ddy]), hat_Pk, hat_thetak, q1, Lhat, dt)

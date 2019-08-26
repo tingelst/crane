@@ -35,7 +35,7 @@
     <rosparam param="smax">250</rosparam>
     <rosparam param="vmin">86</rosparam>
     <rosparam param="vmax">255</rosparam>
-    <rosparam param="queue_size">10</rosparam>
+    <rosparam param="queue_size">2</rosparam>
     <rosparam param="approximate_sync">true</rosparam>
     <rosparam param="debug">false</rosparam>
   </node>
