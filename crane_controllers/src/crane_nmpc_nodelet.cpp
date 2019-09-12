@@ -4,9 +4,9 @@
 #include "std_msgs/String.h"
 #include <crane_msgs/CraneState.h>
 #include <crane_msgs/CraneControl.h>
+#include <crane_msgs/CraneTrajectoryPoint.h>
 #include <realtime_tools/realtime_buffer.h>
 #include <realtime_tools/realtime_publisher.h>
-
 
 // Casadi
 #include "casadi/casadi.hpp"
@@ -20,7 +20,9 @@ class CraneNMPCNodelet : public nodelet::Nodelet
 
   std::unique_ptr<realtime_tools::RealtimePublisher<crane_msgs::CraneControl>> command_pub_;
   ros::Subscriber state_sub_;
+  ros::Subscriber trajectory_point_sub_;
   realtime_tools::RealtimeBuffer<crane_msgs::CraneState> state_buffer_;
+  realtime_tools::RealtimeBuffer<crane_msgs::CraneTrajectoryPoint> trajectory_buffer_;
 
   casadi::Function continuousDynamics(void);
   casadi::Function discreteDynamics(void);
@@ -43,9 +45,21 @@ class CraneNMPCNodelet : public nodelet::Nodelet
   {
     if (!initialized_)
     {
+      crane_msgs::CraneTrajectoryPoint trajectory_point;
+      trajectory_point.position.push_back(msg->x);
+      trajectory_point.position.push_back(msg->y);
+      trajectory_point.velocity.push_back(msg->dx);
+      trajectory_point.velocity.push_back(msg->dy);
+      trajectory_buffer_.writeFromNonRT(trajectory_point);
+
       initialized_ = true;
     }
     state_buffer_.writeFromNonRT(*msg);
+  }
+
+  void trajectoryCB(const crane_msgs::CraneTrajectoryPoint::ConstPtr& msg)
+  {
+    trajectory_buffer_.writeFromNonRT(*msg);
   }
 };
 
@@ -57,6 +71,9 @@ void CraneNMPCNodelet::onInit()
   command_pub_.reset(new realtime_tools::RealtimePublisher<crane_msgs::CraneControl>(private_nh, "command", 3));
   state_sub_ = nh.subscribe<crane_msgs::CraneState>("/lyapunov_pendulum_damping_controller/state", 1,
                                                     &CraneNMPCNodelet::stateCB, this);
+
+  trajectory_point_sub_ =
+      nh.subscribe<crane_msgs::CraneTrajectoryPoint>("/crane_trajectory", 1, &CraneNMPCNodelet::trajectoryCB, this);
 
   last_g_ = std::vector<double>{ { 0.0, 0.0 } };
   last_gopt_ = std::vector<double>{ { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } };
@@ -78,8 +95,19 @@ void CraneNMPCNodelet::run()
       crane_msgs::CraneState state = *state_buffer_.readFromRT();
 
       std::vector<double> z{ state.x, state.dx, state.y, state.dy, state.phix, state.dphix, state.phiy, state.dphiy };
-      
-      std::vector<double> zref{ 0.5, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+
+      crane_msgs::CraneTrajectoryPoint trajectory_point = *trajectory_buffer_.readFromRT();
+
+      std::vector<double> zref{ trajectory_point.position[0],
+                                trajectory_point.velocity[0],
+                                trajectory_point.position[1],
+                                trajectory_point.velocity[1],
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0 };
+
+      // std::vector<double> zref{ 0.5, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
       // Solve the problem
       solver_ = solver(z, zref, last_g_);
