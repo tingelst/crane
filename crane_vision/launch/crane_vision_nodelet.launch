@@ -27,8 +27,8 @@
 
   <node pkg="nodelet" type="nodelet" name="crane_vision_nodelet" args="load crane_vision/CraneVisionNodelet crane_vision_nodelet_manager" output="screen">
     <rosparam param="roi0">[450, 100, 640, 360]</rosparam>
-    <rosparam param="roi1">[200, 100, 640, 360]</rosparam>
-    <rosparam param="roi2">[150, 100, 640, 360]</rosparam>
+    <rosparam param="roi1">[250, 50, 640, 360]</rosparam>
+    <rosparam param="roi2">[150, 50, 640, 360]</rosparam>
     <rosparam param="hmin">43</rosparam>
     <rosparam param="hmax">73</rosparam>
     <rosparam param="smin">54</rosparam>

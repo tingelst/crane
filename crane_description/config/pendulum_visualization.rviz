@@ -74,6 +74,10 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        command_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         cylinder1:
           Alpha: 1
           Show Axes: false
@@ -161,6 +165,8 @@ Visualization Manager:
         All Enabled: false
         base_link:
           Value: false
+        command_frame:
+          Value: true
         cylinder1:
           Value: false
         cylinder2:
@@ -200,6 +206,8 @@ Visualization Manager:
       Show Names: false
       Tree:
         base_link:
+          command_frame:
+            {}
           link1:
             link2:
               cylinder1:
@@ -260,10 +268,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8953994512557983
+      Pitch: 0.43539929389953613
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.3354003429412842
+      Yaw: 1.4454002380371094
     Saved: ~
 Window Geometry:
   Displays:
@@ -282,4 +290,4 @@ Window Geometry:
     collapsed: true
   Width: 1940
   X: 1176
-  Y: 565
+  Y: 528

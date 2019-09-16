@@ -52,65 +52,131 @@ ddx = 0.0
 ddy = 0.0
 
 previous_time = time.time()
+start_time = time.time()
 
-def callback(points_msg, joint_state_msg, commanded_msg):
+initialized = False
+
+def init_callback(points_msg, joint_state_msg):
 
     global previous_time
     global hat_Pk
     global hat_thetak
+    global initialized
 
-    points = np.array(points_msg.points).reshape(-1, 2)
-    
-    if not np.isnan(points).any():
-        center01, center02, center11, center12, center21, center22 = points
+    if not initialized:
+        points = np.array(points_msg.points).reshape(-1, 2)
+        
+        if not np.isnan(points).any():
+            center01, center02, center11, center12, center21, center22 = points
 
-        # Find direction vector of a line through the spheres,
-        # given in camera coordinates
-        Lc0 = find_line(center01, center02,
-                        center11, center12,
-                        center21, center22,
-                        P0, P1, P2)
+            # Find direction vector of a line through the spheres,
+            # given in camera coordinates
+            Lc0 = find_line(center01, center02,
+                            center11, center12,
+                            center21, center22,
+                            P0, P1, P2)
 
 
-        # Find direction vector of a line through the spheres,
-        # given in inertial coordinates
-        q1 = 1.0 * joint_state_msg.position[0]
+            # Find direction vector of a line through the spheres,
+            # given in inertial coordinates
+            q1 = 1.0 * joint_state_msg.position[0]
 
-        Lvec = np.dot(np.array([[-np.cos(q1), 0,  np.sin(q1)],
-                                [np.sin(q1),  0,   np.cos(q1)],
-                                [0,          1.0, 0]]), Lc0)
+            Lvec = np.dot(np.array([[-np.cos(q1), 0,  np.sin(q1)],
+                                    [np.sin(q1),  0,   np.cos(q1)],
+                                    [0,          1.0, 0]]), Lc0)
 
-        if np.linalg.norm(Lvec) > 0.00001:
-            Lvec = Lvec / np.linalg.norm(Lvec)
+            if np.linalg.norm(Lvec) > 0.00001:
+                Lvec = Lvec / np.linalg.norm(Lvec)
 
-        current_time = time.time()
-        dt = current_time - previous_time
-        previous_time = current_time
+            current_time = time.time()
+            dt = current_time - previous_time
+            previous_time = current_time
 
-        ddx, ddy = commanded_msg.gx, commanded_msg.gy
+            ddx, ddy = 0.0, 0.0
 
-        hat_thetak, hat_Pk, zk = ekf(Lvec, np.array(
-            [ddx, ddy]), hat_Pk, hat_thetak, q1, Lhat, dt)
+            hat_thetak, hat_Pk, zk = ekf(Lvec, np.array(
+                [ddx, ddy]), hat_Pk, hat_thetak, q1, Lhat, dt)
 
-        th, phi, dth, dphi, _, _ = hat_thetak
-        msg = JointState()
-        msg.header.stamp = points_msg.header.stamp
-        msg.name = ['phix_joint', 'phiy_joint']
-        msg.position = [th, phi, zk[0], zk[1]]
-        msg.velocity = [dth, dphi, 0.0, 0.0]
-        msg.effort = [zk[0], zk[1]]
+            th, phi, dth, dphi, _, _ = hat_thetak
+            msg = JointState()
+            msg.header.stamp = points_msg.header.stamp
+            msg.name = ['phix_joint', 'phiy_joint']
+            msg.position = [th, phi, zk[0], zk[1]]
+            msg.velocity = [dth, dphi, 0.0, 0.0]
+            msg.effort = [zk[0], zk[1]]
 
-        pendulum_pub.publish(msg)
+            pendulum_pub.publish(msg)
+
+def callback(points_msg, joint_state_msg, commanded_msg=None):
+
+    global previous_time
+    global hat_Pk
+    global hat_thetak
+    global initialized
+
+    if not initialized:
+        initialized = True
+        rospy.loginfo('EKF: Initialized')
+    else:
+        points = np.array(points_msg.points).reshape(-1, 2)
+        
+        if not np.isnan(points).any():
+            center01, center02, center11, center12, center21, center22 = points
+
+            # Find direction vector of a line through the spheres,
+            # given in camera coordinates
+            Lc0 = find_line(center01, center02,
+                            center11, center12,
+                            center21, center22,
+                            P0, P1, P2)
+
+
+            # Find direction vector of a line through the spheres,
+            # given in inertial coordinates
+            q1 = 1.0 * joint_state_msg.position[0]
+
+            Lvec = np.dot(np.array([[-np.cos(q1), 0,  np.sin(q1)],
+                                    [np.sin(q1),  0,   np.cos(q1)],
+                                    [0,          1.0, 0]]), Lc0)
+
+            if np.linalg.norm(Lvec) > 0.00001:
+                Lvec = Lvec / np.linalg.norm(Lvec)
+
+            current_time = time.time()
+            dt = current_time - previous_time
+            previous_time = current_time
+
+            ddx, ddy = commanded_msg.gx, commanded_msg.gy
+
+            hat_thetak, hat_Pk, zk = ekf(Lvec, np.array(
+                [ddx, ddy]), hat_Pk, hat_thetak, q1, Lhat, dt)
+
+            th, phi, dth, dphi, _, _ = hat_thetak
+            msg = JointState()
+            msg.header.stamp = points_msg.header.stamp
+            msg.name = ['phix_joint', 'phiy_joint']
+            msg.position = [th, phi, zk[0], zk[1]]
+            msg.velocity = [dth, dphi, 0.0, 0.0]
+            msg.effort = [zk[0], zk[1]]
+
+            pendulum_pub.publish(msg)
+
     
 def main():
     rospy.init_node('crane_vision_node')
 
     points_sub = message_filters.Subscriber('/crane_vision_nodelet/points', CranePendulumImagePoints)
     joint_state_sub = message_filters.Subscriber('/crane_state_controller/joint_states', JointState)
-    commanded_sub = message_filters.Subscriber(
+
+    points_sub2 = message_filters.Subscriber('/crane_vision_nodelet/points', CranePendulumImagePoints)
+    joint_state_sub2 = message_filters.Subscriber('/crane_state_controller/joint_states', JointState)
+    commanded_sub2 = message_filters.Subscriber(
         '/lyapunov_pendulum_damping_controller/commanded', CraneControl)
 
-    ts = message_filters.ApproximateTimeSynchronizer([points_sub, joint_state_sub, commanded_sub], queue_size=10, slop=0.01)
+    init_ts = message_filters.ApproximateTimeSynchronizer([points_sub, joint_state_sub], queue_size=10, slop=0.01)
+    init_ts.registerCallback(init_callback)
+
+    ts = message_filters.ApproximateTimeSynchronizer([points_sub2, joint_state_sub2, commanded_sub2], queue_size=10, slop=0.01)
     ts.registerCallback(callback)
 
     rospy.spin()

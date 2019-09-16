@@ -20,6 +20,7 @@ class CraneNMPCNodelet : public nodelet::Nodelet
 
   std::unique_ptr<realtime_tools::RealtimePublisher<crane_msgs::CraneControl>> command_pub_;
   ros::Subscriber state_sub_;
+  ros::Subscriber init_state_sub_;
   ros::Subscriber trajectory_point_sub_;
   realtime_tools::RealtimeBuffer<crane_msgs::CraneState> state_buffer_;
   realtime_tools::RealtimeBuffer<crane_msgs::CraneTrajectoryPoint> trajectory_buffer_;
@@ -43,6 +44,11 @@ class CraneNMPCNodelet : public nodelet::Nodelet
 
   void stateCB(const crane_msgs::CraneState::ConstPtr& msg)
   {
+    state_buffer_.writeFromNonRT(*msg);
+  }
+
+  void initStateCB(const crane_msgs::CraneState::ConstPtr& msg)
+  {
     if (!initialized_)
     {
       crane_msgs::CraneTrajectoryPoint trajectory_point;
@@ -52,9 +58,12 @@ class CraneNMPCNodelet : public nodelet::Nodelet
       trajectory_point.velocity.push_back(msg->dy);
       trajectory_buffer_.writeFromNonRT(trajectory_point);
 
+      state_buffer_.writeFromNonRT(*msg);
+
       initialized_ = true;
+
+      ROS_INFO("MPC: Initialized");
     }
-    state_buffer_.writeFromNonRT(*msg);
   }
 
   void trajectoryCB(const crane_msgs::CraneTrajectoryPoint::ConstPtr& msg)
@@ -71,6 +80,9 @@ void CraneNMPCNodelet::onInit()
   command_pub_.reset(new realtime_tools::RealtimePublisher<crane_msgs::CraneControl>(private_nh, "command", 3));
   state_sub_ = nh.subscribe<crane_msgs::CraneState>("/lyapunov_pendulum_damping_controller/state", 1,
                                                     &CraneNMPCNodelet::stateCB, this);
+
+  init_state_sub_ = nh.subscribe<crane_msgs::CraneState>("/crane_state_controller/crane_states", 1,
+                                                         &CraneNMPCNodelet::initStateCB, this);
 
   trajectory_point_sub_ =
       nh.subscribe<crane_msgs::CraneTrajectoryPoint>("/crane_trajectory", 1, &CraneNMPCNodelet::trajectoryCB, this);

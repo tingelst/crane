@@ -48,6 +48,7 @@ public:
   bool init(hardware_interface::RobotHW* robot_hardware, ros::NodeHandle& node_handle) override;
   void update(const ros::Time&, const ros::Duration& period) override;
   void starting(const ros::Time&) override;
+  void stopping(const ros::Time&) override;
 
 private:
   crane_hw_interface::CraneTipVelocityCommandInterface* crane_tip_velocity_command_interface_;

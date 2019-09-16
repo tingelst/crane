@@ -101,7 +101,7 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
   double Tv = 0.2;
   double dwx = ux + gx;
   double dwy = uy + gy;
-  double wx = dwx * period.toSec() + last_wx_; 
+  double wx = dwx * period.toSec() + last_wx_;
   double wy = dwy * period.toSec() + last_wy_;
   double ddx0 = (wx - dx0_) / Tv;
   double ddy0 = (wy - dy0_) / Tv;
@@ -122,6 +122,19 @@ void LyapunovPendulumDampingController::update(const ros::Time& now, const ros::
   }
 
   crane_tip_velocity_handle_.setCommand({ dx0_, dy0_ });
+}
+
+void LyapunovPendulumDampingController::stopping(const ros::Time& now)
+{
+  if (command_pub_->trylock())
+  {
+    command_pub_->msg_.header.stamp = now;
+    command_pub_->msg_.gx = 0.0;
+    command_pub_->msg_.gy = 0.0;
+    command_pub_->unlockAndPublish();
+  }
+
+  crane_tip_velocity_handle_.setCommand({ 0.0, 0.0 });
 }
 
 }  // namespace crane_controllers
